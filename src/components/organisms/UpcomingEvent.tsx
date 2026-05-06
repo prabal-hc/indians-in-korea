@@ -323,7 +323,7 @@ export const UpcomingEvent = ({
 }: UpcomingEventProps) => {
   return (
     <section className="w-full bg-slate-50/80">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 md:px-8 lg:px-10">
+      <div className="mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 px-4 py-12 sm:px-6 md:px-8 lg:px-10">
         {/* ── Header ── */}
         <div className="flex items-end justify-between mb-6">
           <div>

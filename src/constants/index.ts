@@ -29,7 +29,7 @@ export const HERO_CONSTANTS = {
   headline: "Connecting Indians Across Korea",
   highlightWord: "Indians",
   description:
-    "Bridging cultures and communities. Join a vibrant ecosystem of students, professionals, and families thriving in the Land of the Morning Calm.",
+    "Indians in Korea (IIK) community started since 2002, is a non-profit organization with over 12,000 members which mainly includes Indians living in Korea and Koreans who are interested in India or Indian community.",
   primaryCta: {
     label: "Explore Events",
     href: EXTERNAL_LINKS.exploreEvents,
