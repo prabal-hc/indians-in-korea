@@ -46,21 +46,21 @@ export const HERO_CONSTANTS = {
   ],
   floatingCards: [
     {
-      id: "live-connections",
+      id: 1,
       title: "Live Connections",
       subtitle: "842 online now",
       icon: "🌐",
       position: "top-right",
     },
     {
-      id: "bengali-assoc",
+      id: 2,
       title: "Bengali Association",
       subtitle: "Cultural",
       icon: "🎭",
       position: "middle-right",
     },
     {
-      id: "tamil-nanbargal",
+      id: 3,
       title: "Tamil Nanbargal",
       subtitle: "Social",
       icon: "👥",
