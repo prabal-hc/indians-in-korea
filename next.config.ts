@@ -2,6 +2,7 @@
 const nextConfig = {
   images: {
     domains: ["indiansinkorea.com"],
+    unoptimized: true,
   },
 };
 

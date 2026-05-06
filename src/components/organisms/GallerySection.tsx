@@ -207,7 +207,7 @@ export const GallerySection = () => (
           </div>
 
           <Link
-            href="/gallery"
+            href="#"
             className="group inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-3 text-[13px] font-semibold text-white shadow-md transition-all duration-200 hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5"
           >
             Visit Gallery
@@ -278,7 +278,7 @@ export const GallerySection = () => (
           </div>
 
           <Link
-            href="/gallery"
+            href="#"
             className="group inline-flex w-fit items-center gap-2 rounded-full border border-[#FF9933]/30 bg-orange-50 px-5 py-2.5 text-[12px] font-semibold text-[#FF9933] transition-all duration-200 hover:bg-[#FF9933] hover:text-white hover:border-[#FF9933]"
           >
             Browse all photos
