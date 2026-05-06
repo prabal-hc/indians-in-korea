@@ -1,5 +1,6 @@
 import { MainLayout } from "@/components/templates";
 import {
+  AboutSection,
   CommunitySection,
   GallerySection,
   Hero,
@@ -11,6 +12,7 @@ export default function Home() {
   return (
     <MainLayout>
       <Hero />
+      <AboutSection />
       <UpcomingEvent />
       <CommunitySection />
       <GallerySection />

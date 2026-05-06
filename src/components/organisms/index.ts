@@ -2,6 +2,7 @@ export { Hero } from "./Hero";
 export { HeroText } from "./HeroText";
 export { HeroVisual } from "./HeroVisual";
 export { UpcomingEvent } from "./UpcomingEvent";
+export { AboutSection } from "./AboutSection";
 export { CommunitySection } from "./CommunitySection";
 export { GallerySection } from "./GallerySection";
 export { VoiceOfCommunitySection } from "./VoiceOfCommunitySection";

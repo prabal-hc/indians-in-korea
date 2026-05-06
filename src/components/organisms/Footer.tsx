@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const FooterSection = ({
@@ -33,12 +34,14 @@ export const Footer = () => (
           {/* Brand section */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500 text-white font-bold">
-                IIK
-              </div>
-              <span className="text-lg font-bold text-slate-900">
-                Indians in Korea
-              </span>
+              <Image
+                src="https://indiansinkorea.com/inspire/wp-content/uploads/2022/05/logo.png"
+                alt="Indians in Korea"
+                width={220}
+                height={100}
+                className="object-contain"
+                priority
+              />
             </div>
             <p className="mt-4 text-sm text-slate-600">
               Building a vibrant community of Indians across Korea since 2002.
