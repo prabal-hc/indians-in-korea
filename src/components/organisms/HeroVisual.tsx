@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 
@@ -423,231 +423,12 @@ const CyclingImage = ({
   );
 };
 
-// ─── Orbiting Avatar ──────────────────────────────────────────────────────────
-const TRAIL_LENGTH = 12;
-
-interface OrbitingAvatarProps {
-  emoji: string;
-  label: string;
-  orbitRadius: number;
-  startAngleDeg: number;
-  speedDegPerSec: number;
-  trailColor?: string;
-  zIndex?: number;
-}
-
-const OrbitingAvatar = ({
-  emoji,
-  label,
-  orbitRadius,
-  startAngleDeg,
-  speedDegPerSec,
-  trailColor = "rgba(99,153,255,0.3)",
-  zIndex = 40,
-}: OrbitingAvatarProps) => {
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const bubbleRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
-  const trailRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  const angleRef = useRef(startAngleDeg);
-  const lastTimeRef = useRef<number | null>(null);
-  const rafRef = useRef<number>(0);
-  const speedMultRef = useRef(1);
-  const historyRef = useRef<{ x: number; y: number }[]>([]);
-
-  const [hovered, setHovered] = useState(false);
-
-  useEffect(() => {
-    const tick = (now: number) => {
-      if (lastTimeRef.current === null) lastTimeRef.current = now;
-      const dt = Math.min(now - lastTimeRef.current, 50);
-      lastTimeRef.current = now;
-
-      angleRef.current += speedDegPerSec * speedMultRef.current * (dt / 1000);
-
-      const rad = (angleRef.current * Math.PI) / 180;
-      const x = Math.cos(rad) * orbitRadius;
-      const y = Math.sin(rad) * orbitRadius;
-
-      gsap.set(wrapRef.current, { x, y });
-
-      historyRef.current.unshift({ x, y });
-      if (historyRef.current.length > TRAIL_LENGTH) historyRef.current.pop();
-
-      trailRefs.current.forEach((dot, j) => {
-        const pt = historyRef.current[j];
-        if (!dot) return;
-        if (pt) {
-          dot.style.display = "block";
-          dot.style.transform = `translate(calc(${pt.x}px - 50%), calc(${pt.y}px - 50%))`;
-        } else {
-          dot.style.display = "none";
-        }
-      });
-
-      rafRef.current = requestAnimationFrame(tick);
-    };
-
-    rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, []);
-
-  const handleMouseEnter = () => {
-    setHovered(true);
-    speedMultRef.current = 2.5;
-    gsap.to(bubbleRef.current, {
-      scale: 1.25,
-      duration: 0.3,
-      ease: "back.out(2)",
-    });
-    gsap.to(glowRef.current, {
-      opacity: 1,
-      scale: 1.6,
-      duration: 0.35,
-      ease: "power2.out",
-    });
-    gsap.fromTo(
-      tooltipRef.current,
-      { opacity: 0, y: 8, scale: 0.85 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "back.out(1.8)" },
-    );
-  };
-
-  const handleMouseLeave = () => {
-    setHovered(false);
-    speedMultRef.current = 1;
-    gsap.to(bubbleRef.current, {
-      scale: 1,
-      duration: 0.5,
-      ease: "elastic.out(1,0.45)",
-    });
-    gsap.to(glowRef.current, { opacity: 0, scale: 1, duration: 0.4 });
-    gsap.to(tooltipRef.current, {
-      opacity: 0,
-      y: 8,
-      scale: 0.85,
-      duration: 0.2,
-    });
-  };
-
-  return (
-    <>
-      {Array.from({ length: TRAIL_LENGTH }).map((_, j) => {
-        const size = Math.max(2, 7 - j * 0.42);
-        return (
-          <div
-            key={`trail-${emoji}-${j}`}
-            ref={(el) => {
-              trailRefs.current[j] = el;
-            }}
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              width: size,
-              height: size,
-              borderRadius: "50%",
-              background: trailColor,
-              opacity: (1 - j / TRAIL_LENGTH) * 0.55,
-              pointerEvents: "none",
-              zIndex: zIndex - 1,
-              display: "none",
-            }}
-          />
-        );
-      })}
-
-      <div
-        ref={wrapRef}
-        style={{ position: "absolute", zIndex, cursor: "pointer" }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        <div
-          ref={glowRef}
-          style={{
-            position: "absolute",
-            inset: -8,
-            borderRadius: "50%",
-            background:
-              "radial-gradient(circle, rgba(99,153,255,0.6) 0%, transparent 70%)",
-            opacity: 0,
-            pointerEvents: "none",
-            zIndex: -1,
-          }}
-        />
-        <div
-          ref={tooltipRef}
-          style={{
-            position: "absolute",
-            bottom: "calc(100% + 10px)",
-            left: "50%",
-            transform: "translateX(-50%)",
-            background: "rgba(15,15,35,0.90)",
-            color: "#fff",
-            fontSize: 11,
-            fontWeight: 700,
-            padding: "5px 12px",
-            borderRadius: 20,
-            whiteSpace: "nowrap",
-            pointerEvents: "none",
-            opacity: 0,
-            boxShadow: "0 4px 18px rgba(0,0,0,0.30)",
-            backdropFilter: "blur(8px)",
-            letterSpacing: "0.03em",
-          }}
-        >
-          {label}
-          <span
-            style={{
-              position: "absolute",
-              bottom: -5,
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: 0,
-              height: 0,
-              borderLeft: "5px solid transparent",
-              borderRight: "5px solid transparent",
-              borderTop: "5px solid rgba(15,15,35,0.90)",
-            }}
-          />
-        </div>
-        <div
-          ref={bubbleRef}
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: "50%",
-            background: hovered
-              ? "linear-gradient(135deg,#ddeeff,#ffffff)"
-              : "#ffffff",
-            boxShadow: hovered
-              ? "0 0 0 3px rgba(99,153,255,0.65), 0 8px 24px rgba(80,130,240,0.35)"
-              : "0 4px 16px rgba(0,0,0,0.15)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 24,
-            border: "2.5px solid #fff",
-            transition: "background 0.3s, box-shadow 0.3s",
-            willChange: "transform",
-          }}
-        >
-          {emoji}
-        </div>
-      </div>
-    </>
-  );
-};
-
 // ─── Config ───────────────────────────────────────────────────────────────────
 const CARD_POSITIONS = [
-  { x: 195, y: -160, type: "card", cardIdx: 0 },
+  { x: 140, y: -160, type: "card", cardIdx: 0 },
   { x: 170, y: -75, type: "card", cardIdx: 1 },
   { x: 325, y: 5, type: "icon" },
-  { x: -65, y: 210, type: "card", cardIdx: 2 },
+  { x: -65, y: 190, type: "card", cardIdx: 2 },
 ];
 
 const defaultCards = [
@@ -666,80 +447,64 @@ const defaultCards = [
   { id: 3, title: "Tamil Nanbargal", subtitle: "Social", icon: <GroupIcon /> },
 ];
 
-const ORBIT_AVATARS: OrbitingAvatarProps[] = [
-  {
-    emoji: "🧑‍💼",
-    label: "Professional",
-    orbitRadius: 150,
-    startAngleDeg: 0,
-    speedDegPerSec: 28,
-    trailColor: "rgba(99,153,255,0.32)",
-  },
-  {
-    emoji: "👩‍🎓",
-    label: "Student",
-    orbitRadius: 150,
-    startAngleDeg: 180,
-    speedDegPerSec: 28,
-    trailColor: "rgba(160,99,255,0.32)",
-  },
-  {
-    emoji: "👨‍💻",
-    label: "Developer",
-    orbitRadius: 190,
-    startAngleDeg: 90,
-    speedDegPerSec: -20,
-    trailColor: "rgba(50,190,150,0.32)",
-  },
-  {
-    emoji: "🎨",
-    label: "Designer",
-    orbitRadius: 190,
-    startAngleDeg: 270,
-    speedDegPerSec: -20,
-    trailColor: "rgba(240,140,80,0.32)",
-  },
-];
-
 // ─── Default images — replace with your actual paths ─────────────────────────
 const defaultImages = [
   "/images/city_lights.jpg",
   "/images/gallery_pic5.jpg",
-  "/images/city_lights_3.jpg",
-  "/images/gallery_pic5.jpg",
+  "/images/gallery_pic1.jpg",
+  "/images/gallery_pic8.jpg",
 ];
 
 interface HeroVisualProps {
   images?: string[]; // array of image paths to cycle through
-  imageSrc?: string; // fallback single image (ignored when images is provided)
-  floatingCards?: {
-    id: number;
-    title: string;
-    subtitle?: string;
-    icon: React.ReactNode;
-  }[];
+  floatingCards?: typeof defaultCards;
   imageIntervalMs?: number; // how fast to cycle, default 2000ms
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const HeroVisual = ({
   images,
-  imageSrc = "/images/city_lights.jpg",
   floatingCards = defaultCards,
   imageIntervalMs = 2000,
 }: HeroVisualProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const elementRefs = useRef<(HTMLDivElement | null)[]>([]);
   const basePositions = useRef<{ x: number; y: number }[]>([]);
+  const [circleSize, setCircleSize] = useState(360);
 
-  const CIRCLE_SIZE = 360;
+  const scale = circleSize / 360;
+  const scaledCardPositions = useMemo(
+    () =>
+      CARD_POSITIONS.map((pos) => ({
+        ...pos,
+        x: pos.x * scale,
+        y: pos.y * scale,
+      })),
+    [scale],
+  );
 
   // Resolve which images array to use
   const resolvedImages = images && images.length > 0 ? images : defaultImages;
 
   useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+
+    const updateSize = () => {
+      const width = element.clientWidth;
+      const nextSize = Math.min(Math.max(width, 280), 900);
+      setCircleSize(nextSize);
+    };
+
+    updateSize();
+    const resizeObserver = new ResizeObserver(updateSize);
+    resizeObserver.observe(element);
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  useEffect(() => {
     const ctx = gsap.context(() => {
-      CARD_POSITIONS.forEach((pos, i) => {
+      scaledCardPositions.forEach((pos, i) => {
         const el = elementRefs.current[i];
         if (!el) return;
         basePositions.current[i] = { x: pos.x, y: pos.y };
@@ -762,7 +527,7 @@ export const HeroVisual = ({
       });
     }, containerRef);
     return () => ctx.revert();
-  }, []);
+  }, [scaledCardPositions]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -809,7 +574,7 @@ export const HeroVisual = ({
           key={`card-${i}`}
           ref={ref}
           className="absolute will-change-transform"
-          style={{ zIndex: 40 }}
+          style={{ zIndex: 100 }}
         >
           <FloatingCard
             title={card.title}
@@ -837,23 +602,19 @@ export const HeroVisual = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[480px] md:h-[540px] flex items-center justify-center"
+      className="relative w-full max-w-[560px] sm:max-w-[620px] lg:max-w-[800px] xl:max-w-[1040px] mx-auto aspect-square flex items-center justify-center"
       style={{ overflow: "visible" }}
     >
-      <AnimatedRings size={CIRCLE_SIZE} />
+      <AnimatedRings size={circleSize} />
 
       {/* Cycling image — replaces the static <Image> */}
       <CyclingImage
         images={resolvedImages}
-        size={CIRCLE_SIZE}
+        size={circleSize}
         intervalMs={imageIntervalMs}
       />
 
-      {ORBIT_AVATARS.map((av, i) => (
-        <OrbitingAvatar key={`av-${i}`} {...av} />
-      ))}
-
-      {CARD_POSITIONS.map((pos, i) => renderCard(pos, i))}
+      {scaledCardPositions.map((pos, i) => renderCard(pos, i))}
     </div>
   );
 };

@@ -374,7 +374,7 @@ export const CommunitySection = () => (
 
           {/* Show all button */}
           <Link
-            href="/communities"
+            href="#"
             className="mt-2 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-[12px] font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:border-[#FF9933]/60 hover:bg-orange-50 hover:text-[#FF9933]"
           >
             View all communities
@@ -424,7 +424,7 @@ export const CommunitySection = () => (
         </div>
 
         <Link
-          href="/communities"
+          href="#"
           className="inline-flex items-center gap-2 rounded-full bg-[#FF9933] px-5 py-2.5 text-[12px] font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#e8821f] hover:shadow-md"
         >
           Explore all groups
