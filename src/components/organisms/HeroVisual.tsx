@@ -457,7 +457,12 @@ const defaultImages = [
 
 interface HeroVisualProps {
   images?: string[]; // array of image paths to cycle through
-  floatingCards?: typeof defaultCards;
+  floatingCards?: {
+    id: number;
+    title: string;
+    subtitle?: string;
+    icon: React.ReactNode;
+  }[];
   imageIntervalMs?: number; // how fast to cycle, default 2000ms
 }
 
