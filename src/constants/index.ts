@@ -14,7 +14,7 @@ export const EXTERNAL_LINKS = {
   learning:
     "https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app",
   exploreEvents: "/events",
-  ourMission: "/mission",
+  ourMission: "/about",
 };
 
 // App Constants

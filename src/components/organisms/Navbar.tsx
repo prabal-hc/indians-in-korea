@@ -3,12 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Search } from "lucide-react";
 
 const navItems = [
   { name: "Home", href: "/" },
-  { name: "About IIK", href: "/" },
-  { name: "Community", href: "#" },
+  { name: "About Us", href: "/about" },
+  { name: "Community", href: "/community" },
   { name: "Events", href: "#" },
   { name: "Resources", href: "#" },
   { name: "Blog", href: "#" },
@@ -17,7 +18,10 @@ const navItems = [
 ];
 
 const Navbar = () => {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  const isActive = (href: string) => href !== "#" && pathname === href;
 
   return (
     <nav className="w-full sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b">
@@ -35,30 +39,33 @@ const Navbar = () => {
         </h1>
         {/* CENTER: NAV LINKS */}
         <ul className="hidden lg:flex items-center gap-8 text-sm font-medium">
-          {navItems.map((item, index) => (
-            <li key={item.name}>
-              <Link
-                href={item.href}
-                className={`relative transition ${
-                  index === 0
-                    ? "text-orange-500"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                {item.name}
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <li key={item.name}>
+                <Link
+                  href={item.href}
+                  className={`relative transition ${
+                    active
+                      ? "text-orange-500"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                  aria-current={active ? "page" : undefined}
+                >
+                  {item.name}
 
-                {/* ACTIVE UNDERLINE */}
-                {index === 0 && (
-                  <span className="absolute left-0 -bottom-1 w-full h-[2px] bg-orange-500 rounded" />
-                )}
-              </Link>
-            </li>
-          ))}
+                  {active && (
+                    <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 rounded" />
+                  )}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
         {/* RIGHT: SEARCH + BUTTON */}
         <div className="hidden lg:flex items-center gap-4">
           {/* SEARCH */}
-          <div className="relative w-[240px] lg:w-[280px]">
+          <div className="relative w-60 lg:w-70">
             <Search
               size={18}
               className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
@@ -69,7 +76,7 @@ const Navbar = () => {
               placeholder="Search community..."
               className="
       w-full
-      h-[44px]
+      h-11
       pl-12 pr-4
       rounded-full
       bg-gray-100/80

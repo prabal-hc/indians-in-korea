@@ -4,7 +4,40 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 
-// ─── FloatingCard ─────────────────────────────────────────────────────────────
+// ─── Flash News Icons ─────────────────────────────────────────────────────────
+const MegaphoneIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M3 11v2a1 1 0 001 1h1l2 4h2l-1-4h8l2 2V7l-2 2H8L6 7H4a1 1 0 00-1 1v1"
+      stroke="white"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const NewsIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+    <rect
+      x="3"
+      y="4"
+      width="18"
+      height="16"
+      rx="2"
+      stroke="#0ea5e9"
+      strokeWidth="1.8"
+    />
+    <path
+      d="M7 8h10M7 12h6M7 16h4"
+      stroke="#0ea5e9"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+// ─── FloatingCard (kept for fallback) ────────────────────────────────────────
 const FloatingCard = ({
   title,
   subtitle,
@@ -61,6 +94,7 @@ const LiveConnectionIcon = () => (
     <line x1="12" y1="12" x2="19" y2="16" stroke="#22c55e" strokeWidth="1.5" />
   </svg>
 );
+
 const AssociationIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
     <rect
@@ -81,6 +115,7 @@ const AssociationIcon = () => (
     />
   </svg>
 );
+
 const GroupIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
     <circle cx="9" cy="7" r="3" stroke="#6366f1" strokeWidth="1.8" />
@@ -99,6 +134,7 @@ const GroupIcon = () => (
     />
   </svg>
 );
+
 const GraduationIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
     <path
@@ -114,6 +150,287 @@ const GraduationIcon = () => (
       strokeLinecap="round"
     />
   </svg>
+);
+
+// ─── Live Pulse Dot ───────────────────────────────────────────────────────────
+const LiveDot = ({ color = "#ef4444" }: { color?: string }) => (
+  <span
+    style={{
+      position: "relative",
+      display: "inline-flex",
+      width: 10,
+      height: 10,
+      flexShrink: 0,
+    }}
+  >
+    <span
+      style={{
+        position: "absolute",
+        inset: 0,
+        borderRadius: "50%",
+        background: color,
+        opacity: 0.5,
+        animation: "livePing 1.4s ease-in-out infinite",
+      }}
+    />
+    <span
+      style={{
+        position: "relative",
+        borderRadius: "50%",
+        width: 10,
+        height: 10,
+        background: color,
+        flexShrink: 0,
+      }}
+    />
+    <style>{`
+      @keyframes livePing {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(2.2); opacity: 0; }
+      }
+    `}</style>
+  </span>
+);
+
+// ─── Flash News Card (top right) ─────────────────────────────────────────────
+const FlashNewsCard = ({
+  headline,
+  tag,
+}: {
+  headline: string;
+  tag: string;
+}) => (
+  <div
+    style={{
+      background: "white",
+      borderRadius: 16,
+      boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+      border: "1px solid rgba(249,115,22,0.18)",
+      padding: "10px 14px 10px 17px",
+      minWidth: 210,
+      maxWidth: 250,
+      position: "relative",
+      overflow: "hidden",
+    }}
+  >
+    {/* Left accent bar */}
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: 3,
+        background: "linear-gradient(180deg, #f97316, #ef4444)",
+        borderRadius: "16px 0 0 16px",
+      }}
+    />
+    {/* Top row */}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        marginBottom: 7,
+      }}
+    >
+      <span
+        style={{
+          background: "#ef4444",
+          color: "white",
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: "0.08em",
+          padding: "2px 7px",
+          borderRadius: 4,
+          fontFamily: "system-ui, sans-serif",
+          lineHeight: 1.6,
+        }}
+      >
+        ⚡ FLASH
+      </span>
+      <LiveDot color="#ef4444" />
+      <span
+        style={{
+          fontSize: 10,
+          color: "#94a3b8",
+          marginLeft: "auto",
+          fontFamily: "system-ui, sans-serif",
+        }}
+      >
+        {tag}
+      </span>
+    </div>
+    {/* Headline */}
+    <p
+      style={{
+        margin: 0,
+        fontSize: 12,
+        fontWeight: 600,
+        color: "#1e293b",
+        lineHeight: 1.45,
+        fontFamily: "system-ui, sans-serif",
+      }}
+    >
+      {headline}
+    </p>
+  </div>
+);
+
+// ─── Ticker Card (mid right) ──────────────────────────────────────────────────
+const TickerCard = ({ items }: { items: string[] }) => {
+  const [idx, setIdx] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIdx((i) => (i + 1) % items.length);
+        setVisible(true);
+      }, 350);
+    }, 3000);
+    return () => clearInterval(t);
+  }, [items.length]);
+
+  return (
+    <div
+      style={{
+        background: "white",
+        borderRadius: 14,
+        boxShadow: "0 8px 28px rgba(0,0,0,0.10)",
+        border: "1px solid rgba(99,102,241,0.18)",
+        padding: "9px 13px",
+        minWidth: 190,
+        maxWidth: 230,
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          marginBottom: 6,
+        }}
+      >
+        <div
+          style={{
+            background: "#6366f1",
+            borderRadius: 6,
+            width: 22,
+            height: 22,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
+          <MegaphoneIcon />
+        </div>
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: "#6366f1",
+            letterSpacing: "0.06em",
+            fontFamily: "system-ui, sans-serif",
+          }}
+        >
+          IIK UPDATES
+        </span>
+        <LiveDot color="#6366f1" />
+      </div>
+      {/* Cycling text */}
+      <div
+        style={{
+          fontSize: 11.5,
+          color: "#334155",
+          lineHeight: 1.45,
+          fontFamily: "system-ui, sans-serif",
+          fontWeight: 500,
+          minHeight: 34,
+          transition: "opacity 0.35s ease",
+          opacity: visible ? 1 : 0,
+        }}
+      >
+        {items[idx]}
+      </div>
+      {/* Dot indicators */}
+      <div style={{ display: "flex", gap: 4, marginTop: 7 }}>
+        {items.map((_, i) => (
+          <div
+            key={i}
+            style={{
+              height: 3,
+              width: i === idx ? 18 : 6,
+              borderRadius: 2,
+              background: i === idx ? "#6366f1" : "#e2e8f0",
+              transition: "all 0.35s ease",
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ─── Breaking Card (bottom left) ─────────────────────────────────────────────
+const BreakingCard = ({ text }: { text: string }) => (
+  <div
+    style={{
+      background: "white",
+      borderRadius: 14,
+      boxShadow: "0 8px 28px rgba(0,0,0,0.10)",
+      border: "1px solid rgba(14,165,233,0.18)",
+      padding: "9px 13px",
+      minWidth: 175,
+      maxWidth: 215,
+    }}
+  >
+    <div
+      style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}
+    >
+      <div
+        style={{
+          background: "#f0f9ff",
+          borderRadius: 6,
+          width: 22,
+          height: 22,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <NewsIcon />
+      </div>
+      <span
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          color: "#0ea5e9",
+          letterSpacing: "0.05em",
+          fontFamily: "system-ui, sans-serif",
+        }}
+      >
+        BREAKING
+      </span>
+      <LiveDot color="#0ea5e9" />
+    </div>
+    <p
+      style={{
+        margin: 0,
+        fontSize: 11.5,
+        color: "#1e293b",
+        lineHeight: 1.4,
+        fontFamily: "system-ui, sans-serif",
+        fontWeight: 500,
+      }}
+    >
+      {text}
+    </p>
+  </div>
 );
 
 // ─── Animated Rings ───────────────────────────────────────────────────────────
@@ -304,11 +621,10 @@ const CyclingImage = ({
     if (images.length <= 1) return;
 
     const timer = setInterval(() => {
-      const nextIdx = (current + 1) % images.length; // keep cycling in loop
+      const nextIdx = (current + 1) % images.length;
       setNext(nextIdx);
       setFading(true);
 
-      // Animate next layer in, current layer out
       gsap.set(nextLayerRef.current, { opacity: 0, scale: 1.06 });
       gsap.to(nextLayerRef.current, {
         opacity: 1,
@@ -325,12 +641,10 @@ const CyclingImage = ({
           setCurrent(nextIdx);
           setNext(null);
           setFading(false);
-          // Reset current layer for next cycle
           gsap.set(currentLayerRef.current, { opacity: 1, scale: 1 });
         },
       });
 
-      // Animate dot indicator
       dotsRef.current.forEach((dot, i) => {
         if (!dot) return;
         gsap.to(dot, {
@@ -358,9 +672,9 @@ const CyclingImage = ({
         zIndex: 30,
         boxShadow:
           "0 0 0 5px rgba(150,190,255,0.22), 0 0 0 11px rgba(130,175,240,0.10), 0 24px 60px rgba(0,0,0,0.28)",
+        transition: "width 0.4s ease, height 0.4s ease",
       }}
     >
-      {/* Current image layer */}
       <div ref={currentLayerRef} style={{ position: "absolute", inset: 0 }}>
         <Image
           src={images[current]}
@@ -371,7 +685,6 @@ const CyclingImage = ({
         />
       </div>
 
-      {/* Next image layer (only mounted when transitioning) */}
       {fading && next !== null && (
         <div
           ref={nextLayerRef}
@@ -386,7 +699,6 @@ const CyclingImage = ({
         </div>
       )}
 
-      {/* Dot indicators — bottom center inside the circle */}
       <div
         style={{
           position: "absolute",
@@ -425,10 +737,9 @@ const CyclingImage = ({
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 const CARD_POSITIONS = [
-  { x: 140, y: -160, type: "card", cardIdx: 0 },
-  { x: 170, y: -75, type: "card", cardIdx: 1 },
-  { x: 325, y: 5, type: "icon" },
-  { x: -65, y: 190, type: "card", cardIdx: 2 },
+  { x: 140, y: -165, type: "flash", cardIdx: 0 },
+  { x: 175, y: -55, type: "ticker", cardIdx: 0 },
+  { x: -90, y: 145, type: "breaking", cardIdx: 0 },
 ];
 
 const defaultCards = [
@@ -444,10 +755,30 @@ const defaultCards = [
     subtitle: "Cultural",
     icon: <AssociationIcon />,
   },
-  { id: 3, title: "Tamil Nanbargal", subtitle: "Social", icon: <GroupIcon /> },
+  {
+    id: 3,
+    title: "Tamil Nanbargal",
+    subtitle: "Social",
+    icon: <GroupIcon />,
+  },
 ];
 
-// ─── Default images — replace with your actual paths ─────────────────────────
+const FLASH_NEWS = {
+  headline:
+    "IIK hosts its biggest Diwali celebration in Seoul — 3,000 attendees!",
+  tag: "2m ago",
+};
+
+const TICKER_ITEMS = [
+  "New Kannada chapter launched in Incheon 🎉",
+  "IIK Holi Fest registrations now open!",
+  "Job fair for Indian professionals — June 14",
+  "Monthly meetup: Pangyo tech hub, Sat 6pm",
+];
+
+const BREAKING_TEXT =
+  "India–Korea cultural exchange program expanded to 5 new cities";
+
 const defaultImages = [
   "/images/city_lights.jpg",
   "/images/gallery_pic5.jpg",
@@ -455,15 +786,19 @@ const defaultImages = [
   "/images/gallery_pic8.jpg",
 ];
 
+// ─── Props ────────────────────────────────────────────────────────────────────
 interface HeroVisualProps {
-  images?: string[]; // array of image paths to cycle through
+  images?: string[];
   floatingCards?: {
     id: number;
     title: string;
     subtitle?: string;
     icon: React.ReactNode;
   }[];
-  imageIntervalMs?: number; // how fast to cycle, default 2000ms
+  imageIntervalMs?: number;
+  flashNews?: { headline: string; tag: string };
+  tickerItems?: string[];
+  breakingText?: string;
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -471,6 +806,9 @@ export const HeroVisual = ({
   images,
   floatingCards = defaultCards,
   imageIntervalMs = 2000,
+  flashNews = FLASH_NEWS,
+  tickerItems = TICKER_ITEMS,
+  breakingText = BREAKING_TEXT,
 }: HeroVisualProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const elementRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -478,6 +816,7 @@ export const HeroVisual = ({
   const [circleSize, setCircleSize] = useState(360);
 
   const scale = circleSize / 360;
+
   const scaledCardPositions = useMemo(
     () =>
       CARD_POSITIONS.map((pos) => ({
@@ -488,25 +827,23 @@ export const HeroVisual = ({
     [scale],
   );
 
-  // Resolve which images array to use
   const resolvedImages = images && images.length > 0 ? images : defaultImages;
 
+  // ── Responsive size via ResizeObserver ────────────────────────────────────
   useEffect(() => {
     const element = containerRef.current;
     if (!element) return;
-
     const updateSize = () => {
       const width = element.clientWidth;
-      const nextSize = Math.min(Math.max(width, 280), 900);
-      setCircleSize(nextSize);
+      setCircleSize(Math.min(Math.max(width, 280), 900));
     };
-
     updateSize();
-    const resizeObserver = new ResizeObserver(updateSize);
-    resizeObserver.observe(element);
-    return () => resizeObserver.disconnect();
+    const ro = new ResizeObserver(updateSize);
+    ro.observe(element);
+    return () => ro.disconnect();
   }, []);
 
+  // ── Card entrance + float animations ─────────────────────────────────────
   useEffect(() => {
     const ctx = gsap.context(() => {
       scaledCardPositions.forEach((pos, i) => {
@@ -534,6 +871,7 @@ export const HeroVisual = ({
     return () => ctx.revert();
   }, [scaledCardPositions]);
 
+  // ── Mouse parallax ────────────────────────────────────────────────────────
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -567,38 +905,47 @@ export const HeroVisual = ({
     return () => container.removeEventListener("mousemove", handleMove);
   }, []);
 
-  const renderCard = (pos: (typeof CARD_POSITIONS)[0], i: number) => {
+  // ── Render cards ──────────────────────────────────────────────────────────
+  const renderCard = (pos: (typeof scaledCardPositions)[0], i: number) => {
     const ref = (el: HTMLDivElement | null) => {
       elementRefs.current[i] = el;
     };
+
+    const wrapper = (children: React.ReactNode) => (
+      <div
+        key={`card-${i}`}
+        ref={ref}
+        className="absolute will-change-transform"
+        style={{ zIndex: 100 }}
+      >
+        {children}
+      </div>
+    );
+
+    if (pos.type === "flash")
+      return wrapper(
+        <FlashNewsCard headline={flashNews.headline} tag={flashNews.tag} />,
+      );
+    if (pos.type === "ticker")
+      return wrapper(<TickerCard items={tickerItems} />);
+    if (pos.type === "breaking")
+      return wrapper(<BreakingCard text={breakingText} />);
+
+    // Fallback: original FloatingCard / IconBubble
     if (pos.type === "card") {
       const card = floatingCards[pos.cardIdx!];
       if (!card) return null;
-      return (
-        <div
-          key={`card-${i}`}
-          ref={ref}
-          className="absolute will-change-transform"
-          style={{ zIndex: 100 }}
-        >
-          <FloatingCard
-            title={card.title}
-            subtitle={card.subtitle}
-            icon={card.icon}
-          />
-        </div>
+      return wrapper(
+        <FloatingCard
+          title={card.title}
+          subtitle={card.subtitle}
+          icon={card.icon}
+        />,
       );
     }
     if (pos.type === "icon") {
-      return (
-        <div
-          key={`card-${i}`}
-          ref={ref}
-          className="absolute will-change-transform"
-          style={{ zIndex: 40 }}
-        >
-          <IconBubble icon={<GraduationIcon />} color="text-blue-400" />
-        </div>
+      return wrapper(
+        <IconBubble icon={<GraduationIcon />} color="text-blue-400" />,
       );
     }
     return null;
@@ -607,12 +954,11 @@ export const HeroVisual = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full max-w-[560px] sm:max-w-[620px] lg:max-w-[800px] xl:max-w-[1040px] mx-auto aspect-square flex items-center justify-center"
+      className="relative w-full max-w-[380px] sm:max-w-[450px] lg:max-w-[560px] xl:max-w-[720px] pt-10 mx-auto aspect-square flex items-center justify-center"
       style={{ overflow: "visible" }}
     >
       <AnimatedRings size={circleSize} />
 
-      {/* Cycling image — replaces the static <Image> */}
       <CyclingImage
         images={resolvedImages}
         size={circleSize}

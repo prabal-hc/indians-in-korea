@@ -3,6 +3,8 @@ export { HeroText } from "./HeroText";
 export { HeroVisual } from "./HeroVisual";
 export { UpcomingEvent } from "./UpcomingEvent";
 export { AboutSection } from "./AboutSection";
+export { AboutPageContent } from "./AboutPageContent";
+export { CommunityPageContent } from "./CommunityPageContent";
 export { CommunitySection } from "./CommunitySection";
 export { GallerySection } from "./GallerySection";
 export { VoiceOfCommunitySection } from "./VoiceOfCommunitySection";
