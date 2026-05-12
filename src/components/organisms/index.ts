@@ -6,6 +6,7 @@ export { AboutSection } from "./AboutSection";
 export { AboutPageContent } from "./AboutPageContent";
 export { default as CommunityPageContent } from "./CommunityPageContent";
 export { default as EventsPageContent } from "./EventsPageContent";
+export { default as ResourcesPageContent } from "./ResourcesPageContent";
 export { CommunitySection } from "./CommunitySection";
 export { GallerySection } from "./GallerySection";
 export { VoiceOfCommunitySection } from "./VoiceOfCommunitySection";
