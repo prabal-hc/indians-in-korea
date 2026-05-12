@@ -77,7 +77,9 @@ const TiltCard = ({
         transition: isHovered
           ? "transform 0.08s ease-out"
           : "transform 0.5s ease-out",
-        animationDelay: delays[index],
+        animation: `cardReveal 0.6s ease ${delays[index]} forwards`,
+        opacity: 0,
+        animationFillMode: 'forwards'
       }}
       className="gallery-card group relative cursor-pointer overflow-hidden rounded-[28px] border border-slate-100 bg-white shadow-md shadow-slate-200/60"
     >
@@ -304,7 +306,6 @@ export const GallerySection = () => (
     <style>{`
       .gallery-card {
         opacity: 0;
-        animation: cardReveal 0.6s ease forwards;
       }
       @keyframes cardReveal {
         from { opacity: 0; transform: translateY(20px) scale(0.97); }

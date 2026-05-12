@@ -213,7 +213,10 @@ export const HeroText: React.FC<HeroTextProps> = ({
         className="relative w-fit"
         style={{
           zIndex: 1,
-          animation: inView ? "badgeFloat 3.5s ease-in-out infinite" : "none",
+          animationName: inView ? "badgeFloat" : "none",
+          animationDuration: inView ? "3.5s" : "0s",
+          animationTimingFunction: "ease-in-out",
+          animationIterationCount: inView ? "infinite" : "1",
           animationDelay: "0.8s",
         }}
       >
@@ -223,7 +226,10 @@ export const HeroText: React.FC<HeroTextProps> = ({
             background:
               "linear-gradient(135deg, #fff7ed 0%, #ffedd5 60%, #fed7aa 100%)",
             border: "1px solid rgba(249,115,22,0.22)",
-            animation: inView ? "glowPulse 3s ease-in-out infinite" : "none",
+            animationName: inView ? "glowPulse" : "none",
+            animationDuration: inView ? "3s" : "0s",
+            animationTimingFunction: "ease-in-out",
+            animationIterationCount: inView ? "infinite" : "1",
             animationDelay: "1s",
           }}
           whileHover={{
@@ -239,7 +245,10 @@ export const HeroText: React.FC<HeroTextProps> = ({
             style={{
               background:
                 "linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)",
-              animation: "shimmerSweep 2.8s ease-in-out infinite",
+              animationName: "shimmerSweep",
+              animationDuration: "2.8s",
+              animationTimingFunction: "ease-in-out",
+              animationIterationCount: "infinite",
               animationDelay: "1.2s",
             }}
           />
@@ -247,9 +256,10 @@ export const HeroText: React.FC<HeroTextProps> = ({
           <span
             className="text-base sm:text-lg text-orange-500 relative z-10"
             style={{
-              animation: inView
-                ? "iconPulse 2.6s ease-in-out infinite"
-                : "none",
+              animationName: inView ? "iconPulse" : "none",
+              animationDuration: inView ? "2.6s" : "0s",
+              animationTimingFunction: "ease-in-out",
+              animationIterationCount: inView ? "infinite" : "1",
               animationDelay: "0.9s",
               display: "inline-block",
             }}

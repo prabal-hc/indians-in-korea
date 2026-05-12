@@ -254,15 +254,24 @@ const CommunityCard = ({
   isLarge: boolean;
 }) => {
   const [hovered, setHovered] = useState(false);
+  const delayClasses = [
+    "delay-08",
+    "delay-18",
+    "delay-28",
+    "delay-38",
+    "delay-48",
+    "delay-58",
+    "delay-68",
+    "delay-78",
+  ];
+  const delayClass = delayClasses[index % delayClasses.length];
+
   return (
     <div
-      className={`relative rounded-2xl border-[1.5px] bg-white overflow-hidden cursor-pointer transition-all duration-280 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-lg hover:-translate-y-1 animate-card-in ${isLarge ? "md:col-span-2" : ""}`}
-      style={
-        {
-          borderColor: community.borderColor,
-          animationDelay: `${0.08 + index * 0.1}s`,
-        } as React.CSSProperties
-      }
+      className={`relative rounded-2xl border-[1.5px] bg-white overflow-hidden cursor-pointer transition-all duration-280 shadow-[0_2px_12px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-lg hover:-translate-y-1 animate-card-in ${delayClass} ${isLarge ? "md:col-span-2" : ""}`}
+      style={{
+        borderColor: community.borderColor,
+      }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -482,6 +491,16 @@ export default function CommunitiesPage() {
           opacity: 0;
           animation-fill-mode: forwards;
         }
+
+        .delay-08 { animation-delay: 0.08s; }
+        .delay-12 { animation-delay: 0.12s; }
+        .delay-18 { animation-delay: 0.18s; }
+        .delay-20 { animation-delay: 0.20s; }
+        .delay-28 { animation-delay: 0.28s; }
+        .delay-32 { animation-delay: 0.32s; }
+        .delay-38 { animation-delay: 0.38s; }
+        .delay-48 { animation-delay: 0.48s; }
+        .delay-58 { animation-delay: 0.58s; }
       `}</style>
 
       {/* Background texture */}
@@ -496,44 +515,32 @@ export default function CommunitiesPage() {
       </div>
 
       {/* Hero */}
-      <div className="relative z-10 pt-18 px-6 pb-13 text-center max-w-3xl mx-auto">
+      <div className="relative z-10 pt-30 px-6 pb-13 text-center max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-[1.5px] bg-orange-50 border-orange-300 text-orange-800 text-xs font-bold uppercase tracking-widest mb-6 animate-fade-down">
           <div className="w-1.5 h-1.5 rounded-full bg-orange-600 animate-pulse-dot" />
           Regional Showcase · Indians in Korea
         </div>
 
-        <div
-          className="flex w-12 h-1 rounded mx-auto mb-5.5 overflow-hidden animate-fade-up"
-          style={{ animationDelay: "0.08s" }}
-        >
+        <div className="flex w-12 h-1 rounded mx-auto mb-5.5 overflow-hidden animate-fade-up delay-08">
           <div className="flex-1 bg-orange-600" />
           <div className="flex-1 bg-stone-200" />
           <div className="flex-1 bg-green-600" />
         </div>
 
-        <h1
-          className="font-playfair text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter leading-tight text-stone-900 mb-5 animate-fade-up"
-          style={{ animationDelay: "0.12s" }}
-        >
+        <h1 className="font-playfair text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter leading-tight text-stone-900 mb-5 animate-fade-up delay-12">
           Indian <span className="text-orange-600">Communities</span>
           <br />
           in <span className="text-green-600">Korea</span>
         </h1>
 
-        <p
-          className="text-sm leading-relaxed text-stone-600 max-w-md mx-auto mb-9 animate-fade-up"
-          style={{ animationDelay: "0.2s" }}
-        >
+        <p className="text-sm leading-relaxed text-stone-600 max-w-md mx-auto mb-9 animate-fade-up delay-20">
           Showcasing the diverse Indian regional communities in Korea that bring
           people together through culture, language, shared experiences, and
           mutual support.
         </p>
 
         {/* Hero inline stats */}
-        <div
-          className="flex flex-wrap gap-0 justify-center border-t-[1.5px] border-stone-200 pt-7 mt-1 animate-fade-up"
-          style={{ animationDelay: "0.28s" }}
-        >
+        <div className="flex flex-wrap gap-0 justify-center border-t-[1.5px] border-stone-200 pt-7 mt-1 animate-fade-up delay-28">
           <div className="px-7 border-r-[1.5px] border-stone-200 text-center sm:px-4">
             <div className="font-playfair text-2xl font-extrabold text-orange-600 leading-tight">
               5k+
@@ -570,10 +577,7 @@ export default function CommunitiesPage() {
       </div>
 
       {/* Filter Bar */}
-      <div
-        className="flex flex-wrap gap-2 justify-center my-12 px-6 relative z-10 animate-fade-up"
-        style={{ animationDelay: "0.32s" }}
-      >
+      <div className="flex flex-wrap gap-2 justify-center my-12 px-6 relative z-10 animate-fade-up delay-32">
         {filters.map((f) => (
           <button
             key={f}

@@ -73,8 +73,13 @@ const CommunityRow = ({
       href={community.href}
       target="_blank"
       rel="noopener noreferrer"
-      style={{ animationDelay: `${0.3 + index * 0.1}s` }}
-      className="group flex animate-fade-up items-center gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF9933]/40 hover:shadow-md opacity-0 [animation-fill-mode:forwards]"
+      style={{
+        animationDelay: `${0.3 + index * 0.1}s`,
+        animation: 'fade-up 0.6s ease both',
+        opacity: 0,
+        animationFillMode: 'forwards'
+      }}
+      className="group flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF9933]/40 hover:shadow-md"
     >
       {/* Icon */}
       <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-slate-50 text-lg">

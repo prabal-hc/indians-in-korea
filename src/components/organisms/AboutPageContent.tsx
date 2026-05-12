@@ -133,7 +133,7 @@ const stats = [
 export const AboutPageContent = () => (
   <div className="bg-white text-gray-900 font-sans antialiased">
     {/* ── Hero Section ───────────────────────────────────────────────────────── */}
-    <section className="relative overflow-hidden bg-orange-50 px-5 pt-20 pb-28 sm:px-8 lg:px-14">
+    <section className="relative overflow-hidden bg-orange-50 px-5 pt-30 pb-28 sm:px-8 lg:px-14">
       <div
         className="pointer-events-none absolute inset-0"
         style={{

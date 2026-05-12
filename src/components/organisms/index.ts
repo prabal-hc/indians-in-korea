@@ -5,6 +5,7 @@ export { UpcomingEvent } from "./UpcomingEvent";
 export { AboutSection } from "./AboutSection";
 export { AboutPageContent } from "./AboutPageContent";
 export { default as CommunityPageContent } from "./CommunityPageContent";
+export { EventsPageContent } from "./EventsPageContent";
 export { CommunitySection } from "./CommunitySection";
 export { GallerySection } from "./GallerySection";
 export { VoiceOfCommunitySection } from "./VoiceOfCommunitySection";
