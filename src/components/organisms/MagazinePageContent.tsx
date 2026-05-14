@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { ArrowRight, Download, BookOpen, Sparkles, Globe } from "lucide-react";
+import { ArrowRight, Download, BookOpen, Sparkles } from "lucide-react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28, filter: "blur(4px)" },
@@ -19,33 +19,51 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.12 } },
 };
 
-const highlightGradient =
-  "bg-linear-to-r from-orange-400 via-orange-500 to-amber-400";
-
 const magazineIssues = [
   {
-    issue: "Vol. 07",
-    title: "Voices of the Diaspora",
-    date: "April 2026",
-    badge: "Culture",
+    issue: "2021 Spring",
+    title: "IIK Magazine 2021 Spring_1.0",
+    date: "Spring 2021",
+    badge: "PDF Issue",
     description:
-      "Stories that spotlight Indian creatives, leaders, and changemakers in Korea.",
+      "Download or preview the Spring 2021 edition of IIK Magazine from the official archive.",
+    url: "https://indiansinkorea.com/inspire/wp-content/uploads/2022/05/IIK-Magazine-2021-Spring_1.0.pdf",
   },
   {
-    issue: "Vol. 06",
-    title: "Innovation & Impact",
-    date: "February 2026",
-    badge: "Community",
+    issue: "2017 v03",
+    title: "IIK Magazine 2017 v03 A3",
+    date: "2017",
+    badge: "PDF Issue",
     description:
-      "A closer look at projects, clubs, and collective actions shaping today's Indian-Korean exchange.",
+      "Read the 2017 volume 03 issue with community stories, events, and archives.",
+    url: "https://indiansinkorea.com/inspire/wp-content/uploads/2022/05/IIK-Magazine-2017-v03-A3.pdf",
   },
   {
-    issue: "Vol. 05",
-    title: "Food, Festivals & Future",
-    date: "December 2025",
-    badge: "Lifestyle",
+    issue: "2015 v10",
+    title: "IIK Magazine 2015 v10",
+    date: "2015",
+    badge: "PDF Issue",
     description:
-      "Cuisine, culture, and community celebrations — all through the lens of Indians living in Korea.",
+      "Explore the 2015 issue featuring culture, lifestyle, and IIK events updates.",
+    url: "https://indiansinkorea.com/inspire/wp-content/uploads/2022/05/IIK-Magazine-2015-v10.pdf",
+  },
+  {
+    issue: "2014",
+    title: "IIK_Magazine_2014",
+    date: "2014",
+    badge: "PDF Issue",
+    description:
+      "A back issue of IIK Magazine from 2014, available for download and preview.",
+    url: "https://indiansinkorea.com/inspire/wp-content/uploads/2022/05/IIK_Magazine_2014.pdf",
+  },
+  {
+    issue: "2007",
+    title: "IIK_Magazine_2007",
+    date: "2007",
+    badge: "PDF Issue",
+    description:
+      "Dive into the earliest archived edition from 2007, complete with community highlights.",
+    url: "https://indiansinkorea.com/inspire/wp-content/uploads/2022/05/IIK_Magazine_2007.pdf",
   },
 ];
 
@@ -102,15 +120,27 @@ function MagazineCard({ issue }: { issue: (typeof magazineIssues)[0] }) {
       <p className="text-sm text-gray-600 leading-relaxed mb-6">
         {issue.description}
       </p>
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <span className="text-sm text-gray-500">{issue.date}</span>
-        <a
-          href="#"
-          className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600"
-        >
-          Read Issue
-          <ArrowRight className="w-4 h-4" />
-        </a>
+        <div className="flex flex-wrap items-center gap-3">
+          <a
+            href={issue.url}
+            download
+            className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600"
+          >
+            Download
+            <Download className="w-4 h-4" />
+          </a>
+          <a
+            href={issue.url}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-semibold text-orange-700 transition hover:bg-orange-50"
+          >
+            Preview
+            <ArrowRight className="w-4 h-4" />
+          </a>
+        </div>
       </div>
     </motion.article>
   );
@@ -141,11 +171,21 @@ export default function MagazinePageContent() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <a
-                  href="#"
+                  href={magazineIssues[0].url}
+                  download
                   className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-200/60 transition hover:bg-orange-600"
                 >
                   Download Latest Issue
                   <Download className="w-4 h-4" />
+                </a>
+                <a
+                  href={magazineIssues[0].url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-6 py-3 text-sm font-semibold text-orange-700 transition hover:bg-orange-50"
+                >
+                  Preview Latest Issue
+                  <ArrowRight className="w-4 h-4" />
                 </a>
                 <a
                   href="#issues"
@@ -167,17 +207,19 @@ export default function MagazinePageContent() {
                     Featured Issue
                   </p>
                   <h3 className="mt-2 text-3xl font-bold text-gray-900">
-                    Vol. 07
+                    {magazineIssues[0].issue}
                   </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {magazineIssues[0].title}
+                  </p>
                 </div>
                 <div className="inline-flex h-14 w-14 items-center justify-center rounded-3xl bg-orange-50 text-orange-600">
                   <BookOpen className="w-6 h-6" />
                 </div>
               </div>
               <p className="text-sm text-gray-600 leading-relaxed mb-6">
-                This issue showcases voices from Indian artists, social
-                entrepreneurs, and cultural bridges across Korea. Find essays,
-                interviews, and event highlights curated for our readers.
+                Preview or download the featured archive edition from the IIK
+                Magazine collection.
               </p>
               <div className="space-y-4">
                 {highlights.map((item) => (

@@ -194,6 +194,83 @@ const pastEvents = [
   },
 ];
 
+const sportsEvents = [
+  {
+    id: "iik-cricket",
+    title: "IIK Cricket Championship",
+    category: "Cricket",
+    city: "Seoul",
+    venue: "IIK Community Grounds",
+    date: "Spring Season",
+    participants: "18 Teams",
+    attendees: "1.8K+",
+    emoji: "🏏",
+    description:
+      "IIK's flagship cricket championship bringing Indian teams across Korea together with competitive matches, fan energy, and unforgettable community spirit.",
+    image:
+      "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1400&q=80",
+    accent: "#f97316",
+  },
+  {
+    id: "iik-football",
+    title: "Korea Indian Football League",
+    category: "Football",
+    city: "Suwon",
+    venue: "Community Sports Arena",
+    date: "Summer League",
+    participants: "12 Clubs",
+    attendees: "900+",
+    emoji: "⚽",
+    description:
+      "Fast-paced football action featuring Indian students, professionals, and community clubs competing across South Korea.",
+    image:
+      "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1400&q=80",
+    accent: "#22c55e",
+  },
+  {
+    id: "iik-badminton",
+    title: "IIK Badminton Open",
+    category: "Badminton",
+    city: "Incheon",
+    venue: "Indoor Sports Center",
+    date: "Community Weekend",
+    participants: "250+ Players",
+    attendees: "600+",
+    emoji: "🏸",
+    description:
+      "A welcoming badminton meet for competitive players and casual enthusiasts—designed to build friendships through sport.",
+    image:
+      "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=1400&q=80",
+    accent: "#3b82f6",
+  },
+];
+
+const sportsStats = [
+  {
+    value: "30+",
+    label: "Sports Events Hosted",
+  },
+  {
+    value: "2K+",
+    label: "Active Participants",
+  },
+  {
+    value: "20+",
+    label: "Community Teams",
+  },
+  {
+    value: "3",
+    label: "Major Sports",
+  },
+];
+
+const sportsHighlights = [
+  "Competitive inter-city tournaments",
+  "Student & professional participation",
+  "Weekend sports meetups",
+  "Community wellness initiatives",
+];
+
 const timeline = [
   {
     label: "January",

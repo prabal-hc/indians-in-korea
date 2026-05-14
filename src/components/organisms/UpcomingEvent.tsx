@@ -33,19 +33,19 @@ interface CategoryCard {
 // ─── Default data ─────────────────────────────────────────────────────────────
 const defaultFeatured: FeaturedEvent = {
   city: "Seoul",
-  title: "Grand Diwali Gala 2024",
-  date: "Oct 15",
-  venue: "COEX Grand Ballroom",
-  imageSrc: "/images/diwali.jpg",
+  title: "IIK Diwali Dhamaka",
+  date: "Nov 19",
+  venue: "Kwangwoon University",
+  imageSrc: "/images/diwali.jpg", // keep your existing valid image path if different
   href: "/events",
 };
 
 const defaultSideEvent: SideEvent = {
-  city: "Busan",
-  title: "Tech Professionals Meetup",
-  day: "22",
-  month: "OCT",
-  attendees: 45,
+  city: "Seoul",
+  title: "IIK Holi Hungama",
+  day: "24",
+  month: "MAR",
+  attendees: 300,
   href: "/events",
 };
 
@@ -354,23 +354,24 @@ export const UpcomingEvent = ({
           {/* Wide card */}
           <CategoryCard
             icon={<CricketIcon />}
-            title="IIK Sports League"
-            subtitle="Cricket, Football, and Badminton tourneys."
-            members="1.2k Members"
+            title="IIK Sports Club"
+            subtitle="Cricket, football & community sports events."
+            members="12k+ Members"
             accent="bg-orange-50"
             wide
           />
-          {/* Narrow cards */}
+
           <CategoryCard
             icon={<TerminalIcon />}
-            title="Tech Cluster"
-            subtitle="Coding, Startups & AI"
+            title="Professional Network"
+            subtitle="Engineers, researchers, startups & tech community."
             accent="bg-blue-50"
           />
+
           <CategoryCard
             icon={<TheaterIcon />}
-            title="Culture Arts"
-            subtitle="Dance, Yoga & Music"
+            title="Cultural Events"
+            subtitle="Diwali, Holi, music, dance & Indian celebrations."
             accent="bg-green-50"
           />
         </div>

@@ -211,15 +211,23 @@ const Navbar = () => {
             whileTap={{ scale: 0.98 }}
             className="flex-shrink-0"
           >
-            <Link href="/" aria-label="Indians in Korea Home">
+            <Link
+              href="/"
+              aria-label="Indians in Korea Home"
+              className="flex items-center"
+            >
               <Image
-                src="https://indiansinkorea.com/inspire/wp-content/uploads/2022/05/logo.png"
+                src="/images/iik.png"
                 alt="Indians in Korea"
-                width={scrolled ? 180 : 210}
-                height={100}
+                width={scrolled ? 35 : 40}
+                height={60}
                 className="object-contain transition-all duration-400"
                 priority
               />
+              <span className="hidden lg:inline ml-3 font-semibold text-lg text-gray-700">
+                <span className="text-orange-600">INDIANS</span> IN{" "}
+                <span className="text-[#138808]">KOREA</span>
+              </span>
             </Link>
           </motion.div>
 

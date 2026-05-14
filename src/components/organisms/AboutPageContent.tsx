@@ -179,7 +179,7 @@ export const AboutPageContent = () => (
                 Join on Facebook <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="#contact"
+                href="/contact"
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-7 py-4 text-sm font-bold text-gray-700 transition hover:border-orange-300 hover:text-orange-600"
               >
                 Get in Touch

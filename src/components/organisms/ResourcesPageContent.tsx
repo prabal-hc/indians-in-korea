@@ -1367,7 +1367,7 @@ export default function ResourcesPageContent() {
 
             {/* Secondary */}
             <motion.a
-              href="#"
+              href="/contact"
               className="inline-flex items-center justify-center rounded-full px-7 py-3.5 text-sm font-semibold text-stone-700"
               style={{
                 border: "1.5px solid",
@@ -1502,7 +1502,7 @@ export default function ResourcesPageContent() {
             >
               {/* Primary CTA */}
               <motion.a
-                href="#"
+                href="/contact"
                 className="relative overflow-hidden inline-flex items-center justify-center rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-orange-600 whitespace-nowrap"
                 style={{ boxShadow: "0 8px 32px rgba(255,255,255,0.25)" }}
                 whileHover={{
@@ -1531,7 +1531,7 @@ export default function ResourcesPageContent() {
               </motion.a>
 
               {/* Secondary CTA */}
-              <motion.a
+              {/* <motion.a
                 href="https://indiansinkorea.com"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -1545,7 +1545,7 @@ export default function ResourcesPageContent() {
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
                 Join IIK Community
-              </motion.a>
+              </motion.a> */}
             </motion.div>
           </motion.div>
         </div>

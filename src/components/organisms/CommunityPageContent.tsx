@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, useInView, animate } from "framer-motion";
+import { MapPin, Users, ExternalLink } from "lucide-react";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -160,6 +161,28 @@ const communities = [
   },
 ];
 
+const cricketClub = {
+  title: "Indians In Korea Cricket Club",
+  subtitle: "Cricket Club",
+  established: "2013",
+  description:
+    "Established in 2013, Indians in Korea Cricket Club (IIKCC) is one of the oldest and most competitive cricket clubs which prides itself on the ability to provide a healthy sporting habit among sportsmen. In addition, IIKCC is also a platform for personal development as we aim to instill core values like discipline with coordination and teamwork.",
+  details: [
+    "Each year, the Korean Cricket Association (KCA), in affiliation with the International Cricket Council (ICC), organizes a leather-ball T20 league in South Korea.",
+    "The competition is divided into three categories, each of which includes teams representing India, Pakistan, Bangladesh, Sri Lanka, Australia, and New Zealand.",
+    "As a member of the Korean Cricket Association (KCA), IIKCC competes internationally with cricket clubs represented by members of almost all cricketing nations and has always strived for excellence on the field.",
+    "In 2014, IIKCC secured 3rd place in the KCA League and has bagged numerous awards since then.",
+    "Additionally, IIKCC participates in and organizes tennis-ball cricket competitions, which serve as a showcase for the game’s fast-paced version.",
+    "The competitions are nearly entirely hosted at Sungkyunkwan University in Suwon due to the university’s accessible location.",
+    "We practice at Sungkyunkwan University ground during all weekends. If you have played any kind of Cricket, be it tennis or leather ball and want to join the squad for leather-ball matches, this is your chance.",
+  ],
+  link: "https://bit.ly/3jCERv5",
+  contacts: [
+    { name: "Saikrishna", phone: "010-6594-2627" },
+    { name: "Prathamesh", phone: "010-2529-4411" },
+  ],
+};
+
 const filters = [
   "All",
   "Cultural & Regional",
@@ -167,6 +190,7 @@ const filters = [
   "Cultural",
   "Regional",
   "Spiritual",
+  "Sports",
 ];
 
 const stats = [
@@ -532,6 +556,8 @@ const CommunityCard = ({
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function CommunitiesPage() {
   const [activeFilter, setActiveFilter] = useState("All");
+  const showCommunityGrid = activeFilter !== "Sports";
+  const showSportsSection = activeFilter === "All" || activeFilter === "Sports";
   const [visible, setVisible] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const heroInView = useInView(heroRef, { once: true });
@@ -858,44 +884,210 @@ export default function CommunitiesPage() {
         ))}
       </motion.div>
 
-      {/* Section label */}
-      <div className="relative z-10 flex items-center gap-3 px-6 mx-auto mb-7 max-w-6xl">
-        <div
-          className="flex-1 h-px"
-          style={{
-            background:
-              "linear-gradient(90deg, transparent, rgba(234,88,12,0.2), rgba(203,213,225,0.4), transparent)",
-          }}
-        />
-        <span className="label-caps text-stone-500">
-          {filtered.length}{" "}
-          {filtered.length === 1 ? "community" : "communities"} found
-        </span>
-        <div
-          className="flex-1 h-px"
-          style={{
-            background:
-              "linear-gradient(90deg, transparent, rgba(203,213,225,0.4), rgba(234,88,12,0.2), transparent)",
-          }}
-        />
-      </div>
+      {showCommunityGrid && (
+        <>
+          {/* Section label */}
+          <div className="relative z-10 flex items-center gap-3 px-6 mx-auto mb-7 max-w-6xl">
+            <div
+              className="flex-1 h-px"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, rgba(234,88,12,0.2), rgba(203,213,225,0.4), transparent)",
+              }}
+            />
+            <span className="label-caps text-stone-500">
+              {filtered.length}{" "}
+              {filtered.length === 1 ? "community" : "communities"} found
+            </span>
+            <div
+              className="flex-1 h-px"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, rgba(203,213,225,0.4), rgba(234,88,12,0.2), transparent)",
+              }}
+            />
+          </div>
 
-      {/* ── CARDS GRID ── */}
-      <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 px-6 pb-20 max-w-7xl mx-auto">
-        {filtered.map((community, i) => (
-          <CommunityCard
-            key={community.id}
-            community={community}
-            index={i}
-            isLarge={
-              community.size === "large" && activeFilter === "All" && i === 0
-            }
-          />
-        ))}
-      </div>
+          {/* ── CARDS GRID ── */}
+          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 px-6 pb-20 max-w-7xl mx-auto">
+            {filtered.map((community, i) => (
+              <CommunityCard
+                key={community.id}
+                community={community}
+                index={i}
+                isLarge={
+                  community.size === "large" &&
+                  activeFilter === "All" &&
+                  i === 0
+                }
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      {showSportsSection && (
+        <section className="relative z-10 px-6 pb-20 max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 32, filter: "blur(8px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+            className="grid gap-8 xl:grid-cols-[1.1fr_0.9fr] items-start"
+          >
+            <div className="space-y-6">
+              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.35em] text-orange-600">
+                Sports
+              </p>
+              <div>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-stone-900">
+                  Indians In Korea{" "}
+                  <span className="text-orange-600">Cricket Club</span>
+                </h2>
+                <p className="mt-4 text-sm sm:text-base leading-relaxed text-stone-600 max-w-2xl">
+                  Established in 2013, Indians in Korea Cricket Club (IIKCC) is
+                  one of the oldest and most competitive cricket clubs which
+                  prides itself on the ability to provide a healthy sporting
+                  habit among sportsmen. In addition, IIKCC is also a platform
+                  for personal development as we aim to instill core values like
+                  discipline with coordination and teamwork.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                {cricketClub.details.slice(0, 4).map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-3xl border border-orange-100 bg-orange-50/70 p-5 shadow-sm"
+                  >
+                    <p className="text-sm text-stone-700">{item}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_16px_48px_rgba(15,23,42,0.08)]">
+                <div className="mb-4 text-sm font-semibold uppercase tracking-[0.32em] text-stone-500">
+                  Practice & contact
+                </div>
+                <div className="grid gap-4">
+                  <div className="flex items-center gap-3 rounded-3xl bg-stone-50 p-4">
+                    <MapPin className="h-4 w-4 text-orange-500" />
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.25em] text-stone-500">
+                        Training ground
+                      </p>
+                      <p className="text-sm font-semibold text-stone-900">
+                        Sungkyunkwan University, Suwon
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-3xl bg-stone-50 p-4">
+                    <Users className="h-4 w-4 text-orange-500" />
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.25em] text-stone-500">
+                        Weekend practice
+                      </p>
+                      <p className="text-sm font-semibold text-stone-900">
+                        Every weekend for tennis-ball and leather-ball training
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-6 space-y-3">
+                  {cricketClub.contacts.map((contact) => (
+                    <div
+                      key={contact.name}
+                      className="rounded-3xl bg-stone-50 p-4 text-sm text-stone-700"
+                    >
+                      <p className="font-semibold text-stone-900">
+                        {contact.name}
+                      </p>
+                      <p>{contact.phone}</p>
+                    </div>
+                  ))}
+                </div>
+                <a
+                  href={cricketClub.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-orange-600"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  View IIKCC Facebook Page
+                </a>
+              </div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 36, filter: "blur(8px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="group relative overflow-hidden rounded-[2rem] border border-gray-200 bg-gradient-to-br from-orange-50 via-white to-amber-50 p-6 shadow-[0_20px_70px_rgba(234,88,12,0.12)]"
+            >
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(249,115,22,0.14),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.1),_transparent_30%)] pointer-events-none" />
+              <div className="relative z-10 flex flex-col h-full justify-between gap-6">
+                <div className="rounded-3xl border border-orange-100 bg-white/90 p-5 shadow-sm">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.35em] text-orange-600 font-semibold">
+                        IIKCC
+                      </p>
+                      <h3 className="mt-3 text-2xl font-bold text-stone-900">
+                        Cricket Club
+                      </h3>
+                    </div>
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-100 text-2xl">
+                      🏏
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm leading-relaxed text-stone-600">
+                    A community-first club with leather-ball ambition and
+                    tennis-ball energy across Korea.
+                  </p>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-3xl bg-white/85 p-5 shadow-sm border border-orange-100">
+                    <p className="text-xs uppercase tracking-[0.3em] text-stone-500">
+                      Founded
+                    </p>
+                    <p className="mt-3 text-lg font-semibold text-stone-900">
+                      2013
+                    </p>
+                  </div>
+                  <div className="rounded-3xl bg-white/85 p-5 shadow-sm border border-orange-100">
+                    <p className="text-xs uppercase tracking-[0.3em] text-stone-500">
+                      Official affiliation
+                    </p>
+                    <p className="mt-3 text-lg font-semibold text-stone-900">
+                      KCA / ICC
+                    </p>
+                  </div>
+                </div>
+
+                <div className="rounded-[2rem] bg-white/90 p-5 border border-stone-200">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="text-sm font-semibold text-stone-900">
+                      Sungkyunkwan University
+                    </div>
+                    <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold uppercase text-orange-600">
+                      Suwon
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed text-stone-600">
+                    Most cricket competition activity is hosted here for easy
+                    access and premium community reach.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </section>
+      )}
 
       {/* ── BOTTOM CTA — matching HeroText primary+secondary button pattern ── */}
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
@@ -913,7 +1105,6 @@ export default function CommunitiesPage() {
           Part of the IIK ecosystem — 12k+ Indians across South Korea
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          {/* Primary — matching HeroText primary CTA */}
           <motion.a
             href="https://indiansinkorea.com"
             target="_blank"
@@ -942,7 +1133,6 @@ export default function CommunitiesPage() {
             />
             <span className="relative z-10">Explore IIK →</span>
           </motion.a>
-          {/* Secondary — matching HeroText secondary CTA */}
           <motion.a
             href="#"
             className="px-8 py-3 rounded-full text-sm font-bold text-stone-700"
@@ -963,7 +1153,7 @@ export default function CommunitiesPage() {
             Join a Community
           </motion.a>
         </div>
-      </motion.div>
+      </motion.div> */}
     </div>
   );
 }

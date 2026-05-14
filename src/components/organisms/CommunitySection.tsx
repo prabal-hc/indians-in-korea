@@ -79,7 +79,7 @@ const CommunityRow = ({
         opacity: 0,
         animationFillMode: "forwards",
       }}
-      className="group flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF9933]/40 hover:shadow-md"
+      className="group flex items-center gap-2 sm:gap-3 rounded-2xl border border-slate-100 bg-white p-3 sm:p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF9933]/40 hover:shadow-md"
     >
       {/* Icon */}
       <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-slate-50 text-lg">
@@ -88,17 +88,17 @@ const CommunityRow = ({
 
       {/* Info */}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-600 text-slate-900 font-semibold">
+        <p className="mt-0.5 truncate text-[10px] sm:text-[11px] text-slate-400">
           {community.name}
         </p>
-        <p className="mt-0.5 truncate text-[11px] text-slate-400">
+        <p className="mt-0.5 truncate text-[10px] sm:text-[11px] text-slate-400">
           {community.location}
         </p>
       </div>
 
       {/* Tag */}
       <span
-        className={`flex-shrink-0 rounded-full px-2.5 py-1 text-[9px] font-700 uppercase tracking-widest font-bold ${tagStyles}`}
+        className={`hidden sm:flex flex-shrink-0 rounded-full px-2.5 py-1 text-[9px] uppercase tracking-widest font-bold ${tagStyles}`}
       >
         {community.tag}
       </span>
@@ -346,13 +346,13 @@ const KoreaMap = () => (
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export const CommunitySection = () => (
-  <section className="relative w-full overflow-hidden bg-gradient-to-br from-orange-50/70 via-white to-green-50/50 px-4 py-16 sm:px-8 lg:px-16">
+  <section className="relative w-full overflow-hidden bg-gradient-to-br from-orange-50/70 via-white to-green-50/50 px-3 py-10 sm:px-6 sm:py-14 lg:px-16">
     {/* Background ambient blobs */}
     <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#FF9933]/6 blur-3xl" />
     <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[#138808]/5 blur-3xl" />
 
-    <div className="relative mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12">
-      <div className="grid items-center gap-10 lg:grid-cols-2">
+    <div className="relative mx-auto w-full max-w-7xl">
+      <div className="grid items-center gap-8 lg:grid-cols-2">
         {/* ── Left column ── */}
         <div className="flex flex-col gap-5">
           <TricolorBar />
@@ -361,11 +361,11 @@ export const CommunitySection = () => (
             Indians in Korea · IIK
           </p>
 
-          <h2 className="font-playfair text-[38px] font-bold leading-[1.15] text-slate-900">
+          <h2 className="font-playfair text-3xl sm:text-4xl lg:text-[38px] font-bold leading-tight text-slate-900">
             Find Your <span className="text-[#FF9933]">Tribe</span>
           </h2>
 
-          <p className="max-w-sm text-[13px] leading-relaxed text-slate-500">
+          <p className="max-w-full sm:max-w-sm text-sm leading-relaxed text-slate-500">
             Whether you&apos;re a student at SNU, an engineer in Pangyo, or a
             Tamil in Seoul — there&apos;s an IIK community waiting for you.
           </p>
@@ -379,7 +379,7 @@ export const CommunitySection = () => (
 
           {/* Show all button */}
           <Link
-            href="#"
+            href="/community"
             className="mt-2 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-[12px] font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:border-[#FF9933]/60 hover:bg-orange-50 hover:text-[#FF9933]"
           >
             View all communities
@@ -400,14 +400,14 @@ export const CommunitySection = () => (
         </div>
 
         {/* ── Right column — Map ── */}
-        <div className="h-[440px] lg:h-[500px]">
+        <div className="order-first lg:order-none h-[260px] sm:h-[360px] md:h-[420px] lg:h-[500px]">
           <KoreaMap />
         </div>
       </div>
 
       {/* ── Stats strip ── */}
-      <div className="mt-10 flex flex-wrap items-center justify-between gap-6 rounded-2xl border border-slate-100 bg-white px-6 py-5 shadow-sm">
-        <div className="flex flex-wrap gap-8">
+      {/* <div className="mt-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 rounded-2xl border border-slate-100 bg-white px-4 sm:px-6 py-5 shadow-sm">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 w-full lg:w-auto">
           {[
             { num: "12k+", label: "IIK Members", color: "#FF9933" },
             { num: "6+", label: "Active Communities", color: "#138808" },
@@ -416,7 +416,7 @@ export const CommunitySection = () => (
           ].map((s) => (
             <div key={s.label} className="flex flex-col">
               <span
-                className="font-playfair text-2xl font-bold"
+                className="font-playfair text-xl sm:text-2xl font-bold"
                 style={{ color: s.color }}
               >
                 {s.num}
@@ -447,7 +447,7 @@ export const CommunitySection = () => (
             />
           </svg>
         </Link>
-      </div>
+      </div> */}
     </div>
 
     {/* Keyframes */}

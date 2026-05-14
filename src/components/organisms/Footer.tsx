@@ -35,13 +35,17 @@ export const Footer = () => (
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2">
               <Image
-                src="https://indiansinkorea.com/inspire/wp-content/uploads/2022/05/logo.png"
+                src="/images/iik.png"
                 alt="Indians in Korea"
-                width={220}
-                height={100}
-                className="object-contain"
+                width={40}
+                height={60}
+                className="object-contain transition-all duration-400"
                 priority
               />
+              <span className="hidden lg:inline ml-3 font-semibold text-lg text-gray-700">
+                <span className="text-orange-600">INDIANS</span> IN{" "}
+                <span className="text-[#138808]">KOREA</span>
+              </span>
             </div>
             <p className="mt-4 text-sm text-slate-600">
               Building a vibrant community of Indians across Korea since 2002.
