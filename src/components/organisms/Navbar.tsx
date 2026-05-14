@@ -15,8 +15,8 @@ const navItems = [
   { name: "Events", href: "/events" },
   { name: "Resources", href: "/resources" },
   // { name: "Blog", href: "#" },
-  { name: "Contact", href: "#" },
-  { name: "Magazines", href: "#" },
+  { name: "Contact", href: "/contact" },
+  { name: "Magazines", href: "/magazines" },
 ];
 
 // ─── Animation Configs ────────────────────────────────────────────────────────

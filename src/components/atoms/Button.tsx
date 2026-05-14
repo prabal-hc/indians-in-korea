@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 type ButtonVariant = "primary" | "secondary";
 
@@ -32,10 +33,10 @@ export const Button: React.FC<ButtonProps> = ({
 
   if (href) {
     return (
-      <a href={href} className={baseClass}>
+      <Link href={href} className={baseClass}>
         {children}
         {icon && <span>{icon}</span>}
-      </a>
+      </Link>
     );
   }
 

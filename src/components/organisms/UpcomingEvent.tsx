@@ -37,7 +37,7 @@ const defaultFeatured: FeaturedEvent = {
   date: "Oct 15",
   venue: "COEX Grand Ballroom",
   imageSrc: "/images/diwali.jpg",
-  href: "#",
+  href: "/events",
 };
 
 const defaultSideEvent: SideEvent = {
@@ -46,7 +46,7 @@ const defaultSideEvent: SideEvent = {
   day: "22",
   month: "OCT",
   attendees: 45,
-  href: "#",
+  href: "/events",
 };
 
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
@@ -335,10 +335,10 @@ export const UpcomingEvent = ({
             </p>
           </div>
           <Link
-            href="#"
+            href="/events"
             className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors"
           >
-            View Calendar
+            View Events
             <ArrowIcon />
           </Link>
         </div>

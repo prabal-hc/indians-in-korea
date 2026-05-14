@@ -1220,7 +1220,7 @@ export default function ResourcesPageContent() {
             initial={{ opacity: 0, y: -16, scale: 0.88 }}
             animate={heroInView ? { opacity: 1, y: 0, scale: 1 } : {}}
             transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-            className="inline-flex mb-7"
+            className="inline-flex mb-7 pt-5 sm:pt-0"
             style={{
               animation: heroInView
                 ? "badgeFloat 3.8s ease-in-out infinite"

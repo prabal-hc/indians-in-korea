@@ -13,7 +13,7 @@ export const Hero = () => {
       ref={containerRef}
       className="relative w-full bg-gradient-to-br from-orange-50 to-blue-50 overflow-hidden"
     >
-      <div className="mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 px-4 md:px-8 lg:px-12 pt-20 sm:pt-20 pb-25 md:pb-30 lg:pb-32">
+      <div className="mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 px-4 md:px-8 lg:px-12 pt-30 sm:pt-20 pb-25 md:pb-30 lg:pb-32">
         {" "}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center min-h-[80vh]">
           {/* Text Section */}

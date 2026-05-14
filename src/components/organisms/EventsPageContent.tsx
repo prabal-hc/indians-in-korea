@@ -500,7 +500,7 @@ export default function EventsPageContent() {
       <section
         ref={heroRef}
         onMouseMove={handleHeroMouseMove}
-        className={`relative overflow-hidden bg-orange-50 ${S} pt-16 pb-0 sm:pt-20 md:pt-28 xl:pt-30 2xl:pt-30`}
+        className={`relative overflow-hidden bg-orange-50 ${S} pt-30 pb-0 sm:pt-20 md:pt-28 xl:pt-30 2xl:pt-30`}
       >
         {/* ── Cursor spotlight ── */}
         <motion.div

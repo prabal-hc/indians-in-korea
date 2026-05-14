@@ -1,7 +1,38 @@
 "use client";
 
 import Link from "next/link";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 
+// ─── Animation Variants ───────────────────────────────────────────────────────
+const EASE_PREMIUM = [0.16, 1, 0.3, 1] as const;
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 32, filter: "blur(6px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.75, ease: EASE_PREMIUM },
+  },
+};
+
+const fadeLeft = {
+  hidden: { opacity: 0, x: -36, filter: "blur(4px)" },
+  visible: {
+    opacity: 1,
+    x: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.8, ease: EASE_PREMIUM },
+  },
+};
+
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+};
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
 const featureCards = [
   {
     title: "Higher Education",
@@ -67,12 +98,9 @@ const FeatCard = ({
   card: (typeof featureCards)[0];
   index: number;
 }) => (
-  <div
+  <motion.div
+    variants={fadeUp}
     className="group relative overflow-hidden rounded-[22px] border-[1.5px] border-slate-100 bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:border-orange-200 hover:shadow-[0_14px_36px_rgba(0,0,0,0.08)]"
-    style={{
-      animation: `fadeUp 0.6s ${0.18 + index * 0.08}s ease both`,
-      opacity: 0,
-    }}
   >
     {/* Tricolor stripe on hover */}
     <div
@@ -116,82 +144,95 @@ const FeatCard = ({
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
       </svg>
     </div>
-  </div>
+  </motion.div>
 );
 
-export const AboutSection = () => (
-  <section className="relative w-full overflow-hidden bg-gradient-to-br from-orange-50/60 via-white to-green-50/40 py-20 px-4 sm:px-8 lg:px-16">
-    {/* Ambient blobs */}
-    <div
-      className="pointer-events-none absolute -top-24 -right-16 h-72 w-72 rounded-full bg-[#FF9933]/8 blur-3xl"
-      style={{ animation: "float 7s ease-in-out infinite" }}
-    />
-    <div
-      className="pointer-events-none absolute -bottom-16 -left-12 h-56 w-56 rounded-full bg-[#138808]/6 blur-3xl"
-      style={{ animation: "float 9s ease-in-out infinite" }}
-    />
+export const AboutSection = () => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(sectionRef, { once: true, margin: "-100px" });
 
-    <div className="mx-2 sm:mx-4 md:mx-6 lg:mx-8 xl:mx-10">
-      <div className="grid items-start gap-10">
-        {/* ── LEFT ── */}
-        <div style={{ animation: "fadeUp 0.6s 0.1s ease both", opacity: 0 }}>
-          {/* Badge */}
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-2">
-            <span className="flex gap-[3px]">
-              {["#FF9933", "#e2e8f0", "#138808"].map((c) => (
-                <span
-                  key={c}
-                  className="inline-block h-2 w-2 rounded-full"
-                  style={{ background: c }}
-                />
-              ))}
-            </span>
-            <span className="text-[10px] font-[800] uppercase tracking-[0.22em] text-[#FF9933]">
-              About Us
-            </span>
-          </div>
+  return (
+    <motion.section
+      ref={sectionRef}
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"}
+      variants={stagger}
+      className="relative w-full overflow-hidden bg-gradient-to-br from-orange-50/60 via-white to-green-50/40 py-20 px-4 sm:px-8 lg:px-16"
+    >
+      {/* Ambient blobs */}
+      <div
+        className="pointer-events-none absolute -top-24 -right-16 h-72 w-72 rounded-full bg-[#FF9933]/8 blur-3xl"
+        style={{ animation: "float 7s ease-in-out infinite" }}
+      />
+      <div
+        className="pointer-events-none absolute -bottom-16 -left-12 h-56 w-56 rounded-full bg-[#138808]/6 blur-3xl"
+        style={{ animation: "float 9s ease-in-out infinite" }}
+      />
 
-          {/* Tricolor rule */}
-          <div className="mb-4 flex h-[3.5px] w-14 overflow-hidden rounded-full">
-            <div className="flex-1 bg-[#FF9933]" />
-            <div className="flex-1 bg-slate-200" />
-            <div className="flex-1 bg-[#138808]" />
-          </div>
+      <div className="mx-2 sm:mx-4 md:mx-6 lg:mx-8 xl:mx-10">
+        <div className="grid items-start gap-10">
+          {/* ── LEFT ── */}
+          <motion.div variants={fadeLeft}>
+            {/* Badge */}
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-2">
+              <span className="flex gap-[3px]">
+                {["#FF9933", "#e2e8f0", "#138808"].map((c) => (
+                  <span
+                    key={c}
+                    className="inline-block h-2 w-2 rounded-full"
+                    style={{ background: c }}
+                  />
+                ))}
+              </span>
+              <span className="text-[10px] font-[800] uppercase tracking-[0.22em] text-[#FF9933]">
+                About Us
+              </span>
+            </div>
 
-          <h2 className="font-playfair text-[36px] font-bold leading-[1.15] text-slate-900 sm:text-[40px]">
-            We provide our{" "}
-            <em
-              className="italic"
-              style={{
-                background: "linear-gradient(135deg,#FF9933,#ea580c)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
+            {/* Tricolor rule */}
+            <div className="mb-4 flex h-[3.5px] w-14 overflow-hidden rounded-full">
+              <div className="flex-1 bg-[#FF9933]" />
+              <div className="flex-1 bg-slate-200" />
+              <div className="flex-1 bg-[#138808]" />
+            </div>
+
+            <h2 className="font-playfair text-[36px] font-bold leading-[1.15] text-slate-900 sm:text-[40px]">
+              We provide our{" "}
+              <em
+                className="italic"
+                style={{
+                  background: "linear-gradient(135deg,#FF9933,#ea580c)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                Experts
+              </em>
+              <br />
+              to Indians in Korea
+            </h2>
+
+            <p className="mt-4 text-[13px] leading-[1.85] text-slate-500 max-w-[480px]">
+              This group primarily includes engineering professionals, business
+              persons, research fellows, students and housewives. IIK upholds
+              India's umbrella of{" "}
+              <strong className="font-[700] text-slate-800">
+                Unity in Diversity
+              </strong>{" "}
+              — doors of IIK are open for every Indian.
+            </p>
+
+            {/* Feature cards grid */}
+            <motion.div
+              variants={stagger}
+              className="mt-7 grid grid-cols-1 gap-[14px] sm:grid-cols-2 xl:grid-cols-4"
             >
-              Experts
-            </em>
-            <br />
-            to Indians in Korea
-          </h2>
+              {featureCards.map((card, i) => (
+                <FeatCard key={card.title} card={card} index={i} />
+              ))}
+            </motion.div>
 
-          <p className="mt-4 text-[13px] leading-[1.85] text-slate-500 max-w-[480px]">
-            This group primarily includes engineering professionals, business
-            persons, research fellows, students and housewives. IIK upholds
-            India's umbrella of{" "}
-            <strong className="font-[700] text-slate-800">
-              Unity in Diversity
-            </strong>{" "}
-            — doors of IIK are open for every Indian.
-          </p>
-
-          {/* Feature cards grid */}
-          <div className="mt-7 grid grid-cols-1 gap-[14px] sm:grid-cols-2 xl:grid-cols-4">
-            {featureCards.map((card, i) => (
-              <FeatCard key={card.title} card={card} index={i} />
-            ))}
-          </div>
-
-          <Link
+            {/* <Link
             href="#"
             className="mt-7 inline-flex items-center gap-2 rounded-full px-7 py-3 text-[13px] font-[700] text-white shadow-[0_4px_18px_rgba(255,153,51,0.38)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(255,153,51,0.48)]"
             style={{ background: "linear-gradient(135deg,#FF9933,#ea580c)" }}
@@ -210,17 +251,18 @@ export const AboutSection = () => (
                 d="M9 5l7 7-7 7"
               />
             </svg>
-          </Link>
+          </Link> */}
+          </motion.div>
         </div>
       </div>
-    </div>
 
-    <style>{`
+      <style>{`
       @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
       @keyframes float  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
       @keyframes pulse  { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.88)} }
     `}</style>
-  </section>
-);
+    </motion.section>
+  );
+};
 
 export default AboutSection;
