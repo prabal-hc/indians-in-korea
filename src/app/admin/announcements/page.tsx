@@ -1,0 +1,138 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { PageTitle } from "@/components/admin/PageTitle";
+import { SearchBar } from "@/components/admin/SearchBar";
+import { DataTable } from "@/components/admin/DataTable";
+import { ConfirmDeleteModal } from "@/components/admin/ConfirmDeleteModal";
+import { EmptyState } from "@/components/admin/EmptyState";
+import { LoadingSkeleton } from "@/components/admin/LoadingSkeleton";
+import { StatusBadge } from "@/components/admin/StatusBadge";
+import * as announcementsService from "@/services/admin/announcements.service";
+
+const statusOptions = ["All", "Published", "Draft"];
+
+export default function AdminAnnouncementsPage() {
+  const [items, setItems] = useState<announcementsService.AnnouncementItem[]>(
+    [],
+  );
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      const data = await announcementsService.getAll();
+      setItems(data);
+      setLoading(false);
+    };
+    load();
+  }, []);
+
+  const filtered = useMemo(() => {
+    return items.filter((item) => {
+      const matchesSearch = [item.title, item.category, item.content].some(
+        (value) => value.toLowerCase().includes(search.toLowerCase()),
+      );
+      const matchesStatus =
+        statusFilter === "All" || item.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [items, search, statusFilter]);
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setConfirming(true);
+    await announcementsService.remove(deleteTarget);
+    setItems((current) => current.filter((item) => item.id !== deleteTarget));
+    setDeleteTarget(null);
+    setConfirming(false);
+  };
+
+  return (
+    <div className="space-y-8">
+      <PageTitle
+        title="Announcements"
+        subtitle="Manage site announcements and publish dates for community updates."
+      />
+
+      <div className="grid gap-4 sm:grid-cols-[1.2fr_0.8fr]">
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+          placeholder="Search announcements, categories, content..."
+        />
+        <div className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
+          <label className="block text-sm font-medium text-slate-700">
+            Filter by status
+          </label>
+          <select
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value)}
+            className="mt-3 w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+          >
+            {statusOptions.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+        <p className="text-sm text-slate-600">
+          Showing {filtered.length} announcement
+          {filtered.length === 1 ? "" : "s"}.
+        </p>
+        <Link
+          href="/admin/announcements/create"
+          className="inline-flex items-center justify-center rounded-3xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-orange-600"
+        >
+          New announcement
+        </Link>
+      </div>
+
+      {loading ? (
+        <LoadingSkeleton />
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          title="No announcements"
+          description="Create a new announcement or modify the filter to find existing ones."
+          actionLabel="Create announcement"
+          onAction={() => window.location.assign("/admin/announcements/create")}
+        />
+      ) : (
+        <DataTable
+          columns={[
+            { header: "Title", accessor: "title" },
+            { header: "Category", accessor: "category" },
+            { header: "Published", accessor: "publishedAt" },
+            {
+              header: "Status",
+              render: (item) => <StatusBadge status={item.status} />,
+            },
+          ]}
+          data={filtered}
+          onEdit={(item) =>
+            window.location.assign(`/admin/announcements/edit/${item.id}`)
+          }
+          onDelete={(item) => setDeleteTarget(item.id)}
+        />
+      )}
+
+      <ConfirmDeleteModal
+        open={Boolean(deleteTarget)}
+        title="Delete announcement"
+        message="This announcement will be removed from the public feed. Confirm to continue."
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        loading={confirming}
+      />
+    </div>
+  );
+}
