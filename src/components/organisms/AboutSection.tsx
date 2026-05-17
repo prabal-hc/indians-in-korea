@@ -1,8 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, type KeyboardEvent } from "react";
+import { HigherEducationModal } from "./HigherEducationModal";
+import { InternationalSchoolsModal } from "./InternationalSchoolsModal";
+import { AboutKoreaModal } from "./AboutKoreaModal";
+import { FAQModal } from "./FAQModal";
 
 // ─── Animation Variants ───────────────────────────────────────────────────────
 const EASE_PREMIUM = [0.16, 1, 0.3, 1] as const;
@@ -33,8 +36,29 @@ const stagger = {
 };
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
-const featureCards = [
+type FeatureCardId =
+  | "higherEducation"
+  | "internationalSchools"
+  | "aboutKorea"
+  | "faq";
+
+type FeatureCard = {
+  id: FeatureCardId;
+  title: string;
+  label: string;
+  icon: string;
+  description: string;
+  accent: {
+    bg: string;
+    border: string;
+    label: string;
+    link: string;
+  };
+};
+
+const featureCards: FeatureCard[] = [
   {
+    id: "higherEducation",
     title: "Higher Education",
     label: "Education",
     icon: "📚",
@@ -47,6 +71,7 @@ const featureCards = [
     },
   },
   {
+    id: "internationalSchools",
     title: "International Schools",
     label: "Schools",
     icon: "🏫",
@@ -59,6 +84,7 @@ const featureCards = [
     },
   },
   {
+    id: "aboutKorea",
     title: "About Korea",
     label: "Living",
     icon: "🌏",
@@ -71,6 +97,7 @@ const featureCards = [
     },
   },
   {
+    id: "faq",
     title: "FAQ",
     label: "Help",
     icon: "❓",
@@ -84,23 +111,25 @@ const featureCards = [
   },
 ];
 
-const missionStats = [
-  { num: "20+", label: "Years active", color: "orange" },
-  { num: "98%", label: "Satisfaction", color: "green" },
-  { num: "12k+", label: "Members", color: "blue" },
-  { num: "120+", label: "Events/yr", color: "purple" },
-];
-
 const FeatCard = ({
   card,
-  index,
+  onOpen,
 }: {
   card: (typeof featureCards)[0];
-  index: number;
+  onOpen: () => void;
 }) => (
   <motion.div
     variants={fadeUp}
-    className="group relative overflow-hidden rounded-[22px] border-[1.5px] border-slate-100 bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:border-orange-200 hover:shadow-[0_14px_36px_rgba(0,0,0,0.08)]"
+    role="button"
+    tabIndex={0}
+    onClick={onOpen}
+    onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        onOpen();
+      }
+    }}
+    className="group relative overflow-hidden rounded-[22px] border-[1.5px] border-slate-100 bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:border-orange-200 hover:shadow-[0_14px_36px_rgba(0,0,0,0.08)] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
   >
     {/* Tricolor stripe on hover */}
     <div
@@ -150,6 +179,34 @@ const FeatCard = ({
 export const AboutSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: "-100px" });
+  const [openHigherEducation, setOpenHigherEducation] = useState(false);
+  const [openInternationalSchools, setOpenInternationalSchools] =
+    useState(false);
+  const [openAboutKorea, setOpenAboutKorea] = useState(false);
+  const [openFAQ, setOpenFAQ] = useState(false);
+
+  const closeAllModals = () => {
+    setOpenHigherEducation(false);
+    setOpenInternationalSchools(false);
+    setOpenAboutKorea(false);
+    setOpenFAQ(false);
+  };
+
+  const openModal = (
+    id: "higherEducation" | "internationalSchools" | "aboutKorea" | "faq",
+  ) => {
+    closeAllModals();
+
+    if (id === "higherEducation") {
+      setOpenHigherEducation(true);
+    } else if (id === "internationalSchools") {
+      setOpenInternationalSchools(true);
+    } else if (id === "aboutKorea") {
+      setOpenAboutKorea(true);
+    } else if (id === "faq") {
+      setOpenFAQ(true);
+    }
+  };
 
   return (
     <motion.section
@@ -227,8 +284,12 @@ export const AboutSection = () => {
               variants={stagger}
               className="mt-7 grid grid-cols-1 gap-[14px] sm:grid-cols-2 xl:grid-cols-4"
             >
-              {featureCards.map((card, i) => (
-                <FeatCard key={card.title} card={card} index={i} />
+              {featureCards.map((card) => (
+                <FeatCard
+                  key={card.id}
+                  card={card}
+                  onOpen={() => openModal(card.id)}
+                />
               ))}
             </motion.div>
 
@@ -255,6 +316,17 @@ export const AboutSection = () => {
           </motion.div>
         </div>
       </div>
+
+      <HigherEducationModal
+        open={openHigherEducation}
+        onClose={closeAllModals}
+      />
+      <InternationalSchoolsModal
+        open={openInternationalSchools}
+        onClose={closeAllModals}
+      />
+      <AboutKoreaModal open={openAboutKorea} onClose={closeAllModals} />
+      <FAQModal open={openFAQ} onClose={closeAllModals} />
 
       <style>{`
       @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
