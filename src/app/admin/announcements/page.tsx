@@ -107,7 +107,7 @@ export default function AdminAnnouncementsPage() {
           onAction={() => window.location.assign("/admin/announcements/create")}
         />
       ) : (
-        <DataTable
+        <DataTable<announcementsService.AnnouncementItem>
           columns={[
             { header: "Title", accessor: "title" },
             { header: "Category", accessor: "category" },

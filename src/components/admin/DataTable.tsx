@@ -16,7 +16,7 @@ interface DataTableProps<T> {
   onDelete?: (row: T) => void;
 }
 
-export function DataTable<T extends Record<string, unknown>>({
+export function DataTable<T extends object>({
   columns,
   data,
   loading = false,

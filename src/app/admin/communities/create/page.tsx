@@ -19,7 +19,14 @@ export default function AdminCreateCommunitiesPage() {
       />
       <CommunityForm
         onSubmit={async (values: CommunityFormValues) => {
-          await communitiesService.create(values);
+          await communitiesService.create({
+            name: values.name,
+            category: values.category,
+            status: "Draft",
+            members: values.members,
+            contact: values.contact,
+            description: values.description,
+          });
           router.push("/admin/communities");
         }}
       />
