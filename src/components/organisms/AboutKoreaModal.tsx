@@ -286,7 +286,11 @@ export function AboutKoreaModal({ open, onClose }: AboutKoreaModalProps) {
                         Quick Facts
                       </p>
                       <div className="space-y-2.5">
-                        {c.items.map((item, j) => (
+                        {(
+                          c as {
+                            items: Array<{ label: string; value: string }>;
+                          }
+                        ).items.map((item, j) => (
                           <div key={j} className="flex flex-col gap-0.5">
                             <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                               {item.label}
@@ -294,9 +298,16 @@ export function AboutKoreaModal({ open, onClose }: AboutKoreaModalProps) {
                             <span className="text-xs font-medium text-slate-700">
                               {item.value}
                             </span>
-                            {j < c.items.length - 1 && (
-                              <div className="mt-2 h-px bg-slate-50" />
-                            )}
+                            {j <
+                              (
+                                c as {
+                                  items: Array<{
+                                    label: string;
+                                    value: string;
+                                  }>;
+                                }
+                              ).items.length -
+                                1 && <div className="mt-2 h-px bg-slate-50" />}
                           </div>
                         ))}
                       </div>

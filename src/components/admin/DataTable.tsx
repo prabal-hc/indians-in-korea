@@ -16,7 +16,7 @@ interface DataTableProps<T> {
   onDelete?: (row: T) => void;
 }
 
-export function DataTable<T extends object>({
+export function DataTable<T extends { id: string | number }>({
   columns,
   data,
   loading = false,
@@ -90,7 +90,9 @@ export function DataTable<T extends object>({
                       ? column.render(row)
                       : column.accessor
                         ? String(
-                            (row as Record<string, unknown>)[column.accessor],
+                            (row as Record<string, unknown>)[
+                              column.accessor as string
+                            ],
                           )
                         : null}
                   </td>

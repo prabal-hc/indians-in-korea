@@ -19,7 +19,14 @@ export default function AdminCreateSportsPage() {
       />
       <SportsForm
         onSubmit={async (values: SportsFormValues) => {
-          await sportsService.create(values);
+          await sportsService.create({
+            title: values.title,
+            type: values.type,
+            status: "Draft",
+            date: values.date,
+            venue: values.venue,
+            description: values.description,
+          });
           router.push("/admin/sports");
         }}
       />

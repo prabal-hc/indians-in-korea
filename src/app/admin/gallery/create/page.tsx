@@ -19,7 +19,13 @@ export default function AdminCreateGalleryPage() {
       />
       <GalleryForm
         onSubmit={async (values: GalleryFormValues) => {
-          await galleryService.create(values);
+          await galleryService.create({
+            title: values.title,
+            category: values.category,
+            status: "Draft",
+            imageUrl: values.imageUrl,
+            caption: values.caption,
+          });
           router.push("/admin/gallery");
         }}
       />

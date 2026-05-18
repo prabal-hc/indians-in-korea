@@ -23,7 +23,7 @@ export default function AdminCreateCommunitiesPage() {
             name: values.name,
             category: values.category,
             status: "Draft",
-            members: values.members,
+            members: parseInt(values.members, 10),
             contact: values.contact,
             description: values.description,
           });

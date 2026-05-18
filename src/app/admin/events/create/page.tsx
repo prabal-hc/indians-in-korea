@@ -16,7 +16,14 @@ export default function AdminCreateEventPage() {
       />
       <EventForm
         onSubmit={async (values: EventFormValues) => {
-          await eventsService.create(values);
+          await eventsService.create({
+            title: values.title,
+            category: values.category,
+            status: "Draft",
+            date: values.date,
+            location: values.location,
+            description: values.description,
+          });
           router.push("/admin/events");
         }}
       />
