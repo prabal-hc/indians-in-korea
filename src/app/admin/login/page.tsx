@@ -3,20 +3,28 @@
 import { useState } from "react";
 import { createSupabaseClient } from "@/lib/supabase/client";
 
+export const dynamic = "force-dynamic";
+
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const supabase = createSupabaseClient();
-  if (!supabase) {
-    throw new Error(
-      "Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
-    );
-  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const supabase = createSupabaseClient();
+    if (!supabase) {
+      setError(
+        "Supabase is not configured. Please set the environment variables.",
+      );
+      setLoading(false);
+      return;
+    }
     event.preventDefault();
     setError("");
     setLoading(true);
