@@ -1,5 +1,15 @@
 import { createSupabaseClient } from "@/lib/supabase/client";
 
+const getSupabase = () => {
+  const supabase = createSupabaseClient();
+  if (!supabase) {
+    throw new Error(
+      "Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+    );
+  }
+  return supabase;
+};
+
 export interface GalleryItem {
   id: string;
   title: string;
@@ -12,8 +22,6 @@ export interface GalleryItem {
   status: string;
   displayOrder: number;
 }
-
-const supabase = createSupabaseClient();
 
 const mapItem = (item: any): GalleryItem => ({
   id: item.id,
@@ -33,7 +41,7 @@ const mapItem = (item: any): GalleryItem => ({
 // ── Public queries ─────────────────────────────────────────────────────────────
 
 export async function getAll(): Promise<GalleryItem[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("gallery")
     .select("*")
     .eq("is_active", true)
@@ -47,7 +55,7 @@ export async function getAll(): Promise<GalleryItem[]> {
 }
 
 export async function getPreview(limit = 3): Promise<GalleryItem[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("gallery")
     .select("*")
     .eq("is_active", true)
@@ -62,7 +70,7 @@ export async function getPreview(limit = 3): Promise<GalleryItem[]> {
 }
 
 export async function getById(id: string): Promise<GalleryItem | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("gallery")
     .select("*")
     .eq("id", id)
@@ -80,7 +88,7 @@ export async function getById(id: string): Promise<GalleryItem | null> {
 export async function create(
   data: Omit<GalleryItem, "id">,
 ): Promise<GalleryItem> {
-  const { data: created, error } = await supabase
+  const { data: created, error } = await getSupabase()
     .from("gallery")
     .insert([
       {
@@ -119,7 +127,7 @@ export async function update(
   if (data.status !== undefined)
     payload.is_active = data.status === "Published";
 
-  const { data: updated, error } = await supabase
+  const { data: updated, error } = await getSupabase()
     .from("gallery")
     .update(payload)
     .eq("id", id)
@@ -131,7 +139,7 @@ export async function update(
 }
 
 export async function remove(id: string): Promise<boolean> {
-  const { error } = await supabase.from("gallery").delete().eq("id", id);
+  const { error } = await getSupabase().from("gallery").delete().eq("id", id);
   if (error) throw error;
   return true;
 }

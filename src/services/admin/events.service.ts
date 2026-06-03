@@ -1,5 +1,15 @@
 import { createSupabaseClient } from "@/lib/supabase/client";
 
+const getSupabase = () => {
+  const supabase = createSupabaseClient();
+  if (!supabase) {
+    throw new Error(
+      "Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+    );
+  }
+  return supabase;
+};
+
 export interface EventItem {
   id: string;
   title: string;
@@ -14,8 +24,6 @@ export interface EventItem {
   tag?: string;
   isFeatured?: boolean;
 }
-
-const supabase = createSupabaseClient();
 
 const mapEvent = (item: any): EventItem => ({
   id: item.id,
@@ -35,7 +43,7 @@ const mapEvent = (item: any): EventItem => ({
 // ── Public queries (respects RLS — only active events) ────────────────────────
 
 export async function getAll(): Promise<EventItem[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("events")
     .select("*")
     .order("event_date", { ascending: true });
@@ -48,7 +56,7 @@ export async function getAll(): Promise<EventItem[]> {
 }
 
 export async function getFeatured(): Promise<EventItem | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("events")
     .select("*")
     .eq("is_featured", true)
@@ -71,7 +79,7 @@ export async function getFeatured(): Promise<EventItem | null> {
 
 export async function getUpcoming(limit = 6): Promise<EventItem[]> {
   const today = new Date().toISOString().split("T")[0];
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("events")
     .select("*")
     .eq("is_active", true)
@@ -87,7 +95,7 @@ export async function getUpcoming(limit = 6): Promise<EventItem[]> {
 }
 
 export async function getById(id: string): Promise<EventItem | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("events")
     .select("*")
     .eq("id", id)
@@ -105,7 +113,7 @@ export async function getById(id: string): Promise<EventItem | null> {
 export async function create(
   data: Omit<EventItem, "id"> & { isActive?: boolean; isFeatured?: boolean },
 ): Promise<EventItem> {
-  const { data: created, error } = await supabase
+  const { data: created, error } = await getSupabase()
     .from("events")
     .insert([
       {
@@ -148,7 +156,7 @@ export async function update(
   else if (data.status !== undefined)
     payload.is_active = data.status === "Published";
 
-  const { data: updated, error } = await supabase
+  const { data: updated, error } = await getSupabase()
     .from("events")
     .update(payload)
     .eq("id", id)
@@ -160,7 +168,7 @@ export async function update(
 }
 
 export async function remove(id: string): Promise<boolean> {
-  const { error } = await supabase.from("events").delete().eq("id", id);
+  const { error } = await getSupabase().from("events").delete().eq("id", id);
   if (error) throw error;
   return true;
 }
