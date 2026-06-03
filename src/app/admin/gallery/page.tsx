@@ -33,8 +33,8 @@ export default function AdminGalleryPage() {
 
   const filtered = useMemo(() => {
     return items.filter((item) => {
-      const matchesSearch = [item.title, item.tag, item.caption].some(
-        (value) => value.toLowerCase().includes(search.toLowerCase()),
+      const matchesSearch = [item.title, item.tag, item.caption].some((value) =>
+        value.toLowerCase().includes(search.toLowerCase()),
       );
       const matchesStatus =
         statusFilter === "All" || item.status === statusFilter;
