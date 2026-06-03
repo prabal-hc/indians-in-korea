@@ -1,14 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-const mockSignIn = async (email: string, password: string) => {
-  await new Promise((resolve) => setTimeout(resolve, 600));
-  if (email.toLowerCase() === "admin@iik.org" && password === "admin123") {
-    return { success: true };
-  }
-  return { success: false, message: "Invalid email or password." };
-};
+import { createSupabaseClient } from "@/lib/supabase/client";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -16,17 +9,22 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const supabase = createSupabaseClient();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     setLoading(true);
 
-    const result = await mockSignIn(email, password);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
     setLoading(false);
 
-    if (!result.success) {
-      setError(result.message ?? "Unable to sign in.");
+    if (error) {
+      setError(error.message);
       return;
     }
 
@@ -55,13 +53,13 @@ export default function AdminLoginPage() {
               <div className="rounded-[26px] border border-slate-200 bg-white p-5 text-sm text-slate-700 shadow-sm">
                 <p className="font-semibold text-slate-900">Email</p>
                 <p className="mt-3 text-slate-500">
-                  Use admin@iik.org to preview the mock flow.
+                  Use your admin email to sign in.
                 </p>
               </div>
               <div className="rounded-[26px] border border-slate-200 bg-white p-5 text-sm text-slate-700 shadow-sm">
                 <p className="font-semibold text-slate-900">Password</p>
                 <p className="mt-3 text-slate-500">
-                  Enter a secure password such as admin123 for the demo.
+                  Enter your admin password.{" "}
                 </p>
               </div>
             </div>

@@ -7,9 +7,14 @@ export interface EventFormValues {
   title: string;
   category: string;
   date: string;
+  time: string;
   location: string;
   description: string;
   imageUrl: string;
+  attendees: string;
+  tag: string;
+  isActive: boolean;
+  isFeatured: boolean;
 }
 
 interface EventFormProps {
@@ -17,6 +22,31 @@ interface EventFormProps {
   onSubmit: (values: EventFormValues) => void;
   submitLabel?: string;
 }
+
+const CATEGORIES = [
+  "Festival",
+  "Sports",
+  "Adventure",
+  // "Cuisine",
+  "Arts",
+  "Networking",
+  "Cultural",
+  "General",
+];
+const TAGS = [
+  "🪔",
+  "🎨",
+  "🌊",
+  "🏏",
+  "🍛",
+  "🎭",
+  "🤝",
+  "🎉",
+  "🇮🇳",
+  "🎶",
+  "🏸",
+  "⚽",
+];
 
 export function EventForm({
   initialData,
@@ -28,127 +58,199 @@ export function EventForm({
       title: "",
       category: "",
       date: "",
+      time: "",
       location: "",
       description: "",
       imageUrl: "",
+      attendees: "0",
+      tag: "🎉",
+      isActive: true,
+      isFeatured: false,
     },
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleChange = (key: keyof EventFormValues, value: string) => {
-    setValues((current) => ({ ...current, [key]: value }));
-  };
+  const set = (key: keyof EventFormValues, value: string | boolean) =>
+    setValues((v) => ({ ...v, [key]: value }));
 
   const validate = () => {
-    const nextErrors: Record<string, string> = {};
-
-    if (!values.title.trim()) nextErrors.title = "Title is required.";
-    if (!values.category.trim()) nextErrors.category = "Category is required.";
-    if (!values.date.trim()) nextErrors.date = "Date is required.";
-    if (!values.location.trim()) nextErrors.location = "Location is required.";
-    if (!values.description.trim())
-      nextErrors.description = "Description cannot be empty.";
-
-    setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
+    const e: Record<string, string> = {};
+    if (!values.title.trim()) e.title = "Title is required.";
+    if (!values.category.trim()) e.category = "Category is required.";
+    if (!values.date.trim()) e.date = "Date is required.";
+    if (!values.location.trim()) e.location = "Location is required.";
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
+
+  const field =
+    "w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200";
 
   return (
     <form
-      onSubmit={(event) => {
-        event.preventDefault();
-        if (!validate()) return;
-        onSubmit(values);
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (validate()) onSubmit(values);
       }}
-      className="space-y-8 rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm shadow-slate-900/5"
+      className="space-y-8 rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm"
     >
       <div className="grid gap-6 md:grid-cols-2">
-        <label className="space-y-3">
+        {/* Title */}
+        <label className="space-y-2 md:col-span-2">
           <span className="text-sm font-semibold text-slate-900">
             Event title
           </span>
           <input
             value={values.title}
-            onChange={(event) => handleChange("title", event.target.value)}
-            className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
-            placeholder="Summer Cultural Exchange"
+            onChange={(e) => set("title", e.target.value)}
+            className={field}
+            placeholder="IIK Diwali Dhamaka 2026"
           />
-          {errors.title ? (
+          {errors.title && (
             <p className="text-xs text-rose-600">{errors.title}</p>
-          ) : null}
+          )}
         </label>
 
-        <label className="space-y-3">
+        {/* Category */}
+        <label className="space-y-2">
           <span className="text-sm font-semibold text-slate-900">Category</span>
           <select
             value={values.category}
-            onChange={(event) => handleChange("category", event.target.value)}
-            className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+            onChange={(e) => set("category", e.target.value)}
+            className={field}
           >
-            <option value="">Select a category</option>
-            <option value="Culture">Culture</option>
-            <option value="Networking">Networking</option>
-            <option value="Education">Education</option>
-            <option value="Wellness">Wellness</option>
+            <option value="">Select category</option>
+            {CATEGORIES.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
           </select>
-          {errors.category ? (
+          {errors.category && (
             <p className="text-xs text-rose-600">{errors.category}</p>
-          ) : null}
+          )}
         </label>
 
-        <label className="space-y-3">
+        {/* Tag emoji */}
+        <label className="space-y-2">
+          <span className="text-sm font-semibold text-slate-900">
+            Tag emoji
+          </span>
+          <select
+            value={values.tag}
+            onChange={(e) => set("tag", e.target.value)}
+            className={field}
+          >
+            {TAGS.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        {/* Date */}
+        <label className="space-y-2">
           <span className="text-sm font-semibold text-slate-900">Date</span>
           <input
             type="date"
             value={values.date}
-            onChange={(event) => handleChange("date", event.target.value)}
-            className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+            onChange={(e) => set("date", e.target.value)}
+            className={field}
           />
-          {errors.date ? (
+          {errors.date && (
             <p className="text-xs text-rose-600">{errors.date}</p>
-          ) : null}
+          )}
         </label>
 
-        <label className="space-y-3">
+        {/* Time */}
+        <label className="space-y-2">
+          <span className="text-sm font-semibold text-slate-900">Time</span>
+          <input
+            value={values.time}
+            onChange={(e) => set("time", e.target.value)}
+            className={field}
+            placeholder="6:00 PM – 11:30 PM"
+          />
+        </label>
+
+        {/* Location */}
+        <label className="space-y-2">
           <span className="text-sm font-semibold text-slate-900">Location</span>
           <input
             value={values.location}
-            onChange={(event) => handleChange("location", event.target.value)}
-            className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
-            placeholder="Seoul Central Hall"
+            onChange={(e) => set("location", e.target.value)}
+            className={field}
+            placeholder="Seoul Grand Ballroom, Gangnam"
           />
-          {errors.location ? (
+          {errors.location && (
             <p className="text-xs text-rose-600">{errors.location}</p>
-          ) : null}
+          )}
+        </label>
+
+        {/* Expected attendees */}
+        <label className="space-y-2">
+          <span className="text-sm font-semibold text-slate-900">
+            Expected attendees
+          </span>
+          <input
+            value={values.attendees}
+            onChange={(e) => set("attendees", e.target.value)}
+            className={field}
+            placeholder="3,000+"
+          />
         </label>
       </div>
 
-      <label className="space-y-3">
+      {/* Description */}
+      <label className="space-y-2">
         <span className="text-sm font-semibold text-slate-900">
-          Event description
+          Description
         </span>
         <textarea
           value={values.description}
-          onChange={(event) => handleChange("description", event.target.value)}
-          className="min-h-[140px] w-full rounded-[28px] border border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
-          placeholder="Write a short summary of the event, what to expect, and who should attend."
+          onChange={(e) => set("description", e.target.value)}
+          className="min-h-[120px] w-full rounded-[28px] border border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+          placeholder="What to expect, who should attend..."
         />
-        {errors.description ? (
-          <p className="text-xs text-rose-600">{errors.description}</p>
-        ) : null}
       </label>
 
+      {/* Image */}
       <ImageUploader
-        label="Event visual"
+        label="Event image"
         value={values.imageUrl}
-        onChange={(url) => handleChange("imageUrl", url)}
-        note="Add a vibrant image that matches the event tone."
+        onChange={(url) => set("imageUrl", url)}
+        note="Landscape image works best (1200×630)."
       />
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+      {/* Toggles */}
+      <div className="flex flex-wrap gap-6">
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={values.isActive}
+            onChange={(e) => set("isActive", e.target.checked)}
+            className="w-4 h-4 accent-orange-500"
+          />
+          <span className="text-sm font-semibold text-slate-900">
+            Publish event
+          </span>
+        </label>
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={values.isFeatured}
+            onChange={(e) => set("isFeatured", e.target.checked)}
+            className="w-4 h-4 accent-orange-500"
+          />
+          <span className="text-sm font-semibold text-slate-900">
+            Feature on homepage
+          </span>
+        </label>
+      </div>
+
+      <div className="flex justify-end">
         <button
           type="submit"
-          className="inline-flex justify-center rounded-3xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-orange-600"
+          className="inline-flex items-center gap-2 rounded-3xl bg-orange-500 px-8 py-3 text-sm font-bold text-white transition hover:bg-orange-600 hover:shadow-lg hover:shadow-orange-200"
         >
           {submitLabel}
         </button>

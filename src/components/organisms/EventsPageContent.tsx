@@ -20,295 +20,104 @@ import {
   ExternalLink,
   Zap,
 } from "lucide-react";
+import {
+  getUpcoming,
+  getFeatured,
+  getAll,
+  type EventItem,
+} from "@/services/events.service";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-interface EventItem {
-  id: string;
-  name: string;
-  category: string;
-  date: string;
-  time: string;
-  location: string;
-  description: string;
-  attendees: string;
-  accent: string;
-  image: string;
-  tag: string;
-}
+// ─── Layout tokens ────────────────────────────────────────────────────────────
+const S = "px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 2xl:px-24";
+const SY = "py-16 sm:py-20 md:py-24 lg:py-28 xl:py-32";
+const W = "mx-auto w-full max-w-screen-2xl";
 
-// ─── Data (unchanged) ─────────────────────────────────────────────────────────
-const featuredEvent = {
-  title: "IIK Diwali Dhamaka 2026",
-  subtitle:
-    "A night of lights, music, culture and unforgettable community celebration.",
-  date: "November 14, 2026",
-  time: "6:00 PM – 11:30 PM",
-  location: "Seoul Grand Ballroom, Gangnam",
-  venue: "Seoul Grand Ballroom",
-  highlights: [
-    "Live music performances",
-    "Cultural dance showcase",
-    "Flavors of India food curation",
-    "Midnight fireworks finale",
-  ],
-  image:
-    "https://s7ap1.scene7.com/is/image/incredibleindia/diwali-fes-hero?qlt=82&ts=1726639266846",
+// ─── Motion config ────────────────────────────────────────────────────────────
+const EASE_PREMIUM = [0.16, 1, 0.3, 1] as const;
+const EASE_SOFT = [0.22, 1, 0.36, 1] as const;
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 32, filter: "blur(6px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.75, ease: EASE_PREMIUM },
+  },
+};
+const fadeLeft = {
+  hidden: { opacity: 0, x: -36, filter: "blur(4px)" },
+  visible: {
+    opacity: 1,
+    x: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.8, ease: EASE_PREMIUM },
+  },
+};
+const fadeRight = {
+  hidden: { opacity: 0, x: 36, filter: "blur(4px)" },
+  visible: {
+    opacity: 1,
+    x: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.8, ease: EASE_PREMIUM },
+  },
+};
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+};
+const staggerFast = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06 } },
 };
 
-const upcomingEvents: EventItem[] = [
-  {
-    id: "holi",
-    name: "Holi Hungama",
-    category: "Festival",
-    date: "Mar 23",
-    time: "11:00 AM",
-    location: "Hangang Park",
-    description:
-      "Color-filled joy with music, food stalls, and safe play zones for families.",
-    attendees: "3.2K",
-    accent: "#f43f5e",
-    image:
-      "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=80",
-    tag: "🎨",
-  },
-  {
-    id: "summer",
-    name: "Summer Trip",
-    category: "Adventure",
-    date: "Jul 10–12",
-    time: "All day",
-    location: "Jeju Island",
-    description:
-      "A coastal escape with cultural tours, beachside music, and community bonding.",
-    attendees: "1.8K",
-    accent: "#2563eb",
-    image:
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
-    tag: "🌊",
-  },
-  {
-    id: "cricket",
-    name: "Cricket Tournament",
-    category: "Sports",
-    date: "Jun 5",
-    time: "9:00 AM",
-    location: "Seoul Sports Complex",
-    description:
-      "High-energy matches between community teams with food courts and fan zones.",
-    attendees: "2.4K",
-    accent: "#f59e0b",
-    image:
-      "https://images.unsplash.com/photo-1505843412730-59a5157a55fd?auto=format&fit=crop&w=900&q=80",
-    tag: "🏏",
-  },
-  {
-    id: "food",
-    name: "Food Festival",
-    category: "Cuisine",
-    date: "Aug 20",
-    time: "12:00 PM",
-    location: "Itaewon Bazaar",
-    description:
-      "A sensory journey through regional dishes, live cooking and warm hospitality.",
-    attendees: "4.0K",
-    accent: "#14b8a6",
-    image:
-      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
-    tag: "🍛",
-  },
-  {
-    id: "cultural",
-    name: "Indian Cultural Night",
-    category: "Arts",
-    date: "Sep 12",
-    time: "7:00 PM",
-    location: "Seoul Art Center",
-    description:
-      "An elegant evening of classical music, dance, and curated cultural narratives.",
-    attendees: "1.5K",
-    accent: "#7c3aed",
-    image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
-    tag: "🎭",
-  },
-  {
-    id: "meetup",
-    name: "Community Meetup",
-    category: "Networking",
-    date: "Oct 8",
-    time: "5:30 PM",
-    location: "Seongsu Creative Hub",
-    description:
-      "Warm conversations, collaborative workshops, and friends reconnecting.",
-    attendees: "950",
-    accent: "#fb7185",
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80",
-    tag: "🤝",
-  },
-];
+const getCategoryEmoji = (category: string) => {
+  const normalized = category?.toLowerCase() ?? "";
+  if (
+    normalized.includes("fest") ||
+    normalized.includes("diwali") ||
+    normalized.includes("cultural")
+  )
+    return "🪔";
+  if (normalized.includes("sport")) return "🏏";
+  if (normalized.includes("advent")) return "🌊";
+  if (normalized.includes("art")) return "🎨";
+  if (normalized.includes("network")) return "🤝";
+  if (normalized.includes("food") || normalized.includes("cuisine"))
+    return "🍛";
+  return "🎉";
+};
 
-const pastEventYears = ["2026", "2025", "2024"];
-const pastEvents = [
-  {
-    id: "past-diwali",
-    title: "Diwali Dhamaka",
-    year: "2026",
-    summary: "A glittering night of lamps, performances and community joy.",
-    image:
-      "https://images.unsplash.com/photo-1516455590571-18256e5bb9ff?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: "past-holi",
-    title: "Holi Hungama",
-    year: "2026",
-    summary: "Colors, music and laughter flowing across the riverbanks.",
-    image:
-      "https://images.unsplash.com/photo-1487517157794-1f3b6fa4cbc3?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: "past-independence",
-    title: "Independence Day",
-    year: "2025",
-    summary: "Pride, heritage and a community pulse that shines through.",
-    image:
-      "https://images.unsplash.com/photo-1521967908-2f3a158b6fab?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: "past-sports",
-    title: "Sports Meet",
-    year: "2025",
-    summary: "Team spirit, healthy competition, and shared victories.",
-    image:
-      "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: "past-exchange",
-    title: "Cultural Exchange",
-    year: "2024",
-    summary: "Indian and Korean creatives connecting through art and music.",
-    image:
-      "https://images.unsplash.com/photo-1497032205916-ac775f0649ae?auto=format&fit=crop&w=900&q=80",
-  },
-];
+const getEventImage = (event: EventItem) =>
+  event.imageUrl ||
+  (event.category?.toLowerCase().includes("fest")
+    ? "https://images.unsplash.com/photo-1516455590571-18256e5bb9ff?auto=format&fit=crop&w=900&q=80"
+    : "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=900&q=80");
 
-const sportsEvents = [
-  {
-    id: "iik-cricket",
-    title: "IIK Cricket Championship",
-    category: "Cricket",
-    city: "Seoul",
-    venue: "IIK Community Grounds",
-    date: "Spring Season",
-    participants: "18 Teams",
-    attendees: "1.8K+",
-    emoji: "🏏",
-    description:
-      "IIK's flagship cricket championship bringing Indian teams across Korea together with competitive matches, fan energy, and unforgettable community spirit.",
-    image:
-      "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1400&q=80",
-    accent: "#f97316",
-  },
-  {
-    id: "iik-football",
-    title: "Korea Indian Football League",
-    category: "Football",
-    city: "Suwon",
-    venue: "Community Sports Arena",
-    date: "Summer League",
-    participants: "12 Clubs",
-    attendees: "900+",
-    emoji: "⚽",
-    description:
-      "Fast-paced football action featuring Indian students, professionals, and community clubs competing across South Korea.",
-    image:
-      "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1400&q=80",
-    accent: "#22c55e",
-  },
-  {
-    id: "iik-badminton",
-    title: "IIK Badminton Open",
-    category: "Badminton",
-    city: "Incheon",
-    venue: "Indoor Sports Center",
-    date: "Community Weekend",
-    participants: "250+ Players",
-    attendees: "600+",
-    emoji: "🏸",
-    description:
-      "A welcoming badminton meet for competitive players and casual enthusiasts—designed to build friendships through sport.",
-    image:
-      "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=1400&q=80",
-    accent: "#3b82f6",
-  },
-];
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+};
 
-const sportsStats = [
-  {
-    value: "30+",
-    label: "Sports Events Hosted",
-  },
-  {
-    value: "2K+",
-    label: "Active Participants",
-  },
-  {
-    value: "20+",
-    label: "Community Teams",
-  },
-  {
-    value: "3",
-    label: "Major Sports",
-  },
-];
+const formatDateLong = (dateStr: string) => {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+};
 
-const sportsHighlights = [
-  "Competitive inter-city tournaments",
-  "Student & professional participation",
-  "Weekend sports meetups",
-  "Community wellness initiatives",
-];
-
-const timeline = [
-  {
-    label: "January",
-    title: "New Year Meetup",
-    desc: "A warm community kickoff with culture, cuisine and connection.",
-    emoji: "🎉",
-  },
-  {
-    label: "March",
-    title: "Holi Hungama",
-    desc: "Color celebrations and springtime togetherness.",
-    emoji: "🌈",
-  },
-  {
-    label: "Summer",
-    title: "Summer Trip",
-    desc: "Island escape, stories and shared memories.",
-    emoji: "🌊",
-  },
-  {
-    label: "August",
-    title: "Independence Day",
-    desc: "Heritage pride with spirited community festivities.",
-    emoji: "🇮🇳",
-  },
-  {
-    label: "November",
-    title: "Diwali Dhamaka",
-    desc: "The most luminous festival night of the year.",
-    emoji: "🪔",
-  },
-  {
-    label: "December",
-    title: "Year-End Gala",
-    desc: "A cinematic close to the year with friends.",
-    emoji: "✨",
-  },
-];
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
+const Sk = ({ className }: { className?: string }) => (
+  <div className={`animate-pulse bg-orange-100/60 rounded-2xl ${className}`} />
+);
 
 // ─── Countdown hook ───────────────────────────────────────────────────────────
 function useCountdown(targetDate: Date) {
@@ -333,88 +142,13 @@ function useCountdown(targetDate: Date) {
   return r;
 }
 
-// ─── Layout tokens (match About page) ────────────────────────────────────────
-const S = "px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 2xl:px-24";
-const SY = "py-16 sm:py-20 md:py-24 lg:py-28 xl:py-32";
-const W = "mx-auto w-full max-w-screen-2xl";
-
-// ─── Premium motion system ────────────────────────────────────────────────────
-// Apple-grade easing: fast start, smooth settle
-const EASE_PREMIUM = [0.16, 1, 0.3, 1] as const;
-const EASE_SOFT = [0.22, 1, 0.36, 1] as const;
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 32, filter: "blur(6px)" },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.75, ease: EASE_PREMIUM },
-  },
-};
-
-const fadeLeft = {
-  hidden: { opacity: 0, x: -36, filter: "blur(4px)" },
-  visible: {
-    opacity: 1,
-    x: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.8, ease: EASE_PREMIUM },
-  },
-};
-const fadeRight = {
-  hidden: { opacity: 0, x: 36, filter: "blur(4px)" },
-  visible: {
-    opacity: 1,
-    x: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.8, ease: EASE_PREMIUM },
-  },
-};
-
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
-};
-
-const staggerFast = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.06 } },
-};
-
-// ─── Animated countdown digit ────────────────────────────────────────────────
-function CountDigit({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="flex flex-col items-center rounded-xl bg-white/10 pb-3 relative overflow-hidden group/digit">
-      {/* Subtle shimmer sweep on hover */}
-      <div className="absolute inset-0 -translate-x-full group-hover/digit:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/8 to-transparent pointer-events-none" />
-      <AnimatePresence mode="popLayout">
-        <motion.span
-          key={value}
-          initial={{ y: -12, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 12, opacity: 0 }}
-          transition={{ duration: 0.28, ease: EASE_SOFT }}
-          className="text-lg xl:text-xl font-bold text-white tabular-nums"
-        >
-          {value}
-        </motion.span>
-      </AnimatePresence>
-      <span className="text-[9px] xl:text-[10px] text-gray-400 uppercase tracking-wide mt-0.5">
-        {label}
-      </span>
-    </div>
-  );
-}
-
-// ─── Section label ────────────────────────────────────────────────────────────
+// ─── Sub-components ───────────────────────────────────────────────────────────
 const Label = ({ children }: { children: React.ReactNode }) => (
   <p className="text-[10px] sm:text-xs xl:text-sm font-bold uppercase tracking-widest text-orange-500 mb-2 sm:mb-3">
     {children}
   </p>
 );
 
-// ─── Animated floating blob ───────────────────────────────────────────────────
 function Blob({
   className,
   style,
@@ -437,7 +171,29 @@ function Blob({
   );
 }
 
-// ─── Card tilt hook ───────────────────────────────────────────────────────────
+function CountDigit({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="flex flex-col items-center rounded-xl bg-white/10 pb-3 relative overflow-hidden group/digit">
+      <div className="absolute inset-0 -translate-x-full group-hover/digit:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/8 to-transparent pointer-events-none" />
+      <AnimatePresence mode="popLayout">
+        <motion.span
+          key={value}
+          initial={{ y: -12, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 12, opacity: 0 }}
+          transition={{ duration: 0.28, ease: EASE_SOFT }}
+          className="text-lg xl:text-xl font-bold text-white tabular-nums"
+        >
+          {value}
+        </motion.span>
+      </AnimatePresence>
+      <span className="text-[9px] xl:text-[10px] text-gray-400 uppercase tracking-wide mt-0.5">
+        {label}
+      </span>
+    </div>
+  );
+}
+
 function useTilt(strength = 8) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -449,7 +205,6 @@ function useTilt(strength = 8) {
     stiffness: 300,
     damping: 30,
   });
-
   const onMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       const rect = e.currentTarget.getBoundingClientRect();
@@ -458,12 +213,10 @@ function useTilt(strength = 8) {
     },
     [x, y],
   );
-
   const onMouseLeave = useCallback(() => {
     x.set(0);
     y.set(0);
   }, [x, y]);
-
   return { rotX, rotY, onMouseMove, onMouseLeave };
 }
 
@@ -473,11 +226,93 @@ function useTilt(strength = 8) {
 export default function EventsPageContent() {
   const rootRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
-  const tlRef = useRef<HTMLDivElement>(null); // timeline spine ref for GSAP pulse
+  const tlRef = useRef<HTMLDivElement>(null);
+  const cardTilt = useTilt(5);
 
-  const [activeYear, setActiveYear] = useState("2026");
-  const countdown = useCountdown(new Date("2026-11-14T18:00:00"));
+  // ── Supabase state ──────────────────────────────────────────────────────────
+  const [featured, setFeatured] = useState<EventItem | null>(null);
+  const [upcomingEvents, setUpcomingEvents] = useState<EventItem[]>([]);
+  const [allEvents, setAllEvents] = useState<EventItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [feat, events, all] = await Promise.all([
+          getFeatured(),
+          getUpcoming(6),
+          getAll(),
+        ]);
+        setFeatured(feat);
+        setUpcomingEvents(events.filter((e) => !e.isFeatured).slice(0, 6));
+        setAllEvents(all);
+        const pastYears = Array.from(
+          new Set(
+            all
+              .filter((event) => new Date(event.date) < new Date())
+              .map((event) => new Date(event.date).getFullYear().toString()),
+          ),
+        ).sort((a, b) => Number(b) - Number(a));
+        if (pastYears.length) {
+          setActiveYear(pastYears[0]);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  // ── Other state ─────────────────────────────────────────────────────────────
+  const [activeYear, setActiveYear] = useState("");
+
+  // Countdown to featured event date (falls back gracefully)
+  const countdownTarget = useMemo(() => {
+    if (featured?.date) return new Date(`${featured.date}T18:00:00`);
+    return new Date("2026-11-14T18:00:00");
+  }, [featured]);
+  const countdown = useCountdown(countdownTarget);
+
+  const timeline = useMemo(() => {
+    const today = new Date().toISOString().split("T")[0];
+    return allEvents
+      .filter((event) => event.date >= today)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(0, 6)
+      .map((event) => ({
+        label: new Date(event.date).toLocaleDateString("en-US", {
+          month: "short",
+        }),
+        title: event.title,
+        desc: event.description || event.category || "Community event",
+        emoji: getCategoryEmoji(event.category),
+        image: getEventImage(event),
+      }));
+  }, [allEvents]);
+
+  const pastEventYears = useMemo(() => {
+    return Array.from(
+      new Set(
+        allEvents
+          .filter((event) => new Date(event.date) < new Date())
+          .map((event) => new Date(event.date).getFullYear().toString()),
+      ),
+    ).sort((a, b) => Number(b) - Number(a));
+  }, [allEvents]);
+
+  const filteredPast = useMemo(
+    () =>
+      allEvents
+        .filter(
+          (event) =>
+            event.date &&
+            new Date(event.date).getFullYear().toString() === activeYear,
+        )
+        .sort((a, b) => b.date.localeCompare(a.date)),
+    [activeYear, allEvents],
+  );
+
+  // ── Scroll / parallax ───────────────────────────────────────────────────────
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -486,7 +321,6 @@ export default function EventsPageContent() {
   const heroCardY = useTransform(scrollYProgress, [0, 1], ["0%", "8%"]);
   const heroTextY = useTransform(scrollYProgress, [0, 1], ["0%", "-6%"]);
 
-  // Cursor spotlight in hero
   const spotX = useMotionValue(-999);
   const spotY = useMotionValue(-999);
   const handleHeroMouseMove = useCallback(
@@ -498,16 +332,10 @@ export default function EventsPageContent() {
     [spotX, spotY],
   );
 
-  const filteredPast = useMemo(
-    () => pastEvents.filter((e) => e.year === activeYear),
-    [activeYear],
-  );
-
-  // ── GSAP scroll reveals + timeline pulse animation ────────────────────────
+  // ── GSAP ────────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!rootRef.current) return;
     const ctx = gsap.context(() => {
-      // Scroll reveals
       gsap.utils.toArray<HTMLElement>(".ev-reveal").forEach((el) => {
         gsap.fromTo(
           el,
@@ -526,8 +354,6 @@ export default function EventsPageContent() {
           },
         );
       });
-
-      // Timeline spine traveling pulse
       if (tlRef.current) {
         const pulse = tlRef.current.querySelector(".tl-pulse");
         if (pulse) {
@@ -545,8 +371,6 @@ export default function EventsPageContent() {
           });
         }
       }
-
-      // Parallax for community moments images
       gsap.utils.toArray<HTMLElement>(".moment-img").forEach((img) => {
         gsap.to(img, {
           yPercent: -8,
@@ -563,23 +387,32 @@ export default function EventsPageContent() {
     return () => ctx.revert();
   }, []);
 
-  // ── Featured card tilt ────────────────────────────────────────────────────
-  const cardTilt = useTilt(5);
+  // ── Derived featured data ────────────────────────────────────────────────────
+  const featuredTitle = featured?.title ?? "IIK Diwali Dhamaka 2026";
+  const featuredImage =
+    featured?.imageUrl ??
+    "https://s7ap1.scene7.com/is/image/incredibleindia/diwali-fes-hero?qlt=82&ts=1726639266846";
+  const featuredDate = featured?.date
+    ? formatDateLong(featured.date)
+    : "November 14, 2026";
+  const featuredTime = featured?.time ?? "6:00 PM – 11:30 PM";
+  const featuredLocation =
+    featured?.location ?? "Seoul Grand Ballroom, Gangnam";
+  const featuredVenue = featuredLocation.split(",")[0];
 
   return (
     <div
       ref={rootRef}
       className="relative overflow-x-hidden bg-white text-gray-900 font-sans antialiased"
     >
-      {/* ═════════════════════════════════════════════════════════════════════
+      {/* ═══════════════════════════════════════════════════════════════════════
           HERO
-      ═════════════════════════════════════════════════════════════════════ */}
+      ═══════════════════════════════════════════════════════════════════════ */}
       <section
         ref={heroRef}
         onMouseMove={handleHeroMouseMove}
-        className={`relative overflow-hidden bg-orange-50 ${S} pt-30 pb-0 sm:pt-20 md:pt-28 xl:pt-30 2xl:pt-30`}
+        className={`relative overflow-hidden bg-orange-50 ${S} pt-20 sm:pt-20 md:pt-28 xl:pt-30 pb-0`}
       >
-        {/* ── Cursor spotlight ── */}
         <motion.div
           className="pointer-events-none absolute h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
@@ -589,8 +422,6 @@ export default function EventsPageContent() {
               "radial-gradient(circle, rgba(251,146,60,0.10) 0%, transparent 70%)",
           }}
         />
-
-        {/* ── Animated ambient blobs ── */}
         <Blob
           className="h-80 w-80 bg-orange-200/40"
           style={{ top: "-8%", right: "12%" }}
@@ -599,8 +430,6 @@ export default function EventsPageContent() {
           className="h-56 w-56 bg-amber-200/30"
           style={{ bottom: "10%", left: "4%" }}
         />
-
-        {/* ── Subtle noise texture overlay ── */}
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.025]"
           style={{
@@ -618,17 +447,15 @@ export default function EventsPageContent() {
             variants={stagger}
             className="grid gap-0 lg:grid-cols-[1fr_480px] xl:grid-cols-[1fr_560px] 2xl:grid-cols-[1fr_640px] lg:items-end"
           >
-            {/* ── Left: Headline ── */}
+            {/* Left: text */}
             <motion.div
               style={{ y: heroTextY }}
               className="pb-12 sm:pb-16 lg:pb-20 xl:pb-24 space-y-6 sm:space-y-7 xl:space-y-9 pr-0 lg:pr-12 xl:pr-16"
             >
-              {/* Badge with shimmer + pulse dot */}
               <motion.div
                 variants={fadeUp}
                 className="inline-flex items-center gap-2.5 bg-orange-100 text-orange-600 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full w-fit relative overflow-hidden group/badge"
               >
-                {/* Shimmer sweep */}
                 <motion.div
                   className="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/40 to-transparent"
                   initial={{ x: "-120%" }}
@@ -641,18 +468,16 @@ export default function EventsPageContent() {
                     ease: EASE_SOFT,
                   }}
                 />
-                {/* Live pulse */}
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500" />
                 </span>
                 <Zap className="h-3 w-3 sm:h-3.5 sm:w-3.5 relative" />
-                <span className="text-[10px] sm:text-xs xl:text-sm font-bold tracking-widest uppercase relative">
+                <span className="text-[10px] sm:text-xs xl:text-sm font-bold tracking-widest uppercase relative z-10">
                   Premium community events
                 </span>
               </motion.div>
 
-              {/* Headline — word-by-word stagger */}
               <motion.div variants={staggerFast} className="overflow-hidden">
                 {["Celebrating", "India Together", "in Korea"].map(
                   (word, wi) => (
@@ -682,7 +507,6 @@ export default function EventsPageContent() {
                 )}
               </motion.div>
 
-              {/* Description */}
               <motion.p
                 variants={fadeUp}
                 className="text-base sm:text-md xl:text-lg 2xl:text-xl text-gray-600 max-w-lg xl:max-w-xl leading-relaxed"
@@ -691,7 +515,6 @@ export default function EventsPageContent() {
                 unforgettable community moments across South Korea.
               </motion.p>
 
-              {/* CTAs */}
               <motion.div
                 variants={fadeUp}
                 className="flex flex-wrap gap-3 sm:gap-4"
@@ -700,9 +523,8 @@ export default function EventsPageContent() {
                   href="#featured"
                   className="group/btn relative inline-flex items-center gap-2 rounded-full bg-orange-500 px-6 py-3.5 sm:px-7 sm:py-4 xl:px-8 xl:py-4 text-sm xl:text-base font-bold text-white shadow-lg shadow-orange-200 overflow-hidden transition-all duration-300 hover:bg-orange-600 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-orange-300/50"
                 >
-                  {/* Button shine sweep */}
                   <span className="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
-                  <span className="relative">Diwali Dhamaka 2026</span>
+                  <span className="relative">{featuredTitle}</span>
                   <ArrowRight className="h-4 w-4 relative transition-transform duration-300 group-hover/btn:translate-x-0.5" />
                 </a>
                 <a
@@ -713,7 +535,6 @@ export default function EventsPageContent() {
                 </a>
               </motion.div>
 
-              {/* Stats */}
               <motion.div
                 variants={fadeUp}
                 className="flex flex-wrap gap-5 sm:gap-8 xl:gap-10 pt-4 border-t border-gray-200"
@@ -721,7 +542,7 @@ export default function EventsPageContent() {
                 {[
                   { v: "120+", l: "Events hosted" },
                   { v: "12K+", l: "Community members" },
-                  { v: "6+", l: "Events in 2026" },
+                  { v: `${upcomingEvents.length}+`, l: "Upcoming in 2026" },
                 ].map((s) => (
                   <div key={s.l}>
                     <div className="text-2xl sm:text-3xl xl:text-4xl 2xl:text-5xl font-bold text-orange-500">
@@ -735,9 +556,10 @@ export default function EventsPageContent() {
               </motion.div>
             </motion.div>
 
-            {/* ── Right: Featured card with 3D tilt ── */}
+            {/* Right: featured card */}
             <motion.div
               variants={fadeUp}
+              id="featured"
               style={{
                 y: heroCardY,
                 rotateX: cardTilt.rotX,
@@ -748,52 +570,48 @@ export default function EventsPageContent() {
               onMouseLeave={cardTilt.onMouseLeave}
               className="relative self-start cursor-pointer"
             >
-              {/* Cinematic glow behind card */}
               <div className="absolute -bottom-8 left-6 right-6 h-16 bg-orange-300/25 blur-3xl rounded-full" />
-              {/* Shimmer border */}
               <div className="absolute -inset-px rounded-t-3xl bg-gradient-to-br from-orange-200 via-transparent to-orange-100 opacity-60 pointer-events-none" />
 
               <div className="relative overflow-hidden rounded-t-3xl border border-orange-100/80 shadow-2xl shadow-orange-100/60 bg-white">
-                {/* Image with parallax + breathing */}
                 <div className="relative h-64 sm:h-72 xl:h-80 2xl:h-96 overflow-hidden">
-                  <motion.img
-                    src={featuredEvent.image}
-                    alt={featuredEvent.title}
-                    style={{ y: heroImgY }}
-                    animate={{ scale: [1, 1.03, 1] }}
-                    transition={{
-                      duration: 8,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      repeatType: "mirror",
-                    }}
-                    className="w-full h-full object-cover"
-                  />
+                  {loading ? (
+                    <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200 animate-pulse" />
+                  ) : (
+                    <motion.img
+                      src={featuredImage}
+                      alt={featuredTitle}
+                      style={{ y: heroImgY }}
+                      animate={{ scale: [1, 1.03, 1] }}
+                      transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        repeatType: "mirror",
+                      }}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-900/85 via-gray-900/15 to-transparent" />
-                  {/* Floating ambient light */}
                   <div className="absolute top-0 right-0 w-40 h-40 bg-orange-400/20 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-
-                  {/* Glass reflection */}
                   <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white/8 to-transparent pointer-events-none" />
-
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.6, duration: 0.5, ease: EASE_SOFT }}
                     className="absolute top-4 left-4 rounded-full bg-orange-500 px-3 py-1 text-[10px] sm:text-xs font-bold text-white uppercase tracking-widest shadow-md shadow-orange-500/30"
                   >
-                    🪔 Featured Event
+                    {featured?.tag ?? "🪔"} Featured Event
                   </motion.div>
                   <div className="absolute bottom-5 left-5 right-5">
                     <p className="text-xs uppercase tracking-widest text-orange-300 font-semibold">
                       Illuminate the night
                     </p>
                     <h2 className="mt-1.5 text-xl sm:text-2xl xl:text-3xl font-bold text-white leading-tight">
-                      {featuredEvent.title}
+                      {featuredTitle}
                     </h2>
                   </div>
                 </div>
-
                 {/* Info bar */}
                 <div className="bg-white grid grid-cols-2 divide-x divide-gray-100">
                   <div className="p-4 xl:p-5">
@@ -801,20 +619,20 @@ export default function EventsPageContent() {
                       Date & Time
                     </p>
                     <p className="mt-1 text-sm xl:text-base font-semibold text-gray-900">
-                      {featuredEvent.date}
+                      {featuredDate}
                     </p>
-                    <p className="text-xs text-gray-500">
-                      {featuredEvent.time}
-                    </p>
+                    <p className="text-xs text-gray-500">{featuredTime}</p>
                   </div>
                   <div className="p-4 xl:p-5">
                     <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">
                       Venue
                     </p>
                     <p className="mt-1 text-sm xl:text-base font-semibold text-gray-900">
-                      {featuredEvent.venue}
+                      {featuredVenue}
                     </p>
-                    <p className="text-xs text-gray-500">Gangnam, Seoul</p>
+                    <p className="text-xs text-gray-500">
+                      {featuredLocation.split(",").slice(1).join(",").trim()}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -823,16 +641,14 @@ export default function EventsPageContent() {
         </div>
       </section>
 
-      {/* ═════════════════════════════════════════════════════════════════════
+      {/* ═══════════════════════════════════════════════════════════════════════
           UPCOMING EVENTS — Bento grid
-      ═════════════════════════════════════════════════════════════════════ */}
+      ═══════════════════════════════════════════════════════════════════════ */}
       <section
         id="upcoming"
         className={`${S} ${SY} bg-white relative overflow-hidden`}
       >
-        {/* Subtle background atmosphere */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_100%_0%,rgba(251,146,60,0.05),transparent)]" />
-
         <div className={`${W} relative`}>
           <motion.div
             initial="hidden"
@@ -852,226 +668,241 @@ export default function EventsPageContent() {
                 </h2>
               </div>
               <p className="text-sm xl:text-base text-gray-500 max-w-sm leading-relaxed">
-                Six premium experiences designed for the Indian community in
-                Korea — each one unforgettable.
+                {upcomingEvents.length > 0
+                  ? `${upcomingEvents.length} upcoming experiences for the Indian community in Korea.`
+                  : "Vibrant experiences designed for the Indian community in Korea."}
               </p>
             </motion.div>
 
-            <div className="grid gap-4 sm:gap-5 xl:gap-6">
-              {/* Row 1: hero card left + 2 stacked right */}
-              <div className="grid gap-4 sm:gap-5 xl:gap-6 md:grid-cols-[1.6fr_1fr] lg:grid-cols-[1.8fr_1fr]">
-                {/* Big card */}
-                <motion.div
-                  variants={fadeLeft}
-                  whileHover={{
-                    y: -6,
-                    transition: { duration: 0.4, ease: EASE_SOFT },
-                  }}
-                  className="group relative overflow-hidden rounded-2xl xl:rounded-3xl border border-gray-100 shadow-md cursor-pointer"
-                  style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}
-                  onHoverStart={() => {}}
-                >
-                  {/* Hover glow border */}
-                  <div
-                    className="absolute inset-0 rounded-2xl xl:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{
-                      boxShadow:
-                        "inset 0 0 0 1.5px rgba(249,115,22,0.35), 0 20px 60px rgba(249,115,22,0.12)",
-                    }}
-                  />
-                  <div className="relative h-64 sm:h-72 xl:h-80 2xl:h-96 overflow-hidden">
-                    <motion.img
-                      src={upcomingEvents[0].image}
-                      alt={upcomingEvents[0].name}
-                      className="w-full h-full object-cover"
-                      whileHover={{ scale: 1.06 }}
-                      transition={{ duration: 0.7, ease: EASE_SOFT }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/85 via-gray-900/20 to-transparent" />
-                    {/* Hover light sweep */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
-                    <div className="absolute top-4 left-4 flex items-center gap-2">
-                      <span className="text-2xl">{upcomingEvents[0].tag}</span>
-                      <motion.span
-                        className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-gray-700 uppercase tracking-wide shadow-sm"
-                        animate={{ scale: [1, 1.04, 1] }}
-                        transition={{
-                          duration: 2.5,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                        }}
-                      >
-                        {upcomingEvents[0].category}
-                      </motion.span>
-                    </div>
-                    <div className="absolute bottom-5 left-5 right-5">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="flex items-center gap-1 text-xs text-white/80">
-                          <CalendarDays className="h-3 w-3" />
-                          {upcomingEvents[0].date}
-                        </span>
-                        <span className="flex items-center gap-1 text-xs text-white/80">
-                          <MapPin className="h-3 w-3" />
-                          {upcomingEvents[0].location}
-                        </span>
-                      </div>
-                      <h3 className="text-xl sm:text-2xl xl:text-3xl font-bold text-white">
-                        {upcomingEvents[0].name}
-                      </h3>
-                      <p className="mt-1.5 text-sm text-white/70 leading-6">
-                        {upcomingEvents[0].description}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="bg-white flex items-center justify-between px-5 py-4">
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <motion.span
-                        animate={{ opacity: [0.6, 1, 0.6] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      >
-                        <Users className="h-3.5 w-3.5 text-orange-400 inline" />
-                      </motion.span>
-                      &nbsp;{upcomingEvents[0].attendees} expected
-                    </div>
-                    {/* <button className="group/jb relative inline-flex items-center gap-1.5 rounded-full bg-orange-500 px-4 py-2 text-xs font-bold text-white overflow-hidden transition-all duration-300 hover:bg-orange-600 hover:shadow-md hover:shadow-orange-300/40">
-                      <span className="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/jb:translate-x-full transition-transform duration-500" />
-                      <span className="relative">Join</span>
-                      <ArrowRight className="h-3 w-3 relative transition-transform duration-300 group-hover/jb:translate-x-0.5" />
-                    </button> */}
-                  </div>
-                </motion.div>
-
-                {/* 2 stacked */}
-                <div className="grid gap-4 sm:gap-5 xl:gap-6 grid-rows-2">
-                  {upcomingEvents.slice(1, 3).map((ev, i) => (
-                    <motion.div
-                      key={ev.id}
-                      variants={fadeRight}
-                      whileHover={{
-                        y: -4,
-                        transition: { duration: 0.35, ease: EASE_SOFT },
-                      }}
-                      className="group relative overflow-hidden rounded-2xl xl:rounded-3xl border border-gray-100 shadow-sm cursor-pointer flex flex-col"
-                    >
-                      <div
-                        className="absolute inset-0 rounded-2xl xl:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                        style={{
-                          boxShadow:
-                            "inset 0 0 0 1.5px rgba(249,115,22,0.3), 0 12px 40px rgba(249,115,22,0.08)",
-                        }}
-                      />
-                      <div className="relative h-32 sm:h-36 xl:h-40 overflow-hidden">
-                        <motion.img
-                          src={ev.image}
-                          alt={ev.name}
-                          className="w-full h-full object-cover"
-                          whileHover={{ scale: 1.07 }}
-                          transition={{ duration: 0.65, ease: EASE_SOFT }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/75 to-transparent" />
-                        <div className="absolute top-3 left-3 text-xl">
-                          {ev.tag}
-                        </div>
-                        <div className="absolute top-3 right-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[10px] font-bold text-gray-700 uppercase tracking-wide">
-                          {ev.category}
-                        </div>
-                        <div className="absolute bottom-3 left-3 right-3">
-                          <h3 className="text-base sm:text-lg font-bold text-white">
-                            {ev.name}
-                          </h3>
-                        </div>
-                      </div>
-                      <div className="bg-white flex items-center justify-between px-4 py-3 flex-1">
-                        <div className="space-y-0.5">
-                          <p className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
-                            <CalendarDays className="h-3 w-3 text-orange-400" />
-                            {ev.date}
-                          </p>
-                          <p className="text-[10px] text-gray-400 flex items-center gap-1.5">
-                            <MapPin className="h-2.5 w-2.5" />
-                            {ev.location}
-                          </p>
-                        </div>
-                        {/* <button className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-[10px] font-bold text-orange-600 transition-all duration-300 hover:bg-orange-500 hover:text-white hover:border-orange-500 hover:shadow-md hover:shadow-orange-200/50">
-                          Join
-                        </button> */}
-                      </div>
-                    </motion.div>
-                  ))}
+            {/* ── Loading skeletons ── */}
+            {loading && (
+              <div className="grid gap-4">
+                <div className="grid gap-4 md:grid-cols-[1.6fr_1fr]">
+                  <Sk className="h-80" />
+                  <Sk className="h-80" />
+                </div>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <Sk className="h-56" />
+                  <Sk className="h-56" />
+                  <Sk className="h-56" />
                 </div>
               </div>
+            )}
 
-              {/* Row 2: 3 equal */}
-              <div className="grid gap-4 sm:gap-5 xl:gap-6 sm:grid-cols-3">
-                {upcomingEvents.slice(3).map((ev, i) => (
+            {/* ── Populated grid ── */}
+            {!loading && upcomingEvents.length > 0 && (
+              <div className="grid gap-4 sm:gap-5 xl:gap-6">
+                {/* Row 1 */}
+                <div className="grid gap-4 sm:gap-5 xl:gap-6 md:grid-cols-[1.6fr_1fr] lg:grid-cols-[1.8fr_1fr]">
+                  {/* Big card — index 0 */}
                   <motion.div
-                    key={ev.id}
-                    variants={fadeUp}
-                    custom={i}
+                    variants={fadeLeft}
                     whileHover={{
                       y: -6,
                       transition: { duration: 0.4, ease: EASE_SOFT },
                     }}
-                    className="group overflow-hidden rounded-2xl xl:rounded-3xl border border-gray-100 shadow-sm cursor-pointer"
+                    className="group relative overflow-hidden rounded-2xl xl:rounded-3xl border border-gray-100 shadow-md cursor-pointer"
+                    style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}
                   >
                     <div
                       className="absolute inset-0 rounded-2xl xl:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                       style={{
-                        boxShadow: "inset 0 0 0 1.5px rgba(249,115,22,0.3)",
+                        boxShadow:
+                          "inset 0 0 0 1.5px rgba(249,115,22,0.35), 0 20px 60px rgba(249,115,22,0.12)",
                       }}
                     />
-                    <div className="relative h-44 xl:h-52 overflow-hidden">
+                    <div className="relative h-64 sm:h-72 xl:h-80 2xl:h-96 overflow-hidden">
                       <motion.img
-                        src={ev.image}
-                        alt={ev.name}
+                        src={upcomingEvents[0]?.imageUrl ?? ""}
+                        alt={upcomingEvents[0]?.title}
                         className="w-full h-full object-cover"
-                        whileHover={{ scale: 1.07 }}
-                        transition={{ duration: 0.65, ease: EASE_SOFT }}
+                        whileHover={{ scale: 1.06 }}
+                        transition={{ duration: 0.7, ease: EASE_SOFT }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
-                      {/* Hover light sweep */}
-                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-white/6 to-transparent pointer-events-none" />
-                      <div className="absolute top-3 left-3 text-xl">
-                        {ev.tag}
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/85 via-gray-900/20 to-transparent" />
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
+                      <div className="absolute top-4 left-4 flex items-center gap-2">
+                        <span className="text-2xl">
+                          {upcomingEvents[0]?.tag ?? "🎉"}
+                        </span>
+                        <motion.span
+                          className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-gray-700 uppercase tracking-wide shadow-sm"
+                          animate={{ scale: [1, 1.04, 1] }}
+                          transition={{
+                            duration: 2.5,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
+                        >
+                          {upcomingEvents[0]?.category}
+                        </motion.span>
                       </div>
-                      <div className="absolute top-3 right-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[10px] font-bold text-gray-700 uppercase">
-                        {ev.category}
-                      </div>
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <h3 className="text-base xl:text-lg font-bold text-white">
-                          {ev.name}
+                      <div className="absolute bottom-5 left-5 right-5">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="flex items-center gap-1 text-xs text-white/80">
+                            <CalendarDays className="h-3 w-3" />
+                            {formatDate(upcomingEvents[0]?.date)}
+                          </span>
+                          <span className="flex items-center gap-1 text-xs text-white/80">
+                            <MapPin className="h-3 w-3" />
+                            {upcomingEvents[0]?.location}
+                          </span>
+                        </div>
+                        <h3 className="text-xl sm:text-2xl xl:text-3xl font-bold text-white">
+                          {upcomingEvents[0]?.title}
                         </h3>
-                        <p className="mt-1 text-xs text-white/70 leading-5 line-clamp-2">
-                          {ev.description}
+                        <p className="mt-1.5 text-sm text-white/70 leading-6">
+                          {upcomingEvents[0]?.description}
                         </p>
                       </div>
                     </div>
-                    <div className="bg-white px-4 py-3.5 flex items-center justify-between">
-                      <div>
-                        <p className="text-xs font-semibold text-gray-700">
-                          {ev.date} · {ev.time}
-                        </p>
-                        <p className="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
-                          <Users className="h-2.5 w-2.5 text-orange-400" />
-                          {ev.attendees} attending
-                        </p>
+                    <div className="bg-white flex items-center justify-between px-5 py-4">
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <motion.span
+                          animate={{ opacity: [0.6, 1, 0.6] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        >
+                          <Users className="h-3.5 w-3.5 text-orange-400 inline" />
+                        </motion.span>
+                        &nbsp;{upcomingEvents[0]?.attendees} expected
                       </div>
-                      {/* <button className="group/jb2 relative rounded-full bg-orange-500 px-3.5 py-2 text-[10px] font-bold text-white overflow-hidden transition-all duration-300 hover:bg-orange-600 hover:shadow-md hover:shadow-orange-300/40">
-                        <span className="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/jb2:translate-x-full transition-transform duration-500" />
-                        <span className="relative">Join</span>
-                      </button> */}
                     </div>
                   </motion.div>
-                ))}
+
+                  {/* 2 stacked — index 1 & 2 */}
+                  <div className="grid gap-4 sm:gap-5 xl:gap-6 grid-rows-2">
+                    {upcomingEvents.slice(1, 3).map((ev) => (
+                      <motion.div
+                        key={ev.id}
+                        variants={fadeRight}
+                        whileHover={{
+                          y: -4,
+                          transition: { duration: 0.35, ease: EASE_SOFT },
+                        }}
+                        className="group relative overflow-hidden rounded-2xl xl:rounded-3xl border border-gray-100 shadow-sm cursor-pointer flex flex-col"
+                      >
+                        <div
+                          className="absolute inset-0 rounded-2xl xl:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                          style={{
+                            boxShadow:
+                              "inset 0 0 0 1.5px rgba(249,115,22,0.3), 0 12px 40px rgba(249,115,22,0.08)",
+                          }}
+                        />
+                        <div className="relative h-32 sm:h-36 xl:h-40 overflow-hidden">
+                          <motion.img
+                            src={ev.imageUrl ?? ""}
+                            alt={ev.title}
+                            className="w-full h-full object-cover"
+                            whileHover={{ scale: 1.07 }}
+                            transition={{ duration: 0.65, ease: EASE_SOFT }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/75 to-transparent" />
+                          <div className="absolute top-3 left-3 text-xl">
+                            {ev.tag ?? "🎉"}
+                          </div>
+                          <div className="absolute top-3 right-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[10px] font-bold text-gray-700 uppercase tracking-wide">
+                            {ev.category}
+                          </div>
+                          <div className="absolute bottom-3 left-3 right-3">
+                            <h3 className="text-base sm:text-lg font-bold text-white">
+                              {ev.title}
+                            </h3>
+                          </div>
+                        </div>
+                        <div className="bg-white flex items-center justify-between px-4 py-3 flex-1">
+                          <div className="space-y-0.5">
+                            <p className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
+                              <CalendarDays className="h-3 w-3 text-orange-400" />
+                              {formatDate(ev.date)}
+                            </p>
+                            <p className="text-[10px] text-gray-400 flex items-center gap-1.5">
+                              <MapPin className="h-2.5 w-2.5" />
+                              {ev.location}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Row 2 — index 3–5 */}
+                {upcomingEvents.length > 3 && (
+                  <div className="grid gap-4 sm:gap-5 xl:gap-6 sm:grid-cols-3">
+                    {upcomingEvents.slice(3, 6).map((ev, i) => (
+                      <motion.div
+                        key={ev.id}
+                        variants={fadeUp}
+                        custom={i}
+                        whileHover={{
+                          y: -6,
+                          transition: { duration: 0.4, ease: EASE_SOFT },
+                        }}
+                        className="group overflow-hidden rounded-2xl xl:rounded-3xl border border-gray-100 shadow-sm cursor-pointer relative"
+                      >
+                        <div className="relative h-44 xl:h-52 overflow-hidden">
+                          <motion.img
+                            src={ev.imageUrl ?? ""}
+                            alt={ev.title}
+                            className="w-full h-full object-cover"
+                            whileHover={{ scale: 1.07 }}
+                            transition={{ duration: 0.65, ease: EASE_SOFT }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
+                          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-white/6 to-transparent pointer-events-none" />
+                          <div className="absolute top-3 left-3 text-xl">
+                            {ev.tag ?? "🎉"}
+                          </div>
+                          <div className="absolute top-3 right-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[10px] font-bold text-gray-700 uppercase">
+                            {ev.category}
+                          </div>
+                          <div className="absolute bottom-4 left-4 right-4">
+                            <h3 className="text-base xl:text-lg font-bold text-white">
+                              {ev.title}
+                            </h3>
+                            <p className="mt-1 text-xs text-white/70 leading-5 line-clamp-2">
+                              {ev.description}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="bg-white px-4 py-3.5 flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-semibold text-gray-700">
+                              {formatDate(ev.date)}
+                              {ev.time ? ` · ${ev.time}` : ""}
+                            </p>
+                            <p className="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
+                              <Users className="h-2.5 w-2.5 text-orange-400" />
+                              {ev.attendees} attending
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
+            )}
+
+            {/* ── Empty state ── */}
+            {!loading && upcomingEvents.length === 0 && (
+              <div className="text-center py-20">
+                <p className="text-5xl mb-4">🎉</p>
+                <p className="text-gray-500 text-lg font-medium">
+                  No upcoming events yet.
+                </p>
+                <p className="text-gray-400 text-sm mt-1">
+                  Check back soon — something exciting is coming!
+                </p>
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
 
-      {/* ═════════════════════════════════════════════════════════════════════
-          TIMELINE — Glowing animated spine
-      ═════════════════════════════════════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════════════════════════════════════
+          TIMELINE  (static — unchanged)
+      ═══════════════════════════════════════════════════════════════════════ */}
       <section
         id="timeline"
         className={`bg-gray-50 ${S} ${SY} relative overflow-hidden`}
@@ -1080,7 +911,6 @@ export default function EventsPageContent() {
           className="h-96 w-96 bg-orange-100/60"
           style={{ top: "10%", right: "-8%" }}
         />
-
         <div className={`${W} relative`}>
           <motion.div
             initial="hidden"
@@ -1105,9 +935,7 @@ export default function EventsPageContent() {
 
             {/* Desktop zig-zag */}
             <div ref={tlRef} className="hidden md:block relative">
-              {/* Static spine */}
               <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-orange-100" />
-              {/* Traveling pulse */}
               <div
                 className="tl-pulse absolute left-1/2 top-0 -translate-x-1/2 w-px h-24"
                 style={{
@@ -1115,13 +943,12 @@ export default function EventsPageContent() {
                     "linear-gradient(to bottom, transparent, rgba(249,115,22,0.8), transparent)",
                 }}
               />
-
               <div className="space-y-8 xl:space-y-10">
                 {timeline.map((item, i) => (
                   <motion.div
                     key={item.label}
                     variants={i % 2 === 0 ? fadeLeft : fadeRight}
-                    className={`relative grid grid-cols-2 gap-8 xl:gap-12 items-center`}
+                    className="relative grid grid-cols-2 gap-8 xl:gap-12 items-center"
                   >
                     <div
                       className={
@@ -1151,7 +978,6 @@ export default function EventsPageContent() {
                         </p>
                       </motion.div>
                     </div>
-                    {/* Animated milestone dot */}
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
                       <motion.div
                         className="h-5 w-5 xl:h-6 xl:w-6 rounded-full bg-orange-500 ring-4 ring-white shadow-lg"
@@ -1175,7 +1001,7 @@ export default function EventsPageContent() {
               </div>
             </div>
 
-            {/* Mobile horizontal scroll */}
+            {/* Mobile scroll */}
             <div
               className="md:hidden -mx-4 px-4 overflow-x-auto"
               style={{ scrollbarWidth: "none" }}
@@ -1205,9 +1031,9 @@ export default function EventsPageContent() {
         </div>
       </section>
 
-      {/* ═════════════════════════════════════════════════════════════════════
-          PAST EVENTS — Masonry grid with fluid year filter
-      ═════════════════════════════════════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════════════════════════════════════
+          PAST EVENTS  (static — unchanged)
+      ═══════════════════════════════════════════════════════════════════════ */}
       <section className={`${S} ${SY} bg-white relative overflow-hidden`}>
         <div className={`${W} relative`}>
           <motion.div
@@ -1227,7 +1053,6 @@ export default function EventsPageContent() {
                   <span className="text-orange-500">define us</span>
                 </h2>
               </div>
-              {/* Year filter — animated pill */}
               <div className="flex gap-2 p-1 rounded-full bg-gray-100 w-fit">
                 {pastEventYears.map((year) => (
                   <button
@@ -1279,15 +1104,13 @@ export default function EventsPageContent() {
                     className={`group relative overflow-hidden rounded-2xl xl:rounded-3xl bg-gray-900 text-white shadow-lg cursor-pointer ${i === 0 ? "sm:row-span-2 sm:col-span-1" : ""}`}
                   >
                     <motion.img
-                      src={ev.image}
+                      src={ev.imageUrl || getEventImage(ev)}
                       alt={ev.title}
                       className={`w-full object-cover ${i === 0 ? "h-64 sm:h-full sm:absolute sm:inset-0" : "h-56 xl:h-64"}`}
                       whileHover={{ scale: 1.06 }}
                       transition={{ duration: 0.7, ease: EASE_SOFT }}
                     />
-                    {/* Cinematic overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-gray-950/95 via-gray-950/20 to-transparent" />
-                    {/* Hover ambient glow */}
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-orange-500/10 to-transparent pointer-events-none" />
                     <div className="absolute bottom-0 left-0 right-0 p-5 xl:p-6">
                       <motion.span
@@ -1295,13 +1118,13 @@ export default function EventsPageContent() {
                         initial={{ opacity: 0.7 }}
                         whileHover={{ opacity: 1 }}
                       >
-                        {ev.year}
+                        {ev.date ? new Date(ev.date).getFullYear() : ""}
                       </motion.span>
                       <h3 className="mt-1.5 text-lg sm:text-xl xl:text-2xl font-bold text-white">
                         {ev.title}
                       </h3>
                       <p className="mt-2 text-xs xl:text-sm text-white/70 leading-5">
-                        {ev.summary}
+                        {ev.description || ev.location || "Community event"}
                       </p>
                       <motion.div
                         className="mt-4 flex items-center gap-1.5 text-orange-400 text-xs font-semibold"
@@ -1319,13 +1142,11 @@ export default function EventsPageContent() {
         </div>
       </section>
 
-      {/* ═════════════════════════════════════════════════════════════════════
-          COMMUNITY MOMENTS — Immersive dark with parallax
-      ═════════════════════════════════════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════════════════════════════════════
+          COMMUNITY MOMENTS  (static — unchanged)
+      ═══════════════════════════════════════════════════════════════════════ */}
       <section className={`bg-gray-900 ${S} ${SY} relative overflow-hidden`}>
-        {/* Atmospheric radial layers */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_15%_20%,rgba(251,146,60,0.12),transparent),radial-gradient(ellipse_40%_30%_at_85%_80%,rgba(59,130,246,0.08),transparent)]" />
-
         <div className={`${W} relative`}>
           <motion.div
             initial="hidden"
@@ -1349,7 +1170,6 @@ export default function EventsPageContent() {
                 Korea.
               </p>
             </motion.div>
-
             <div className="grid gap-4 sm:gap-5 xl:gap-6 md:grid-cols-3">
               {[
                 {
@@ -1367,7 +1187,7 @@ export default function EventsPageContent() {
                   sub: "Family feasts and food festival highlights.",
                   img: "https://images.unsplash.com/photo-1543353071-873f17a7a088?auto=format&fit=crop&w=900&q=80",
                 },
-              ].map((m, i) => (
+              ].map((m) => (
                 <motion.div
                   key={m.title}
                   variants={fadeUp}
@@ -1377,7 +1197,6 @@ export default function EventsPageContent() {
                   }}
                   className="group relative overflow-hidden rounded-2xl xl:rounded-3xl border border-white/8 shadow-xl cursor-pointer"
                 >
-                  {/* Parallax image wrapper */}
                   <div className="h-64 xl:h-72 2xl:h-80 overflow-hidden">
                     <img
                       src={m.img}
@@ -1386,11 +1205,8 @@ export default function EventsPageContent() {
                       style={{ transformOrigin: "center center" }}
                     />
                   </div>
-                  {/* Glassmorphism overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-950/92 via-gray-950/15 to-transparent" />
-                  {/* Hover ambient glow */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-600 bg-gradient-to-br from-orange-500/12 to-transparent pointer-events-none" />
-                  {/* Glowing border on hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br from-orange-500/12 to-transparent pointer-events-none" />
                   <div
                     className="absolute inset-0 rounded-2xl xl:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                     style={{
@@ -1412,9 +1228,9 @@ export default function EventsPageContent() {
         </div>
       </section>
 
-      {/* ═════════════════════════════════════════════════════════════════════
-          CTA — Animated orange band
-      ═════════════════════════════════════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════════════════════════════════════
+          CTA  (unchanged)
+      ═══════════════════════════════════════════════════════════════════════ */}
       <section className={`bg-orange-50 ${S} ${SY}`}>
         <div className={W}>
           <motion.div
@@ -1424,7 +1240,6 @@ export default function EventsPageContent() {
             variants={fadeUp}
             className="relative overflow-hidden rounded-2xl xl:rounded-3xl bg-orange-500 px-8 py-14 sm:px-12 sm:py-16 xl:px-16 xl:py-20 2xl:px-20 2xl:py-24 text-white text-center shadow-2xl shadow-orange-300/50"
           >
-            {/* Animated gradient blobs */}
             <motion.div
               className="absolute -top-24 -right-24 h-80 w-80 rounded-full bg-orange-400/50 blur-3xl pointer-events-none"
               animate={{ scale: [1, 1.2, 1], x: [0, 20, 0], y: [0, -16, 0] }}
@@ -1446,7 +1261,6 @@ export default function EventsPageContent() {
                 delay: 1,
               }}
             />
-            {/* Noise texture */}
             <div
               className="absolute inset-0 opacity-[0.04] pointer-events-none"
               style={{
@@ -1456,17 +1270,15 @@ export default function EventsPageContent() {
                 backgroundSize: "256px",
               }}
             />
-
             <div className="relative">
               <motion.span
-                className="inline-flex items-center gap-2 rounded-full bg-white/20 border border-white/30 px-4 py-1.5 text-[10px] sm:text-xs xl:text-sm font-bold uppercase tracking-widest text-white mb-6 overflow-hidden"
+                className="inline-flex items-center gap-2 rounded-full bg-white/20 border border-white/30 px-4 py-1.5 text-[10px] sm:text-xs xl:text-sm font-bold uppercase tracking-widest text-white mb-6"
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, ease: EASE_PREMIUM }}
               >
                 <Zap className="h-3 w-3" /> Join the movement
               </motion.span>
-
               <h2 className="text-2xl sm:text-3xl md:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-white max-w-3xl mx-auto leading-tight">
                 Be part of India's most vibrant community in Korea
               </h2>
@@ -1474,7 +1286,6 @@ export default function EventsPageContent() {
                 Festivals, sports, cultural nights, food events, networking —
                 there's always something happening. Don't miss out.
               </p>
-
               <div className="mt-8 xl:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a
                   href="https://www.facebook.com/groups/IIK2002/"

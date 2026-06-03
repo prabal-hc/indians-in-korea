@@ -21,10 +21,14 @@ export default function AdminCreateGalleryPage() {
         onSubmit={async (values: GalleryFormValues) => {
           await galleryService.create({
             title: values.title,
-            category: values.category,
-            status: "Draft",
-            imageUrl: values.imageUrl,
+            tag: values.tag,
+            tagColor: values.tagColor,
+            year: values.year,
             caption: values.caption,
+            imageUrl: values.imageUrl,
+            displayOrder: values.displayOrder,
+            status: values.isActive ? "Published" : "Draft",
+            likes: 0,
           });
           router.push("/admin/gallery");
         }}

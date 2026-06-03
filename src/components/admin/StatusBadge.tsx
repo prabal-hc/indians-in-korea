@@ -7,18 +7,19 @@ const statusStyles: Record<string, string> = {
 };
 
 interface StatusBadgeProps {
-  status: string;
+  status?: string;
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {
-  const normalized = status.toLowerCase();
+  const value = typeof status === "string" && status.trim() ? status : "Draft";
+  const normalized = value.toLowerCase();
   const classes = statusStyles[normalized] ?? "bg-slate-100 text-slate-700";
 
   return (
     <span
       className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${classes}`}
     >
-      {status}
+      {value}
     </span>
   );
 }

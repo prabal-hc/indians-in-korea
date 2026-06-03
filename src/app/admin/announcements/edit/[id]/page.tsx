@@ -24,10 +24,8 @@ export default function AdminEditAnnouncementPage() {
       if (item) {
         setValues({
           title: item.title,
-          category: item.category,
-          publishedAt: item.publishedAt,
-          content: item.content,
-          imageUrl: "",
+          description: item.description,
+          display_order: item.display_order,
         });
       }
       setLoading(false);

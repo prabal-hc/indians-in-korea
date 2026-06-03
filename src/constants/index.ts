@@ -44,27 +44,5 @@ export const HERO_CONSTANTS = {
     { value: "120+", label: "Events" },
     { value: "15+", label: "Organizations" },
   ],
-  floatingCards: [
-    {
-      id: 1,
-      title: "Live Connections",
-      subtitle: "842 online now",
-      icon: "🌐",
-      position: "top-right",
-    },
-    {
-      id: 2,
-      title: "Bengali Association",
-      subtitle: "Cultural",
-      icon: "🎭",
-      position: "middle-right",
-    },
-    {
-      id: 3,
-      title: "Tamil Nanbargal",
-      subtitle: "Social",
-      icon: "👥",
-      position: "bottom-center",
-    },
-  ],
+  floatingCards: [],
 };

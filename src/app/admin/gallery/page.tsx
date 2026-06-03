@@ -33,7 +33,7 @@ export default function AdminGalleryPage() {
 
   const filtered = useMemo(() => {
     return items.filter((item) => {
-      const matchesSearch = [item.title, item.category, item.caption].some(
+      const matchesSearch = [item.title, item.tag, item.caption].some(
         (value) => value.toLowerCase().includes(search.toLowerCase()),
       );
       const matchesStatus =
@@ -108,7 +108,7 @@ export default function AdminGalleryPage() {
         <DataTable
           columns={[
             { header: "Title", accessor: "title" },
-            { header: "Category", accessor: "category" },
+            { header: "Tag", accessor: "tag" },
             { header: "Caption", accessor: "caption" },
             {
               header: "Status",

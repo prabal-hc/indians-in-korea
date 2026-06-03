@@ -8,17 +8,13 @@ import { DataTable } from "@/components/admin/DataTable";
 import { ConfirmDeleteModal } from "@/components/admin/ConfirmDeleteModal";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { LoadingSkeleton } from "@/components/admin/LoadingSkeleton";
-import { StatusBadge } from "@/components/admin/StatusBadge";
 import * as announcementsService from "@/services/admin/announcements.service";
-
-const statusOptions = ["All", "Published", "Draft"];
 
 export default function AdminAnnouncementsPage() {
   const [items, setItems] = useState<announcementsService.AnnouncementItem[]>(
     [],
   );
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
@@ -34,15 +30,16 @@ export default function AdminAnnouncementsPage() {
   }, []);
 
   const filtered = useMemo(() => {
+    const lowerSearch = search.toLowerCase();
     return items.filter((item) => {
-      const matchesSearch = [item.title, item.category, item.content].some(
-        (value) => value.toLowerCase().includes(search.toLowerCase()),
-      );
-      const matchesStatus =
-        statusFilter === "All" || item.status === statusFilter;
-      return matchesSearch && matchesStatus;
+      const matchesSearch = [
+        item.title,
+        item.description ?? "",
+        String(item.display_order),
+      ].some((value) => value.toLowerCase().includes(lowerSearch));
+      return matchesSearch;
     });
-  }, [items, search, statusFilter]);
+  }, [items, search]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -60,28 +57,12 @@ export default function AdminAnnouncementsPage() {
         subtitle="Manage site announcements and publish dates for community updates."
       />
 
-      <div className="grid gap-4 sm:grid-cols-[1.2fr_0.8fr]">
+      <div className="grid gap-4">
         <SearchBar
           value={search}
           onChange={setSearch}
-          placeholder="Search announcements, categories, content..."
+          placeholder="Search announcements by title, description, or order..."
         />
-        <div className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
-          <label className="block text-sm font-medium text-slate-700">
-            Filter by status
-          </label>
-          <select
-            value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
-            className="mt-3 w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
-          >
-            {statusOptions.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
@@ -102,7 +83,7 @@ export default function AdminAnnouncementsPage() {
       ) : filtered.length === 0 ? (
         <EmptyState
           title="No announcements"
-          description="Create a new announcement or modify the filter to find existing ones."
+          description="Create a new announcement or modify the search to find existing ones."
           actionLabel="Create announcement"
           onAction={() => window.location.assign("/admin/announcements/create")}
         />
@@ -110,12 +91,8 @@ export default function AdminAnnouncementsPage() {
         <DataTable<announcementsService.AnnouncementItem>
           columns={[
             { header: "Title", accessor: "title" },
-            { header: "Category", accessor: "category" },
-            { header: "Published", accessor: "publishedAt" },
-            {
-              header: "Status",
-              render: (item) => <StatusBadge status={item.status} />,
-            },
+            { header: "Description", accessor: "description" },
+            { header: "Display Order", accessor: "display_order" },
           ]}
           data={filtered}
           onEdit={(item) =>

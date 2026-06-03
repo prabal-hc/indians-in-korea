@@ -82,12 +82,73 @@ const highlights = [
   },
 ];
 
-function SectionBadge({ label }: { label: string }) {
+function SectionBadge({ label, inView }: { label: string; inView?: boolean }) {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-700">
-      <Sparkles className="w-4 h-4" />
-      {label}
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: -14, scale: 0.9 }}
+      animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="relative w-fit"
+      style={{
+        zIndex: 1,
+        animationName: inView ? "badgeFloat" : "none",
+        animationDuration: inView ? "3.5s" : "0s",
+        animationTimingFunction: "ease-in-out",
+        animationIterationCount: inView ? "infinite" : "1",
+        animationDelay: "0.8s",
+      }}
+    >
+      <motion.div
+        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full w-fit cursor-default select-none relative overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(135deg, #fff7ed 0%, #ffedd5 60%, #fed7aa 100%)",
+          border: "1px solid rgba(249,115,22,0.22)",
+          animationName: inView ? "glowPulse" : "none",
+          animationDuration: inView ? "3s" : "0s",
+          animationTimingFunction: "ease-in-out",
+          animationIterationCount: inView ? "infinite" : "1",
+          animationDelay: "1s",
+        }}
+        whileHover={{
+          scale: 1.04,
+          boxShadow: "0 0 22px 5px rgba(255,153,51,0.22)",
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      >
+        {/* Shimmer sweep */}
+        <span
+          aria-hidden
+          className="absolute top-0 bottom-0 w-12 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)",
+            animationName: "shimmerSweep",
+            animationDuration: "2.8s",
+            animationTimingFunction: "ease-in-out",
+            animationIterationCount: "infinite",
+            animationDelay: "1.2s",
+          }}
+        />
+        {/* Pulsing icon */}
+        <span
+          className="text-base sm:text-lg text-orange-500 relative z-10"
+          style={{
+            animationName: inView ? "iconPulse" : "none",
+            animationDuration: inView ? "2.6s" : "0s",
+            animationTimingFunction: "ease-in-out",
+            animationIterationCount: inView ? "infinite" : "1",
+            animationDelay: "0.9s",
+            display: "inline-block",
+          }}
+        >
+          ⊙
+        </span>
+        <span className="text-[10px] sm:text-xs md:text-sm font-bold tracking-wider uppercase text-orange-600 relative z-10">
+          {label}
+        </span>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -162,7 +223,7 @@ export default function MagazinePageContent() {
             className="grid gap-12 lg:grid-cols-[1.15fr_0.85fr] items-start"
           >
             <motion.div variants={fadeUp} className="space-y-6">
-              <SectionBadge label="Magazine" />
+              <SectionBadge label="Magazine" inView={inView} />
               <HighlightHeadline label="Stories from our community" />
               <p className="max-w-2xl text-lg text-gray-600 leading-relaxed">
                 Discover the latest editions of IIK Magazine. Each issue brings

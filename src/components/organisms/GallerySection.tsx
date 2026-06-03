@@ -1,131 +1,49 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import {
-  X,
-  ChevronLeft,
-  ChevronRight,
-  ZoomIn,
-  Download,
-  Share2,
-} from "lucide-react";
-
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
-const galleryItems = [
-  {
-    id: 1,
-    title: "Summer Picnic 2024",
-    caption: "Han River Park gatherings under the stars.",
-    image: "/images/city_lights.jpg",
-    tag: "Outdoor",
-    tagColor: "saffron" as const,
-    year: "2024",
-    likes: 284,
-  },
-  {
-    id: 2,
-    title: "Festive Feast",
-    caption: "Community dinners and Diwali celebrations.",
-    image: "/images/diwali.jpg",
-    tag: "Festival",
-    tagColor: "green" as const,
-    year: "2024",
-    likes: 512,
-  },
-  {
-    id: 3,
-    title: "Rangoli Moments",
-    caption: "Creative art shared by our members.",
-    image: "/images/gallery_pic5.jpg",
-    tag: "Culture",
-    tagColor: "saffron" as const,
-    year: "2024",
-    likes: 341,
-  },
-  {
-    id: 4,
-    title: "Holi Colours",
-    caption: "Colours, laughter and pure joy at Han River.",
-    image: "/images/gallery_pic1.jpg",
-    tag: "Festival",
-    tagColor: "saffron" as const,
-    year: "2024",
-    likes: 628,
-  },
-  {
-    id: 5,
-    title: "Independence Day",
-    caption: "Tricolour pride celebrated across Seoul.",
-    image: "/images/gallery_pic8.jpg",
-    tag: "Patriotic",
-    tagColor: "green" as const,
-    year: "2024",
-    likes: 445,
-  },
-  {
-    id: 6,
-    title: "Cultural Night",
-    caption: "Classical dance performances at IIK gala.",
-    image: "/images/city_lights.jpg",
-    tag: "Arts",
-    tagColor: "green" as const,
-    year: "2023",
-    likes: 389,
-  },
-  {
-    id: 7,
-    title: "Cricket League",
-    caption: "IIK cricket tournament finals at Seoul Sports Complex.",
-    image: "/images/gallery_pic5.jpg",
-    tag: "Sports",
-    tagColor: "saffron" as const,
-    year: "2023",
-    likes: 267,
-  },
-  {
-    id: 8,
-    title: "New Year Meetup",
-    caption: "Community kickoff with warm conversations.",
-    image: "/images/diwali.jpg",
-    tag: "Meetup",
-    tagColor: "green" as const,
-    year: "2023",
-    likes: 198,
-  },
-  {
-    id: 9,
-    title: "Food Festival",
-    caption: "A sensory journey through regional Indian cuisine.",
-    image: "/images/gallery_pic1.jpg",
-    tag: "Food",
-    tagColor: "saffron" as const,
-    year: "2023",
-    likes: 721,
-  },
-];
+  getAll,
+  getPreview,
+  type GalleryItem,
+} from "@/services/gallery.service";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const EASE_SOFT = [0.22, 1, 0.36, 1] as const;
 
-// ─── Tag style helper ─────────────────────────────────────────────────────────
+const FILTERS = [
+  "All",
+  "Festival",
+  "Culture",
+  "Outdoor",
+  "Sports",
+  "Food",
+  "Meetup",
+  "Patriotic",
+  "Arts",
+];
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 const tagStyle = (tagColor: "saffron" | "green") =>
   tagColor === "saffron"
     ? { bg: "bg-orange-100", text: "text-[#FF9933]", dot: "#FF9933" }
     : { bg: "bg-green-100", text: "text-[#138808]", dot: "#138808" };
 
-// ─── Tilt Card (homepage preview) ────────────────────────────────────────────
+const Sk = ({ className }: { className?: string }) => (
+  <div
+    className={`animate-pulse bg-orange-100/50 rounded-[28px] ${className}`}
+  />
+);
 
+// ─── Tilt Card ────────────────────────────────────────────────────────────────
 const TiltCard = ({
   item,
   index,
   onClick,
 }: {
-  item: (typeof galleryItems)[number];
+  item: GalleryItem;
   index: number;
   onClick: () => void;
 }) => {
@@ -134,21 +52,22 @@ const TiltCard = ({
   const [hovered, setHovered] = useState(false);
   const ts = tagStyle(item.tagColor);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = cardRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const dx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
-    const dy = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
-    setTilt({ x: dy * -10, y: dx * 10 });
-  };
-
   const delays = ["0.08s", "0.18s", "0.28s"];
 
   return (
     <div
       ref={cardRef}
       onClick={onClick}
-      onMouseMove={handleMouseMove}
+      onMouseMove={(e) => {
+        const rect = cardRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        setTilt({
+          x:
+            ((e.clientY - rect.top - rect.height / 2) / (rect.height / 2)) *
+            -10,
+          y: ((e.clientX - rect.left - rect.width / 2) / (rect.width / 2)) * 10,
+        });
+      }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => {
         setTilt({ x: 0, y: 0 });
@@ -159,29 +78,32 @@ const TiltCard = ({
         transition: hovered
           ? "transform 0.08s ease-out"
           : "transform 0.5s ease-out",
-        animation: `cardReveal 0.6s ease ${delays[index]} forwards`,
+        animation: `cardReveal 0.6s ease ${delays[Math.min(index, 2)]} forwards`,
         opacity: 0,
         animationFillMode: "forwards",
       }}
       className="gallery-card group relative cursor-pointer overflow-hidden rounded-[28px] border border-slate-100 bg-white shadow-md shadow-slate-200/60"
     >
       <div className="relative h-64 overflow-hidden sm:h-72">
-        <Image
-          src={item.image}
-          alt={item.title}
-          fill
-          className="object-cover transition-transform duration-700 group-hover:scale-110"
-          priority
-        />
+        {item.imageUrl ? (
+          <Image
+            src={item.imageUrl}
+            alt={item.title}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
+            priority
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-200" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
         <div
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           style={{
             background:
-              "linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%)",
+              "linear-gradient(135deg,rgba(255,255,255,0.18) 0%,transparent 60%)",
           }}
         />
-        {/* Zoom hint */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="flex items-center gap-2 rounded-full bg-black/50 px-4 py-2 backdrop-blur-sm border border-white/20">
             <ZoomIn className="w-3.5 h-3.5 text-white" />
@@ -194,6 +116,9 @@ const TiltCard = ({
           className={`absolute top-4 left-4 rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest ${ts.bg} ${ts.text}`}
         >
           {item.tag}
+        </span>
+        <span className="absolute top-4 right-4 text-[9px] font-bold text-white/90 bg-black/40 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
+          {item.year}
         </span>
       </div>
       <div className="p-5">
@@ -214,29 +139,16 @@ const TiltCard = ({
 };
 
 // ─── Gallery Popup ────────────────────────────────────────────────────────────
-
-const FILTERS = [
-  "All",
-  "Festival",
-  "Culture",
-  "Outdoor",
-  "Sports",
-  "Food",
-  "Meetup",
-  "Patriotic",
-  "Arts",
-];
-
 const GalleryPopup = ({
   open,
   onClose,
-  initialIndex,
   onOpenLightbox,
+  allItems,
 }: {
   open: boolean;
   onClose: () => void;
-  initialIndex: number | null;
   onOpenLightbox: (index: number) => void;
+  allItems: GalleryItem[];
 }) => {
   const [filter, setFilter] = useState("All");
 
@@ -255,7 +167,7 @@ const GalleryPopup = ({
     return () => window.removeEventListener("keydown", handler);
   }, [open, onClose]);
 
-  const filtered = galleryItems.filter(
+  const filtered = allItems.filter(
     (item) => filter === "All" || item.tag === filter,
   );
 
@@ -269,7 +181,6 @@ const GalleryPopup = ({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.22 }}
         >
-          {/* Backdrop */}
           <motion.div
             className="absolute inset-0 bg-slate-950/90 backdrop-blur-md"
             onClick={onClose}
@@ -278,7 +189,6 @@ const GalleryPopup = ({
             exit={{ opacity: 0 }}
           />
 
-          {/* Panel */}
           <motion.div
             className="relative flex flex-col w-full h-full sm:h-[94dvh] sm:my-auto sm:max-w-6xl sm:mx-auto sm:rounded-3xl overflow-hidden bg-white shadow-[0_40px_120px_rgba(0,0,0,0.5)]"
             initial={{ opacity: 0, y: 40, scale: 0.96 }}
@@ -291,7 +201,6 @@ const GalleryPopup = ({
             <div className="relative flex-shrink-0 bg-gradient-to-r from-orange-500 to-amber-500 px-5 sm:px-8 py-5 overflow-hidden">
               <div className="pointer-events-none absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
               <div className="pointer-events-none absolute -bottom-6 left-8 w-28 h-28 rounded-full bg-amber-300/20 blur-xl" />
-
               <div className="relative flex items-center justify-between">
                 <div>
                   <p className="text-[9px] font-extrabold uppercase tracking-[0.3em] text-orange-100">
@@ -301,7 +210,7 @@ const GalleryPopup = ({
                     Community Gallery
                   </h2>
                   <p className="mt-0.5 text-xs text-orange-100/80">
-                    {galleryItems.length} moments · 2023–2024
+                    {allItems.length} moments
                   </p>
                 </div>
                 <button
@@ -312,9 +221,11 @@ const GalleryPopup = ({
                   <X className="w-4 h-4 text-white" />
                 </button>
               </div>
-
               {/* Filter tabs */}
-              <div className="relative mt-4 flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-none">
+              <div
+                className="relative mt-4 flex gap-1.5 overflow-x-auto pb-0.5"
+                style={{ scrollbarWidth: "none" }}
+              >
                 {FILTERS.map((f) => (
                   <button
                     key={f}
@@ -358,7 +269,7 @@ const GalleryPopup = ({
                   className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-3"
                 >
                   {filtered.map((item, i) => {
-                    const globalIndex = galleryItems.findIndex(
+                    const globalIndex = allItems.findIndex(
                       (g) => g.id === item.id,
                     );
                     const ts = tagStyle(item.tagColor);
@@ -380,15 +291,17 @@ const GalleryPopup = ({
                         className="group relative cursor-pointer overflow-hidden rounded-xl bg-slate-100"
                         style={{ aspectRatio: i % 5 === 0 ? "1/1.3" : "1/1" }}
                       >
-                        <Image
-                          src={item.image}
-                          alt={item.title}
-                          fill
-                          className="object-cover transition-all duration-500 group-hover:scale-110"
-                        />
+                        {item.imageUrl ? (
+                          <Image
+                            src={item.imageUrl}
+                            alt={item.title}
+                            fill
+                            className="object-cover transition-all duration-500 group-hover:scale-110"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-orange-100 to-amber-100" />
+                        )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                        {/* Hover info */}
                         <div className="absolute bottom-0 left-0 right-0 p-2.5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
                           <p className="text-[11px] font-bold text-white leading-tight">
                             {item.title}
@@ -399,13 +312,9 @@ const GalleryPopup = ({
                             {item.tag}
                           </span>
                         </div>
-
-                        {/* Zoom icon */}
-                        <div className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-white/20">
+                        <div className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-white/20">
                           <ZoomIn className="w-3 h-3 text-white" />
                         </div>
-
-                        {/* Year badge */}
                         <div className="absolute top-2 left-2 text-[9px] font-bold text-white/90 bg-black/40 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
                           {item.year}
                         </div>
@@ -414,7 +323,6 @@ const GalleryPopup = ({
                   })}
                 </motion.div>
               </AnimatePresence>
-
               {filtered.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-20 text-slate-400">
                   <span className="text-4xl mb-3">🖼️</span>
@@ -428,19 +336,22 @@ const GalleryPopup = ({
             {/* Footer */}
             <div className="flex-shrink-0 border-t border-slate-100 bg-slate-50 px-5 py-3 flex items-center justify-between">
               <p className="text-[10px] text-slate-400 font-medium">
-                {filtered.length} of {galleryItems.length} photos shown
+                {filtered.length} of {allItems.length} photos shown
               </p>
               <div className="flex items-center gap-2">
                 <div className="flex h-1.5 w-24 rounded-full overflow-hidden bg-slate-200">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-orange-400 to-amber-400 transition-all duration-300"
                     style={{
-                      width: `${(filtered.length / galleryItems.length) * 100}%`,
+                      width: `${(filtered.length / Math.max(allItems.length, 1)) * 100}%`,
                     }}
                   />
                 </div>
                 <span className="text-[10px] font-semibold text-slate-400">
-                  {Math.round((filtered.length / galleryItems.length) * 100)}%
+                  {Math.round(
+                    (filtered.length / Math.max(allItems.length, 1)) * 100,
+                  )}
+                  %
                 </span>
               </div>
             </div>
@@ -452,20 +363,21 @@ const GalleryPopup = ({
 };
 
 // ─── Lightbox ─────────────────────────────────────────────────────────────────
-
 const Lightbox = ({
   index,
   onClose,
   onPrev,
   onNext,
+  allItems,
 }: {
   index: number | null;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
+  allItems: GalleryItem[];
 }) => {
-  const item = index !== null ? galleryItems[index] : null;
-  const total = galleryItems.length;
+  const item = index !== null ? allItems[index] : null;
+  const total = allItems.length;
   const [zoomed, setZoomed] = useState(false);
 
   useEffect(() => {
@@ -479,7 +391,6 @@ const Lightbox = ({
     return () => window.removeEventListener("keydown", handler);
   }, [index, onClose, onPrev, onNext]);
 
-  // Reset zoom on image change
   useEffect(() => {
     setZoomed(false);
   }, [index]);
@@ -494,7 +405,6 @@ const Lightbox = ({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
         >
-          {/* Cinematic backdrop */}
           <motion.div
             className="absolute inset-0 bg-slate-950/96"
             onClick={onClose}
@@ -502,7 +412,6 @@ const Lightbox = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            {/* Ambient blur from image color */}
             <div
               className="absolute inset-0 opacity-20"
               style={{
@@ -528,7 +437,6 @@ const Lightbox = ({
               </h3>
             </div>
             <div className="flex items-center gap-2">
-              {/* Zoom toggle */}
               <button
                 onClick={() => setZoomed((z) => !z)}
                 className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all ${zoomed ? "bg-orange-500 border-orange-400" : "bg-white/10 border-white/20 hover:bg-white/20"}`}
@@ -546,7 +454,7 @@ const Lightbox = ({
             </div>
           </motion.div>
 
-          {/* Main image */}
+          {/* Image */}
           <motion.div
             key={index}
             className="relative z-0 flex items-center justify-center w-full h-full px-16"
@@ -556,29 +464,29 @@ const Lightbox = ({
             transition={{ duration: 0.4, ease: EASE }}
           >
             <div
-              className={`relative overflow-hidden rounded-2xl shadow-[0_40px_120px_rgba(0,0,0,0.8)] transition-transform duration-500 ${
-                zoomed ? "scale-[1.6] cursor-zoom-out" : "cursor-zoom-in"
-              }`}
-              style={{
-                width: "min(90vw, 900px)",
-                height: "min(75vh, 700px)",
-              }}
+              className={`relative overflow-hidden rounded-2xl shadow-[0_40px_120px_rgba(0,0,0,0.8)] transition-transform duration-500 ${zoomed ? "scale-[1.6] cursor-zoom-out" : "cursor-zoom-in"}`}
+              style={{ width: "min(90vw,900px)", height: "min(75vh,700px)" }}
               onClick={() => setZoomed((z) => !z)}
             >
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                className="object-contain"
-                priority
-                sizes="(max-width: 768px) 90vw, 900px"
-              />
-              {/* Cinematic vignette */}
+              {item.imageUrl ? (
+                <Image
+                  src={item.imageUrl}
+                  alt={item.title}
+                  fill
+                  className="object-contain"
+                  priority
+                  sizes="(max-width:768px) 90vw, 900px"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-orange-100 to-amber-200 flex items-center justify-center">
+                  <span className="text-6xl">🖼️</span>
+                </div>
+              )}
               <div className="absolute inset-0 rounded-2xl shadow-[inset_0_0_60px_rgba(0,0,0,0.25)]" />
             </div>
           </motion.div>
 
-          {/* Prev button */}
+          {/* Prev */}
           <motion.button
             onClick={onPrev}
             className="absolute left-3 sm:left-5 z-10 w-11 h-11 rounded-full flex items-center justify-center bg-white/10 border border-white/20 hover:bg-white/25 hover:scale-105 transition-all backdrop-blur-sm"
@@ -590,7 +498,7 @@ const Lightbox = ({
             <ChevronLeft className="w-5 h-5 text-white" />
           </motion.button>
 
-          {/* Next button */}
+          {/* Next */}
           <motion.button
             onClick={onNext}
             className="absolute right-3 sm:right-5 z-10 w-11 h-11 rounded-full flex items-center justify-center bg-white/10 border border-white/20 hover:bg-white/25 hover:scale-105 transition-all backdrop-blur-sm"
@@ -602,7 +510,7 @@ const Lightbox = ({
             <ChevronRight className="w-5 h-5 text-white" />
           </motion.button>
 
-          {/* Bottom caption bar */}
+          {/* Bottom caption */}
           <motion.div
             className="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-black/70 to-transparent px-5 pb-6 pt-16"
             initial={{ y: 20, opacity: 0 }}
@@ -631,32 +539,29 @@ const Lightbox = ({
                   </span>
                 </div>
               </div>
-
               {/* Thumbnail strip */}
               <div className="hidden sm:flex items-center gap-1.5">
-                {galleryItems
+                {allItems
                   .slice(Math.max(0, index - 2), index + 3)
-                  .map((thumb, ti) => {
-                    const globalIdx = galleryItems.findIndex(
-                      (g) => g.id === thumb.id,
-                    );
+                  .map((thumb) => {
+                    const gi = allItems.findIndex((g) => g.id === thumb.id);
                     return (
-                      <button
+                      <div
                         key={thumb.id}
-                        onClick={() => {
-                          // handled via onNext/onPrev chain externally
-                          // We need direct jump — passed from parent
-                        }}
-                        className={`relative rounded-lg overflow-hidden flex-shrink-0 transition-all duration-200 ${globalIdx === index ? "ring-2 ring-orange-400 scale-110" : "opacity-50 hover:opacity-80"}`}
+                        className={`relative rounded-lg overflow-hidden flex-shrink-0 transition-all duration-200 ${gi === index ? "ring-2 ring-orange-400 scale-110" : "opacity-50"}`}
                         style={{ width: 44, height: 36 }}
                       >
-                        <Image
-                          src={thumb.image}
-                          alt={thumb.title}
-                          fill
-                          className="object-cover"
-                        />
-                      </button>
+                        {thumb.imageUrl ? (
+                          <Image
+                            src={thumb.imageUrl}
+                            alt={thumb.title}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-orange-100" />
+                        )}
+                      </div>
                     );
                   })}
               </div>
@@ -665,7 +570,7 @@ const Lightbox = ({
 
           {/* Progress dots */}
           <div className="absolute bottom-24 sm:bottom-28 left-1/2 -translate-x-1/2 z-10 flex gap-1">
-            {galleryItems.map((_, i) => (
+            {allItems.map((_, i) => (
               <div
                 key={i}
                 className="rounded-full transition-all duration-300"
@@ -683,49 +588,54 @@ const Lightbox = ({
   );
 };
 
-// ─── Main Section ─────────────────────────────────────────────────────────────
-
+// ─── Main GallerySection ──────────────────────────────────────────────────────
 export const GallerySection = () => {
+  const [allItems, setAllItems] = useState<GalleryItem[]>([]);
+  const [previewItems, setPreviewItems] = useState<GalleryItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  const openLightbox = useCallback((index: number) => {
-    setLightboxIndex(index);
+  useEffect(() => {
+    const load = async () => {
+      const [preview, all] = await Promise.all([getPreview(3), getAll()]);
+      setPreviewItems(preview);
+      setAllItems(all);
+      setLoading(false);
+    };
+    load();
   }, []);
 
-  const closeLightbox = useCallback(() => {
-    setLightboxIndex(null);
-  }, []);
-
-  const prevPhoto = useCallback(() => {
-    setLightboxIndex((i) =>
-      i === null ? null : (i - 1 + galleryItems.length) % galleryItems.length,
-    );
-  }, []);
-
-  const nextPhoto = useCallback(() => {
-    setLightboxIndex((i) =>
-      i === null ? null : (i + 1) % galleryItems.length,
-    );
-  }, []);
+  const openLightbox = useCallback((i: number) => setLightboxIndex(i), []);
+  const closeLightbox = useCallback(() => setLightboxIndex(null), []);
+  const prevPhoto = useCallback(
+    () =>
+      setLightboxIndex((i) =>
+        i === null ? null : (i - 1 + allItems.length) % allItems.length,
+      ),
+    [allItems.length],
+  );
+  const nextPhoto = useCallback(
+    () =>
+      setLightboxIndex((i) => (i === null ? null : (i + 1) % allItems.length)),
+    [allItems.length],
+  );
 
   const openGalleryWithPreview = (index: number) => {
     setGalleryOpen(true);
-    // Slight delay so gallery mounts before lightbox opens
     setTimeout(() => openLightbox(index), 120);
   };
 
   return (
     <>
       <section className="relative w-full overflow-hidden bg-gradient-to-br from-orange-50/60 via-white to-green-50/40 py-20 px-4 sm:px-8 lg:px-16">
-        {/* Background blobs */}
         <div className="pointer-events-none absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-[#FF9933]/6 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-[#138808]/5 blur-3xl" />
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.025]"
           style={{
             backgroundImage:
-              "linear-gradient(#94a3b8 1px, transparent 1px), linear-gradient(90deg, #94a3b8 1px, transparent 1px)",
+              "linear-gradient(#94a3b8 1px,transparent 1px),linear-gradient(90deg,#94a3b8 1px,transparent 1px)",
             backgroundSize: "40px 40px",
           }}
         />
@@ -757,21 +667,18 @@ export const GallerySection = () => {
             <div className="flex items-center gap-4">
               <div className="rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-sm text-center">
                 <p className="font-playfair text-2xl font-bold text-[#FF9933]">
-                  200+
+                  {loading ? "—" : `${allItems.length}+`}
                 </p>
                 <p className="text-[9px] font-semibold uppercase tracking-widest text-slate-400">
-                  Stories this year
+                  Stories shared
                 </p>
               </div>
-
-              {/* View Gallery button */}
               <motion.button
                 onClick={() => setGalleryOpen(true)}
-                className="group inline-flex items-center gap-2 pointer rounded-full bg-slate-900 px-6 py-3 text-[13px] font-semibold text-white shadow-md transition-all duration-200 hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5 relative overflow-hidden"
+                className="group inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-3 text-[13px] font-semibold text-white shadow-md transition-all duration-200 hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5 relative overflow-hidden"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.97 }}
               >
-                {/* Shine on hover */}
                 <span className="absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/12 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 <span className="relative">Visit Gallery</span>
                 <svg
@@ -791,78 +698,50 @@ export const GallerySection = () => {
             </div>
           </div>
 
-          {/* 3-card preview grid */}
+          {/* Preview cards */}
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {galleryItems.slice(0, 3).map((item, i) => (
-              <TiltCard
-                key={item.title}
-                item={item}
-                index={i}
-                onClick={() => openGalleryWithPreview(i)}
-              />
-            ))}
+            {loading
+              ? [...Array(3)].map((_, i) => <Sk key={i} className="h-80" />)
+              : previewItems.map((item, i) => (
+                  <TiltCard
+                    key={item.id}
+                    item={item}
+                    index={i}
+                    onClick={() =>
+                      openGalleryWithPreview(
+                        allItems.findIndex((g) => g.id === item.id),
+                      )
+                    }
+                  />
+                ))}
           </div>
-
-          {/* "See all" nudge */}
-          {/* <motion.div
-            className="mt-8 flex items-center justify-center gap-3"
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <div className="h-px w-16 bg-gradient-to-r from-transparent to-slate-200" />
-            <button
-              onClick={() => setGalleryOpen(true)}
-              className="text-[11px] font-semibold text-slate-400 hover:text-orange-500 transition-colors flex items-center gap-1.5"
-            >
-              <span>+{galleryItems.length - 3} more photos in the gallery</span>
-              <svg
-                className="w-3 h-3"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-            <div className="h-px w-16 bg-gradient-to-l from-transparent to-slate-200" />
-          </motion.div> */}
         </div>
 
         <style>{`
           .gallery-card { opacity: 0; }
           @keyframes cardReveal {
-            from { opacity: 0; transform: translateY(20px) scale(0.97); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
+            from { opacity:0; transform:translateY(20px) scale(0.97); }
+            to   { opacity:1; transform:translateY(0) scale(1); }
           }
-          .scrollbar-none { scrollbar-width: none; }
-          .scrollbar-none::-webkit-scrollbar { display: none; }
         `}</style>
       </section>
 
-      {/* Gallery popup */}
       <GalleryPopup
         open={galleryOpen}
         onClose={() => {
           setGalleryOpen(false);
           setLightboxIndex(null);
         }}
-        initialIndex={null}
         onOpenLightbox={openLightbox}
+        allItems={allItems}
       />
 
-      {/* Cinematic lightbox */}
       <Lightbox
         index={lightboxIndex}
         onClose={closeLightbox}
         onPrev={prevPhoto}
         onNext={nextPhoto}
+        allItems={allItems}
       />
     </>
   );

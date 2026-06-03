@@ -25,7 +25,12 @@ export default function AdminEditEventPage() {
           date: event.date,
           location: event.location,
           description: event.description,
-          imageUrl: "",
+          imageUrl: event.imageUrl || "",
+          isActive: event.status === "Published",
+          time: event.time || "",
+          attendees: event.attendees || "0",
+          tag: event.tag || "🎉",
+          isFeatured: event.isFeatured || false,
         });
       }
       setLoading(false);

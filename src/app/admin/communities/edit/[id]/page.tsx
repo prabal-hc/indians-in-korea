@@ -24,11 +24,23 @@ export default function AdminEditCommunitiesPage() {
       if (item) {
         setValues({
           name: item.name,
+          abbr: item.abbr,
           category: item.category,
+          tag: item.tag,
+          icon: item.icon,
           members: String(item.members),
-          contact: item.contact,
+          since: item.since,
           description: item.description,
-          imageUrl: "",
+          highlights: item.highlights ?? ["", "", "", ""],
+          websiteUrl: item.websiteUrl,
+          facebookUrl: item.facebookUrl,
+          email: item.email,
+          contact: item.contact,
+          imageUrl: item.imageUrl,
+          accentColor: item.accentColor,
+          isActive: item.status === "Published",
+          isFeatured: item.isFeatured,
+          displayOrder: item.displayOrder,
         });
       }
       setLoading(false);
@@ -50,7 +62,7 @@ export default function AdminEditCommunitiesPage() {
           onSubmit={async (updated) => {
             await communitiesService.update(id, {
               ...updated,
-              members: Number(updated.members),
+              members: updated.members,
             });
             router.push("/admin/communities");
           }}

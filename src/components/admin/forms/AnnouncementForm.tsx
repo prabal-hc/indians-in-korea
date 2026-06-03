@@ -1,14 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { ImageUploader } from "@/components/admin/ImageUploader";
 
 export interface AnnouncementFormValues {
   title: string;
-  category: string;
-  publishedAt: string;
-  content: string;
-  imageUrl: string;
+  description: string;
+  display_order: number;
 }
 
 interface AnnouncementFormProps {
@@ -25,15 +22,16 @@ export function AnnouncementForm({
   const [values, setValues] = useState<AnnouncementFormValues>(
     initialData ?? {
       title: "",
-      category: "",
-      publishedAt: "",
-      content: "",
-      imageUrl: "",
+      description: "",
+      display_order: 0,
     },
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleChange = (key: keyof AnnouncementFormValues, value: string) => {
+  const handleChange = <K extends keyof AnnouncementFormValues>(
+    key: K,
+    value: AnnouncementFormValues[K],
+  ) => {
     setValues((current) => ({ ...current, [key]: value }));
   };
 
@@ -41,10 +39,11 @@ export function AnnouncementForm({
     const nextErrors: Record<string, string> = {};
 
     if (!values.title.trim()) nextErrors.title = "Title is required.";
-    if (!values.category.trim()) nextErrors.category = "Category is required.";
-    if (!values.publishedAt.trim())
-      nextErrors.publishedAt = "Publish date is required.";
-    if (!values.content.trim()) nextErrors.content = "Content cannot be empty.";
+    if (!values.description.trim())
+      nextErrors.description = "Description is required.";
+    if (!Number.isFinite(values.display_order) || values.display_order < 0) {
+      nextErrors.display_order = "Display order is required.";
+    }
 
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
@@ -61,9 +60,7 @@ export function AnnouncementForm({
     >
       <div className="grid gap-6 md:grid-cols-2">
         <label className="space-y-3">
-          <span className="text-sm font-semibold text-slate-900">
-            Announcement title
-          </span>
+          <span className="text-sm font-semibold text-slate-900">Title</span>
           <input
             value={values.title}
             onChange={(event) => handleChange("title", event.target.value)}
@@ -76,60 +73,38 @@ export function AnnouncementForm({
         </label>
 
         <label className="space-y-3">
-          <span className="text-sm font-semibold text-slate-900">Category</span>
-          <select
-            value={values.category}
-            onChange={(event) => handleChange("category", event.target.value)}
-            className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
-          >
-            <option value="">Select category</option>
-            <option value="Health">Health</option>
-            <option value="Volunteer">Volunteer</option>
-            <option value="Alert">Alert</option>
-            <option value="News">News</option>
-          </select>
-          {errors.category ? (
-            <p className="text-xs text-rose-600">{errors.category}</p>
-          ) : null}
-        </label>
-
-        <label className="space-y-3">
           <span className="text-sm font-semibold text-slate-900">
-            Publish date
+            Display Order
           </span>
           <input
-            type="date"
-            value={values.publishedAt}
+            type="number"
+            value={values.display_order}
             onChange={(event) =>
-              handleChange("publishedAt", event.target.value)
+              handleChange("display_order", Number(event.target.value))
             }
             className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+            placeholder="0"
           />
-          {errors.publishedAt ? (
-            <p className="text-xs text-rose-600">{errors.publishedAt}</p>
+          {errors.display_order ? (
+            <p className="text-xs text-rose-600">{errors.display_order}</p>
           ) : null}
         </label>
       </div>
 
       <label className="space-y-3">
-        <span className="text-sm font-semibold text-slate-900">Content</span>
+        <span className="text-sm font-semibold text-slate-900">
+          Description
+        </span>
         <textarea
-          value={values.content}
-          onChange={(event) => handleChange("content", event.target.value)}
+          value={values.description}
+          onChange={(event) => handleChange("description", event.target.value)}
           className="min-h-[140px] w-full rounded-[28px] border border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
           placeholder="Describe the announcement details and the expected community action."
         />
-        {errors.content ? (
-          <p className="text-xs text-rose-600">{errors.content}</p>
+        {errors.description ? (
+          <p className="text-xs text-rose-600">{errors.description}</p>
         ) : null}
       </label>
-
-      <ImageUploader
-        label="Announcement image"
-        value={values.imageUrl}
-        onChange={(url) => handleChange("imageUrl", url)}
-        note="Attach a visual that reinforces the announcement."
-      />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
         <button

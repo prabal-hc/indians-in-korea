@@ -21,11 +21,23 @@ export default function AdminCreateCommunitiesPage() {
         onSubmit={async (values: CommunityFormValues) => {
           await communitiesService.create({
             name: values.name,
+            abbr: values.abbr,
             category: values.category,
-            status: "Draft",
-            members: parseInt(values.members, 10),
-            contact: values.contact,
+            tag: values.tag,
+            icon: values.icon,
+            members: values.members,
+            since: values.since,
             description: values.description,
+            highlights: values.highlights,
+            websiteUrl: values.websiteUrl,
+            facebookUrl: values.facebookUrl,
+            email: values.email,
+            contact: values.contact,
+            imageUrl: values.imageUrl,
+            accentColor: values.accentColor,
+            status: values.isActive ? "Published" : "Draft",
+            isFeatured: values.isFeatured,
+            displayOrder: values.displayOrder,
           });
           router.push("/admin/communities");
         }}

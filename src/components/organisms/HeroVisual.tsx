@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 
@@ -22,8 +22,21 @@ const MegaphoneIcon = () => (
 
 const NewsIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-    <rect x="3" y="4" width="18" height="16" rx="2" stroke="#0ea5e9" strokeWidth="1.8" />
-    <path d="M7 8h10M7 12h6M7 16h4" stroke="#0ea5e9" strokeWidth="1.8" strokeLinecap="round" />
+    <rect
+      x="3"
+      y="4"
+      width="18"
+      height="16"
+      rx="2"
+      stroke="#0ea5e9"
+      strokeWidth="1.8"
+    />
+    <path
+      d="M7 8h10M7 12h6M7 16h4"
+      stroke="#0ea5e9"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    />
   </svg>
 );
 
@@ -34,58 +47,41 @@ const FloatingCard = ({
 }: {
   title: string;
   subtitle?: string;
-  icon?: React.ReactNode;
+  icon?: React.ReactNode | string;
 }) => (
   <div className="flex items-center gap-2.5 bg-white rounded-2xl shadow-xl px-3.5 py-2.5 min-w-[160px] max-w-[230px] border border-gray-100">
     {icon && (
-      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-orange-50">
-        {icon}
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-orange-50 text-sm">
+        {typeof icon === "string" ? <span>{icon}</span> : icon}
       </div>
     )}
     <div className="flex flex-col min-w-0">
-      <span className="text-[13px] font-semibold text-gray-800 leading-tight truncate">{title}</span>
+      <span className="text-[13px] font-semibold text-gray-800 leading-tight truncate">
+        {title}
+      </span>
       {subtitle && (
-        <span className="text-[11px] text-gray-400 leading-tight mt-0.5 truncate">{subtitle}</span>
+        <span className="text-[11px] text-gray-400 leading-tight mt-0.5 truncate">
+          {subtitle}
+        </span>
       )}
     </div>
   </div>
 );
 
-const LiveConnectionIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-    <circle cx="12" cy="12" r="3" fill="#22c55e" />
-    <circle cx="5" cy="8" r="2" fill="#22c55e" opacity="0.7" />
-    <circle cx="19" cy="8" r="2" fill="#22c55e" opacity="0.7" />
-    <circle cx="5" cy="16" r="2" fill="#22c55e" opacity="0.7" />
-    <circle cx="19" cy="16" r="2" fill="#22c55e" opacity="0.7" />
-    <line x1="12" y1="12" x2="5" y2="8" stroke="#22c55e" strokeWidth="1.5" />
-    <line x1="12" y1="12" x2="19" y2="8" stroke="#22c55e" strokeWidth="1.5" />
-    <line x1="12" y1="12" x2="5" y2="16" stroke="#22c55e" strokeWidth="1.5" />
-    <line x1="12" y1="12" x2="19" y2="16" stroke="#22c55e" strokeWidth="1.5" />
-  </svg>
-);
-
-const AssociationIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-    <rect x="3" y="10" width="18" height="11" rx="1" stroke="#f97316" strokeWidth="1.8" />
-    <path d="M9 21V14h6v7" stroke="#f97316" strokeWidth="1.8" />
-    <path d="M2 10l10-7 10 7" stroke="#f97316" strokeWidth="1.8" strokeLinecap="round" />
-  </svg>
-);
-
-const GroupIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-    <circle cx="9" cy="7" r="3" stroke="#6366f1" strokeWidth="1.8" />
-    <circle cx="17" cy="9" r="2.5" stroke="#6366f1" strokeWidth="1.8" />
-    <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="#6366f1" strokeWidth="1.8" strokeLinecap="round" />
-    <path d="M17 14c2.2 0 4 1.8 4 4" stroke="#6366f1" strokeWidth="1.8" strokeLinecap="round" />
-  </svg>
-);
-
 const GraduationIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-    <path d="M12 3L2 9l10 6 10-6-10-6z" stroke="#60a5fa" strokeWidth="1.8" strokeLinejoin="round" />
-    <path d="M6 12v5c0 2.2 2.7 4 6 4s6-1.8 6-4v-5" stroke="#60a5fa" strokeWidth="1.8" strokeLinecap="round" />
+    <path
+      d="M12 3L2 9l10 6 10-6-10-6z"
+      stroke="#60a5fa"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M6 12v5c0 2.2 2.7 4 6 4s6-1.8 6-4v-5"
+      stroke="#60a5fa"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    />
   </svg>
 );
 
@@ -94,7 +90,15 @@ const GraduationIcon = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 
 const LiveDot = ({ color = "#ef4444" }: { color?: string }) => (
-  <span style={{ position: "relative", display: "inline-flex", width: 10, height: 10, flexShrink: 0 }}>
+  <span
+    style={{
+      position: "relative",
+      display: "inline-flex",
+      width: 10,
+      height: 10,
+      flexShrink: 0,
+    }}
+  >
     {/* Outer ring pulse */}
     <span
       style={{
@@ -145,7 +149,15 @@ const LiveDot = ({ color = "#ef4444" }: { color?: string }) => (
 // FLASH NEWS CARD — enhanced glassmorphism + hover glow
 // ─────────────────────────────────────────────────────────────────────────────
 
-const FlashNewsCard = ({ headline, tag }: { headline: string; tag: string }) => {
+const FlashNewsCard = ({
+  label,
+  headline,
+  tag,
+}: {
+  label: string;
+  headline: string;
+  tag: string;
+}) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -153,7 +165,8 @@ const FlashNewsCard = ({ headline, tag }: { headline: string; tag: string }) => 
     if (!el) return;
     const onEnter = () =>
       gsap.to(el, {
-        boxShadow: "0 16px 48px rgba(249,115,22,0.22), 0 4px 16px rgba(0,0,0,0.10)",
+        boxShadow:
+          "0 16px 48px rgba(249,115,22,0.22), 0 4px 16px rgba(0,0,0,0.10)",
         y: -3,
         scale: 1.025,
         duration: 0.35,
@@ -183,7 +196,8 @@ const FlashNewsCard = ({ headline, tag }: { headline: string; tag: string }) => 
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
         borderRadius: 18,
-        boxShadow: "0 8px 32px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.8) inset",
+        boxShadow:
+          "0 8px 32px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.8) inset",
         border: "1px solid rgba(249,115,22,0.18)",
         padding: "10px 14px 10px 17px",
         minWidth: 210,
@@ -203,7 +217,8 @@ const FlashNewsCard = ({ headline, tag }: { headline: string; tag: string }) => 
           top: 0,
           bottom: 0,
           width: 3,
-          background: "linear-gradient(180deg, #f97316 0%, #ef4444 50%, #f97316 100%)",
+          background:
+            "linear-gradient(180deg, #f97316 0%, #ef4444 50%, #f97316 100%)",
           backgroundSize: "100% 200%",
           borderRadius: "18px 0 0 18px",
           animation: "accentShimmer 2.5s ease-in-out infinite",
@@ -214,11 +229,19 @@ const FlashNewsCard = ({ headline, tag }: { headline: string; tag: string }) => 
         style={{
           position: "absolute",
           inset: 0,
-          background: "radial-gradient(ellipse at top left, rgba(249,115,22,0.06) 0%, transparent 60%)",
+          background:
+            "radial-gradient(ellipse at top left, rgba(249,115,22,0.06) 0%, transparent 60%)",
           pointerEvents: "none",
         }}
       />
-      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 7 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          marginBottom: 7,
+        }}
+      >
         <span
           style={{
             background: "linear-gradient(135deg, #ef4444, #dc2626)",
@@ -233,10 +256,17 @@ const FlashNewsCard = ({ headline, tag }: { headline: string; tag: string }) => 
             boxShadow: "0 2px 6px rgba(239,68,68,0.35)",
           }}
         >
-          ⚡ FLASH
+          {label}
         </span>
         <LiveDot color="#ef4444" />
-        <span style={{ fontSize: 10, color: "#94a3b8", marginLeft: "auto", fontFamily: "system-ui, sans-serif" }}>
+        <span
+          style={{
+            fontSize: 10,
+            color: "#94a3b8",
+            marginLeft: "auto",
+            fontFamily: "system-ui, sans-serif",
+          }}
+        >
           {tag}
         </span>
       </div>
@@ -267,7 +297,7 @@ const FlashNewsCard = ({ headline, tag }: { headline: string; tag: string }) => 
 // TICKER CARD — enhanced with smoother transitions + glass
 // ─────────────────────────────────────────────────────────────────────────────
 
-const TickerCard = ({ items }: { items: string[] }) => {
+const TickerCard = ({ items, label }: { items: string[]; label: string }) => {
   const [idx, setIdx] = useState(0);
   const [phase, setPhase] = useState<"visible" | "out" | "in">("visible");
   const cardRef = useRef<HTMLDivElement>(null);
@@ -288,12 +318,28 @@ const TickerCard = ({ items }: { items: string[] }) => {
     const el = cardRef.current;
     if (!el) return;
     const onEnter = () =>
-      gsap.to(el, { boxShadow: "0 14px 40px rgba(99,102,241,0.2), 0 4px 12px rgba(0,0,0,0.08)", y: -3, scale: 1.02, duration: 0.3, ease: "power2.out" });
+      gsap.to(el, {
+        boxShadow:
+          "0 14px 40px rgba(99,102,241,0.2), 0 4px 12px rgba(0,0,0,0.08)",
+        y: -3,
+        scale: 1.02,
+        duration: 0.3,
+        ease: "power2.out",
+      });
     const onLeave = () =>
-      gsap.to(el, { boxShadow: "0 8px 28px rgba(0,0,0,0.10)", y: 0, scale: 1, duration: 0.4, ease: "power3.out" });
+      gsap.to(el, {
+        boxShadow: "0 8px 28px rgba(0,0,0,0.10)",
+        y: 0,
+        scale: 1,
+        duration: 0.4,
+        ease: "power3.out",
+      });
     el.addEventListener("mouseenter", onEnter);
     el.addEventListener("mouseleave", onLeave);
-    return () => { el.removeEventListener("mouseenter", onEnter); el.removeEventListener("mouseleave", onLeave); };
+    return () => {
+      el.removeEventListener("mouseenter", onEnter);
+      el.removeEventListener("mouseleave", onLeave);
+    };
   }, []);
 
   const textOpacity = phase === "visible" ? 1 : 0;
@@ -307,7 +353,8 @@ const TickerCard = ({ items }: { items: string[] }) => {
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
         borderRadius: 16,
-        boxShadow: "0 8px 28px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.8) inset",
+        boxShadow:
+          "0 8px 28px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.8) inset",
         border: "1px solid rgba(99,102,241,0.18)",
         padding: "10px 13px",
         minWidth: 195,
@@ -318,13 +365,48 @@ const TickerCard = ({ items }: { items: string[] }) => {
         overflow: "hidden",
       }}
     >
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at top right, rgba(99,102,241,0.05) 0%, transparent 60%)", pointerEvents: "none" }} />
-      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 7 }}>
-        <div style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)", borderRadius: 7, width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 3px 10px rgba(99,102,241,0.35)" }}>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse at top right, rgba(99,102,241,0.05) 0%, transparent 60%)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          marginBottom: 7,
+        }}
+      >
+        <div
+          style={{
+            background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+            borderRadius: 7,
+            width: 24,
+            height: 24,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            boxShadow: "0 3px 10px rgba(99,102,241,0.35)",
+          }}
+        >
           <MegaphoneIcon />
         </div>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "#6366f1", letterSpacing: "0.07em", fontFamily: "system-ui, sans-serif" }}>
-          IIK UPDATES
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: "#6366f1",
+            letterSpacing: "0.07em",
+            fontFamily: "system-ui, sans-serif",
+          }}
+        >
+          {label}
         </span>
         <LiveDot color="#6366f1" />
       </div>
@@ -338,7 +420,8 @@ const TickerCard = ({ items }: { items: string[] }) => {
           minHeight: 36,
           opacity: textOpacity,
           transform: `translateY(${textY}px)`,
-          transition: "opacity 0.28s ease, transform 0.28s cubic-bezier(0.4,0,0.2,1)",
+          transition:
+            "opacity 0.28s ease, transform 0.28s cubic-bezier(0.4,0,0.2,1)",
         }}
       >
         {items[idx]}
@@ -366,17 +449,35 @@ const TickerCard = ({ items }: { items: string[] }) => {
 // BREAKING CARD — enhanced glass + hover
 // ─────────────────────────────────────────────────────────────────────────────
 
-const BreakingCard = ({ text }: { text: string }) => {
+const BreakingCard = ({ text, label }: { text: string; label: string }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = cardRef.current;
     if (!el) return;
-    const onEnter = () => gsap.to(el, { boxShadow: "0 14px 36px rgba(14,165,233,0.2), 0 4px 12px rgba(0,0,0,0.08)", y: -3, scale: 1.02, duration: 0.3, ease: "power2.out" });
-    const onLeave = () => gsap.to(el, { boxShadow: "0 8px 28px rgba(0,0,0,0.10)", y: 0, scale: 1, duration: 0.4, ease: "power3.out" });
+    const onEnter = () =>
+      gsap.to(el, {
+        boxShadow:
+          "0 14px 36px rgba(14,165,233,0.2), 0 4px 12px rgba(0,0,0,0.08)",
+        y: -3,
+        scale: 1.02,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+    const onLeave = () =>
+      gsap.to(el, {
+        boxShadow: "0 8px 28px rgba(0,0,0,0.10)",
+        y: 0,
+        scale: 1,
+        duration: 0.4,
+        ease: "power3.out",
+      });
     el.addEventListener("mouseenter", onEnter);
     el.addEventListener("mouseleave", onLeave);
-    return () => { el.removeEventListener("mouseenter", onEnter); el.removeEventListener("mouseleave", onLeave); };
+    return () => {
+      el.removeEventListener("mouseenter", onEnter);
+      el.removeEventListener("mouseleave", onLeave);
+    };
   }, []);
 
   return (
@@ -387,7 +488,8 @@ const BreakingCard = ({ text }: { text: string }) => {
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
         borderRadius: 16,
-        boxShadow: "0 8px 28px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.8) inset",
+        boxShadow:
+          "0 8px 28px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.8) inset",
         border: "1px solid rgba(14,165,233,0.18)",
         padding: "10px 13px",
         minWidth: 178,
@@ -398,17 +500,62 @@ const BreakingCard = ({ text }: { text: string }) => {
         overflow: "hidden",
       }}
     >
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at bottom left, rgba(14,165,233,0.05) 0%, transparent 60%)", pointerEvents: "none" }} />
-      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-        <div style={{ background: "#f0f9ff", borderRadius: 7, width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 2px 8px rgba(14,165,233,0.18)" }}>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse at bottom left, rgba(14,165,233,0.05) 0%, transparent 60%)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          marginBottom: 6,
+        }}
+      >
+        <div
+          style={{
+            background: "#f0f9ff",
+            borderRadius: 7,
+            width: 24,
+            height: 24,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            boxShadow: "0 2px 8px rgba(14,165,233,0.18)",
+          }}
+        >
           <NewsIcon />
         </div>
-        <span style={{ fontSize: 10, fontWeight: 700, color: "#0ea5e9", letterSpacing: "0.06em", fontFamily: "system-ui, sans-serif" }}>
-          BREAKING
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: "#0ea5e9",
+            letterSpacing: "0.06em",
+            fontFamily: "system-ui, sans-serif",
+          }}
+        >
+          {label}
         </span>
         <LiveDot color="#0ea5e9" />
       </div>
-      <p style={{ margin: 0, fontSize: 11.5, color: "#1e293b", lineHeight: 1.45, fontFamily: "system-ui, sans-serif", fontWeight: 500, position: "relative" }}>
+      <p
+        style={{
+          margin: 0,
+          fontSize: 11.5,
+          color: "#1e293b",
+          lineHeight: 1.45,
+          fontFamily: "system-ui, sans-serif",
+          fontWeight: 500,
+          position: "relative",
+        }}
+      >
         {text}
       </p>
     </div>
@@ -477,7 +624,11 @@ const AmbientBlob = ({
 // CURSOR SPOTLIGHT — soft radial glow following the mouse
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CursorSpotlight = ({ containerRef }: { containerRef: React.RefObject<HTMLDivElement> }) => {
+const CursorSpotlight = ({
+  containerRef,
+}: {
+  containerRef: React.RefObject<HTMLDivElement>;
+}) => {
   const spotRef = useRef<HTMLDivElement>(null);
   const posRef = useRef({ x: 0, y: 0 });
   const rafRef = useRef<number>(0);
@@ -497,7 +648,10 @@ const CursorSpotlight = ({ containerRef }: { containerRef: React.RefObject<HTMLD
 
     const animate = () => {
       if (spot) {
-        const cur = { x: parseFloat(spot.style.left) || 0, y: parseFloat(spot.style.top) || 0 };
+        const cur = {
+          x: parseFloat(spot.style.left) || 0,
+          y: parseFloat(spot.style.top) || 0,
+        };
         const lerped = {
           x: cur.x + (posRef.current.x - cur.x) * 0.09,
           y: cur.y + (posRef.current.y - cur.y) * 0.09,
@@ -511,8 +665,10 @@ const CursorSpotlight = ({ containerRef }: { containerRef: React.RefObject<HTMLD
     container.addEventListener("mousemove", onMove);
     rafRef.current = requestAnimationFrame(animate);
 
-    const onEnter = () => gsap.to(spot, { opacity: 1, duration: 0.4, ease: "power2.out" });
-    const onLeave = () => gsap.to(spot, { opacity: 0, duration: 0.6, ease: "power2.out" });
+    const onEnter = () =>
+      gsap.to(spot, { opacity: 1, duration: 0.4, ease: "power2.out" });
+    const onLeave = () =>
+      gsap.to(spot, { opacity: 0, duration: 0.6, ease: "power2.out" });
     container.addEventListener("mouseenter", onEnter);
     container.addEventListener("mouseleave", onLeave);
 
@@ -532,7 +688,8 @@ const CursorSpotlight = ({ containerRef }: { containerRef: React.RefObject<HTMLD
         width: 280,
         height: 280,
         borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(155,180,255,0.13) 0%, rgba(100,150,255,0.06) 45%, transparent 70%)",
+        background:
+          "radial-gradient(circle, rgba(155,180,255,0.13) 0%, rgba(100,150,255,0.06) 45%, transparent 70%)",
         transform: "translate(-50%, -50%)",
         pointerEvents: "none",
         zIndex: 50,
@@ -548,20 +705,19 @@ const CursorSpotlight = ({ containerRef }: { containerRef: React.RefObject<HTMLD
 // ─────────────────────────────────────────────────────────────────────────────
 
 const AnimatedRings = ({ size }: { size: number }) => {
-  const ring1Ref = useRef<HTMLDivElement>(null);   // Inner breathing ring
-  const ring2Ref = useRef<HTMLDivElement>(null);   // Mid breathing ring
-  const ring3Ref = useRef<HTMLDivElement>(null);   // Outer soft ring
-  const ring4Ref = useRef<HTMLDivElement>(null);   // Sonar pulse A
-  const ring5Ref = useRef<HTMLDivElement>(null);   // Sonar pulse B
-  const ring6Ref = useRef<HTMLDivElement>(null);   // Sonar pulse C (new, offset)
-  const spinCWRef = useRef<HTMLDivElement>(null);  // Clockwise dashed
+  const ring1Ref = useRef<HTMLDivElement>(null); // Inner breathing ring
+  const ring2Ref = useRef<HTMLDivElement>(null); // Mid breathing ring
+  const ring3Ref = useRef<HTMLDivElement>(null); // Outer soft ring
+  const ring4Ref = useRef<HTMLDivElement>(null); // Sonar pulse A
+  const ring5Ref = useRef<HTMLDivElement>(null); // Sonar pulse B
+  const ring6Ref = useRef<HTMLDivElement>(null); // Sonar pulse C (new, offset)
+  const spinCWRef = useRef<HTMLDivElement>(null); // Clockwise dashed
   const spinCCWRef = useRef<HTMLDivElement>(null); // Counter-clockwise dashed
   const spinCW2Ref = useRef<HTMLDivElement>(null); // Slow CW large ring
-  const glowRingRef = useRef<HTMLDivElement>(null);// Atmospheric glow halo
+  const glowRingRef = useRef<HTMLDivElement>(null); // Atmospheric glow halo
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-
       // ── Breathing rings (organic, non-uniform timing) ──────────────────
       gsap.to(ring1Ref.current, {
         scale: 1.055,
@@ -663,16 +819,44 @@ const AnimatedRings = ({ size }: { size: number }) => {
           ...center,
           width: size * 1.55,
           height: size * 1.55,
-          background: "radial-gradient(circle, transparent 42%, rgba(100,155,240,0.07) 65%, rgba(80,130,220,0.04) 80%, transparent 100%)",
+          background:
+            "radial-gradient(circle, transparent 42%, rgba(100,155,240,0.07) 65%, rgba(80,130,220,0.04) 80%, transparent 100%)",
           zIndex: 20,
           opacity: 0.12,
         }}
       />
 
       {/* Sonar pulse rings */}
-      <div ref={ring4Ref} style={{ ...center, width: size, height: size, border: "1.5px solid rgba(110,165,245,0.48)", zIndex: 24 }} />
-      <div ref={ring5Ref} style={{ ...center, width: size, height: size, border: "1.5px solid rgba(120,170,250,0.42)", zIndex: 24 }} />
-      <div ref={ring6Ref} style={{ ...center, width: size * 0.94, height: size * 0.94, border: "1px solid rgba(130,175,255,0.35)", zIndex: 24 }} />
+      <div
+        ref={ring4Ref}
+        style={{
+          ...center,
+          width: size,
+          height: size,
+          border: "1.5px solid rgba(110,165,245,0.48)",
+          zIndex: 24,
+        }}
+      />
+      <div
+        ref={ring5Ref}
+        style={{
+          ...center,
+          width: size,
+          height: size,
+          border: "1.5px solid rgba(120,170,250,0.42)",
+          zIndex: 24,
+        }}
+      />
+      <div
+        ref={ring6Ref}
+        style={{
+          ...center,
+          width: size * 0.94,
+          height: size * 0.94,
+          border: "1px solid rgba(130,175,255,0.35)",
+          zIndex: 24,
+        }}
+      />
 
       {/* Rotating dashed ring — CW */}
       <div
@@ -747,7 +931,8 @@ const AnimatedRings = ({ size }: { size: number }) => {
           width: size * 1.34,
           height: size * 1.34,
           border: "1px solid rgba(118,168,238,0.16)",
-          background: "radial-gradient(circle, transparent 55%, rgba(100,155,230,0.05) 80%, transparent 100%)",
+          background:
+            "radial-gradient(circle, transparent 55%, rgba(100,155,230,0.05) 80%, transparent 100%)",
           boxShadow: "0 0 42px 16px rgba(85,140,215,0.06)",
           zIndex: 27,
           opacity: 0.22,
@@ -767,7 +952,11 @@ interface CyclingImageProps {
   intervalMs?: number;
 }
 
-const CyclingImage = ({ images, size, intervalMs = 2000 }: CyclingImageProps) => {
+const CyclingImage = ({
+  images,
+  size,
+  intervalMs = 2000,
+}: CyclingImageProps) => {
   const [current, setCurrent] = useState(0);
   const [next, setNext] = useState<number | null>(null);
   const [fading, setFading] = useState(false);
@@ -838,7 +1027,8 @@ const CyclingImage = ({ images, size, intervalMs = 2000 }: CyclingImageProps) =>
         if (!dot) return;
         gsap.to(dot, {
           width: i === nextIdx ? 22 : 6,
-          background: i === nextIdx ? "rgba(99,153,255,0.9)" : "rgba(150,185,255,0.35)",
+          background:
+            i === nextIdx ? "rgba(99,153,255,0.9)" : "rgba(150,185,255,0.35)",
           duration: 0.4,
           ease: "power2.out",
         });
@@ -867,7 +1057,8 @@ const CyclingImage = ({ images, size, intervalMs = 2000 }: CyclingImageProps) =>
           position: "absolute",
           inset: -16,
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(100,155,255,0.18) 0%, rgba(80,130,220,0.10) 50%, transparent 72%)",
+          background:
+            "radial-gradient(circle, rgba(100,155,255,0.18) 0%, rgba(80,130,220,0.10) 50%, transparent 72%)",
           filter: "blur(12px)",
           zIndex: 0,
           opacity: 0.5,
@@ -890,13 +1081,30 @@ const CyclingImage = ({ images, size, intervalMs = 2000 }: CyclingImageProps) =>
         }}
       >
         {/* Breathing wrapper */}
-        <div ref={breatheRef} style={{ position: "absolute", inset: 0, willChange: "transform" }}>
+        <div
+          ref={breatheRef}
+          style={{ position: "absolute", inset: 0, willChange: "transform" }}
+        >
           <div ref={currentLayerRef} style={{ position: "absolute", inset: 0 }}>
-            <Image src={images[current]} alt="Hero" fill className="object-cover" priority />
+            <Image
+              src={images[current]}
+              alt="Hero"
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
           {fading && next !== null && (
-            <div ref={nextLayerRef} style={{ position: "absolute", inset: 0, opacity: 0 }}>
-              <Image src={images[next]} alt="Hero next" fill className="object-cover" />
+            <div
+              ref={nextLayerRef}
+              style={{ position: "absolute", inset: 0, opacity: 0 }}
+            >
+              <Image
+                src={images[next]}
+                alt="Hero next"
+                fill
+                className="object-cover"
+              />
             </div>
           )}
         </div>
@@ -906,7 +1114,8 @@ const CyclingImage = ({ images, size, intervalMs = 2000 }: CyclingImageProps) =>
           style={{
             position: "absolute",
             inset: 0,
-            background: "radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.04) 0%, transparent 55%), linear-gradient(180deg, transparent 55%, rgba(10,15,30,0.35) 100%)",
+            background:
+              "radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.04) 0%, transparent 55%), linear-gradient(180deg, transparent 55%, rgba(10,15,30,0.35) 100%)",
             borderRadius: "50%",
             pointerEvents: "none",
             zIndex: 5,
@@ -930,14 +1139,21 @@ const CyclingImage = ({ images, size, intervalMs = 2000 }: CyclingImageProps) =>
           {images.map((_, i) => (
             <div
               key={i}
-              ref={(el) => { dotsRef.current[i] = el; }}
+              ref={(el) => {
+                dotsRef.current[i] = el;
+              }}
               style={{
                 width: i === current ? 22 : 6,
                 height: 6,
                 borderRadius: 3,
-                background: i === current ? "rgba(99,153,255,0.9)" : "rgba(150,185,255,0.35)",
-                transition: "width 0.4s cubic-bezier(0.4,0,0.2,1), background 0.4s ease",
-                boxShadow: i === current ? "0 0 8px rgba(100,153,255,0.6)" : "none",
+                background:
+                  i === current
+                    ? "rgba(99,153,255,0.9)"
+                    : "rgba(150,185,255,0.35)",
+                transition:
+                  "width 0.4s cubic-bezier(0.4,0,0.2,1), background 0.4s ease",
+                boxShadow:
+                  i === current ? "0 0 8px rgba(100,153,255,0.6)" : "none",
               }}
             />
           ))}
@@ -951,20 +1167,71 @@ const CyclingImage = ({ images, size, intervalMs = 2000 }: CyclingImageProps) =>
 // CONFIG (unchanged from original)
 // ─────────────────────────────────────────────────────────────────────────────
 
+type FloatingCardItem = {
+  id: number;
+  title: string;
+  subtitle?: string;
+  icon?: React.ReactNode | string;
+  position?:
+    | "top-right"
+    | "middle-right"
+    | "bottom-center"
+    | "top-left"
+    | "bottom-left";
+};
+
 const CARD_POSITIONS = [
   { x: 140, y: -165, type: "flash", cardIdx: 0 },
   { x: 175, y: -55, type: "ticker", cardIdx: 0 },
   { x: -90, y: 145, type: "breaking", cardIdx: 0 },
 ];
 
-const defaultCards = [
-  { id: 1, title: "Live Connections", subtitle: "842 online now", icon: <LiveConnectionIcon /> },
-  { id: 2, title: "Bengali Association", subtitle: "Cultural", icon: <AssociationIcon /> },
-  { id: 3, title: "Tamil Nanbargal", subtitle: "Social", icon: <GroupIcon /> },
+const CARD_POSITION_PRESETS: Record<string, { x: number; y: number }> = {
+  "top-right": { x: 135, y: -125 },
+  "middle-right": { x: 155, y: 10 },
+  "bottom-center": { x: 10, y: 175 },
+  "top-left": { x: -140, y: -70 },
+  "bottom-left": { x: -130, y: 150 },
+};
+
+const getDynamicCardPositions = (cards: FloatingCardItem[]) =>
+  cards.map((card, index) => {
+    const preset =
+      card.position && CARD_POSITION_PRESETS[card.position]
+        ? CARD_POSITION_PRESETS[card.position]
+        : index === 0
+          ? CARD_POSITION_PRESETS["top-right"]
+          : index === 1
+            ? CARD_POSITION_PRESETS["middle-right"]
+            : CARD_POSITION_PRESETS["bottom-center"];
+
+    return {
+      x: preset.x,
+      y: preset.y,
+      type: "card" as const,
+      cardIdx: index,
+    };
+  });
+
+const defaultCards: FloatingCardItem[] = [
+  //   {
+  //     id: 1,
+  //     title: "Live Connections",
+  //     subtitle: "842 online now",
+  //     icon: <LiveConnectionIcon />,
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Bengali Association",
+  //     subtitle: "Cultural",
+  //     icon: <AssociationIcon />,
+  //   },
+  //   { id: 3, title: "Tamil Nanbargal", subtitle: "Social", icon: <GroupIcon /> },
 ];
 
 const FLASH_NEWS = {
-  headline: "IIK hosts its biggest Diwali celebration in Seoul — 3,000 attendees!",
+  headline:
+    "IIK hosts its biggest Diwali celebration in Seoul — 3,000 attendees!",
   tag: "2m ago",
 };
 
@@ -975,7 +1242,8 @@ const TICKER_ITEMS = [
   "Monthly meetup: Pangyo tech hub, Sat 6pm",
 ];
 
-const BREAKING_TEXT = "India–Korea cultural exchange program expanded to 5 new cities";
+const BREAKING_TEXT =
+  "India–Korea cultural exchange program expanded to 5 new cities";
 
 const defaultImages = [
   "/images/city_lights.jpg",
@@ -990,11 +1258,14 @@ const defaultImages = [
 
 interface HeroVisualProps {
   images?: string[];
-  floatingCards?: { id: number; title: string; subtitle?: string; icon: React.ReactNode }[];
+  floatingCards?: FloatingCardItem[];
   imageIntervalMs?: number;
   flashNews?: { headline: string; tag: string };
+  flashLabel?: string;
   tickerItems?: string[];
+  tickerLabel?: string;
   breakingText?: string;
+  breakingLabel?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1006,8 +1277,11 @@ export const HeroVisual = ({
   floatingCards = defaultCards,
   imageIntervalMs = 2000,
   flashNews = FLASH_NEWS,
+  flashLabel = "⚡ FLASH",
   tickerItems = TICKER_ITEMS,
+  tickerLabel = "IIK UPDATES",
   breakingText = BREAKING_TEXT,
+  breakingLabel = "BREAKING",
 }: HeroVisualProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const elementRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -1017,14 +1291,19 @@ export const HeroVisual = ({
 
   const scale = circleSize / 360;
 
+  const dynamicCardPositions = useMemo(
+    () => getDynamicCardPositions(floatingCards),
+    [floatingCards],
+  );
+
   const scaledCardPositions = useMemo(
     () =>
-      CARD_POSITIONS.map((pos) => ({
+      [...CARD_POSITIONS, ...dynamicCardPositions].map((pos) => ({
         ...pos,
         x: pos.x * scale,
         y: pos.y * scale,
       })),
-    [scale]
+    [scale, dynamicCardPositions],
   );
 
   const resolvedImages = images && images.length > 0 ? images : defaultImages;
@@ -1061,9 +1340,9 @@ export const HeroVisual = ({
 
         // Starting offset directions per card for variety
         const directions = [
-          { x: pos.x + 30, y: pos.y - 20 },  // flash: from top-right
-          { x: pos.x + 30, y: pos.y + 10 },  // ticker: from right
-          { x: pos.x - 20, y: pos.y + 25 },  // breaking: from bottom-left
+          { x: pos.x + 30, y: pos.y - 20 }, // flash: from top-right
+          { x: pos.x + 30, y: pos.y + 10 }, // ticker: from right
+          { x: pos.x - 20, y: pos.y + 25 }, // breaking: from bottom-left
         ];
 
         basePositions.current[i] = { x: pos.x, y: pos.y };
@@ -1086,7 +1365,7 @@ export const HeroVisual = ({
             duration: 0.75,
             ease: "back.out(1.3)",
           },
-          0.6 + i * 0.18
+          0.6 + i * 0.18,
         );
       });
     });
@@ -1199,26 +1478,50 @@ export const HeroVisual = ({
 
   // ── Render floating cards ─────────────────────────────────────────────────
   const renderCard = (pos: (typeof scaledCardPositions)[0], i: number) => {
-    const ref = (el: HTMLDivElement | null) => { elementRefs.current[i] = el; };
+    const ref = (el: HTMLDivElement | null) => {
+      elementRefs.current[i] = el;
+    };
     const wrapper = (children: React.ReactNode) => (
-      <div key={`card-${i}`} ref={ref} className="absolute will-change-transform" style={{ zIndex: 100 }}>
+      <div
+        key={`card-${i}`}
+        ref={ref}
+        className="absolute will-change-transform"
+        style={{ zIndex: 100 }}
+      >
         {children}
       </div>
     );
 
-    if (pos.type === "flash") return wrapper(<FlashNewsCard headline={flashNews.headline} tag={flashNews.tag} />);
-    if (pos.type === "ticker") return wrapper(<TickerCard items={tickerItems} />);
-    if (pos.type === "breaking") return wrapper(<BreakingCard text={breakingText} />);
+    if (pos.type === "flash")
+      return wrapper(
+        <FlashNewsCard
+          label={flashLabel}
+          headline={flashNews.headline}
+          tag={flashNews.tag}
+        />,
+      );
+    if (pos.type === "ticker")
+      return wrapper(<TickerCard items={tickerItems} label={tickerLabel} />);
+    if (pos.type === "breaking")
+      return wrapper(
+        <BreakingCard text={breakingText} label={breakingLabel} />,
+      );
     if (pos.type === "card") {
       const card = floatingCards[pos.cardIdx!];
       if (!card) return null;
-      return wrapper(<FloatingCard title={card.title} subtitle={card.subtitle} icon={card.icon} />);
+      return wrapper(
+        <FloatingCard
+          title={card.title}
+          subtitle={card.subtitle}
+          icon={card.icon}
+        />,
+      );
     }
     if (pos.type === "icon") {
       return wrapper(
         <div className="w-10 h-10 rounded-xl bg-white shadow-md flex items-center justify-center text-blue-400">
           <GraduationIcon />
-        </div>
+        </div>,
       );
     }
     return null;
@@ -1231,7 +1534,16 @@ export const HeroVisual = ({
       style={{ overflow: "visible" }}
     >
       {/* Ambient background blobs — subtle moving gradients */}
-      <div style={{ position: "absolute", inset: "-30%", pointerEvents: "none", zIndex: 0, overflow: "hidden", borderRadius: "50%" }}>
+      <div
+        style={{
+          position: "absolute",
+          inset: "-30%",
+          pointerEvents: "none",
+          zIndex: 0,
+          overflow: "hidden",
+          borderRadius: "50%",
+        }}
+      >
         <AmbientBlob
           color="radial-gradient(circle, rgba(255,153,51,0.55) 0%, rgba(255,120,30,0.3) 40%, transparent 70%)"
           size={circleSize * 0.55}
@@ -1250,13 +1562,19 @@ export const HeroVisual = ({
       </div>
 
       {/* Cursor spotlight */}
-      <CursorSpotlight containerRef={containerRef as React.RefObject<HTMLDivElement>} />
+      <CursorSpotlight
+        containerRef={containerRef as React.RefObject<HTMLDivElement>}
+      />
 
       {/* Animated concentric rings */}
       <AnimatedRings size={circleSize} />
 
       {/* Hero cycling image */}
-      <CyclingImage images={resolvedImages} size={circleSize} intervalMs={imageIntervalMs} />
+      <CyclingImage
+        images={resolvedImages}
+        size={circleSize}
+        intervalMs={imageIntervalMs}
+      />
 
       {/* Floating cards */}
       {scaledCardPositions.map((pos, i) => renderCard(pos, i))}

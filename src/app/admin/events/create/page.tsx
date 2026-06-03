@@ -19,10 +19,11 @@ export default function AdminCreateEventPage() {
           await eventsService.create({
             title: values.title,
             category: values.category,
-            status: "Draft",
+            status: values.isActive ? "Published" : "Draft",
             date: values.date,
             location: values.location,
             description: values.description,
+            imageUrl: values.imageUrl,
           });
           router.push("/admin/events");
         }}

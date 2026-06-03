@@ -24,9 +24,13 @@ export default function AdminEditGalleryPage() {
       if (item) {
         setValues({
           title: item.title,
-          category: item.category,
+          tag: item.tag,
+          tagColor: item.tagColor,
+          year: item.year,
           caption: item.caption,
           imageUrl: item.imageUrl,
+          displayOrder: item.displayOrder,
+          isActive: item.status === "Published",
         });
       }
       setLoading(false);
@@ -46,7 +50,10 @@ export default function AdminEditGalleryPage() {
         <GalleryForm
           initialData={values}
           onSubmit={async (updated) => {
-            await galleryService.update(id, updated);
+            await galleryService.update(id, {
+              ...updated,
+              status: updated.isActive ? "Published" : "Draft",
+            });
             router.push("/admin/gallery");
           }}
           submitLabel="Update gallery item"

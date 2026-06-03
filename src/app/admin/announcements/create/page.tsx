@@ -21,10 +21,8 @@ export default function AdminCreateAnnouncementPage() {
         onSubmit={async (values: AnnouncementFormValues) => {
           await announcementsService.create({
             title: values.title,
-            category: values.category,
-            status: "Draft",
-            publishedAt: values.publishedAt,
-            content: values.content,
+            description: values.description,
+            display_order: values.display_order,
           });
           router.push("/admin/announcements");
         }}
