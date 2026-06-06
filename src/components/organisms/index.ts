@@ -1,15 +1,17 @@
-export { Hero } from "./Hero";
-export { HeroText } from "./HeroText";
-export { HeroVisual } from "./HeroVisual";
-export { UpcomingEvent } from "./UpcomingEvent";
-export { AboutSection } from "./AboutSection";
+export {
+  Hero,
+  HeroText,
+  HeroVisual,
+  UpcomingEvent,
+  AboutSection,
+  CommunitySection,
+  GallerySection,
+  VoiceOfCommunitySection,
+} from "./home";
 export { AboutPageContent } from "./AboutPageContent";
 export { default as CommunityPageContent } from "./CommunityPageContent";
 export { default as EventsPageContent } from "./EventsPageContent";
 export { default as ResourcesPageContent } from "./ResourcesPageContent";
 export { default as MagazinePageContent } from "./MagazinePageContent";
 export { default as ContactPageContent } from "./ContactPageContent";
-export { CommunitySection } from "./CommunitySection";
-export { GallerySection } from "./GallerySection";
-export { VoiceOfCommunitySection } from "./VoiceOfCommunitySection";
 export { Footer } from "./Footer";

@@ -1,8 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { motion, useInView } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { getFeatured, type CommunityItem } from "@/services/community.service";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 26, filter: "blur(6px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.65, ease: EASE },
+  },
+};
+
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const tagColorClass = (accent: string) => {
@@ -313,6 +331,8 @@ const KoreaMap = () => (
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const CommunitySection = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const inView = useInView(sectionRef, { once: true, margin: "-80px" });
   const [communities, setCommunities] = useState<CommunityItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -324,18 +344,27 @@ export const CommunitySection = () => {
   }, []);
 
   return (
-    <section className="relative w-full overflow-hidden bg-gradient-to-br from-orange-50/70 via-white to-green-50/50 px-3 py-10 sm:px-6 sm:py-14 lg:px-16">
+    <motion.section
+      ref={sectionRef}
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"}
+      variants={stagger}
+      className="relative w-full overflow-hidden bg-gradient-to-br from-orange-50/70 via-white to-green-50/50 px-3 py-10 sm:px-6 sm:py-14 lg:px-16"
+    >
       <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#FF9933]/6 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[#138808]/5 blur-3xl" />
 
       <div className="relative mx-auto w-full max-w-7xl">
         <div className="grid items-center gap-8 lg:grid-cols-2">
           {/* Left */}
-          <div className="flex flex-col gap-5">
+          <motion.div variants={fadeUp} className="flex flex-col gap-5">
             <TricolorBar />
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#138808]">
+            <motion.p
+              variants={fadeUp}
+              className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#138808]"
+            >
               Indians in Korea · IIK
-            </p>
+            </motion.p>
             <h2 className="font-playfair text-3xl sm:text-4xl lg:text-[38px] font-bold leading-tight text-slate-900">
               Find Your <span className="text-[#FF9933]">Tribe</span>
             </h2>
@@ -353,38 +382,43 @@ export const CommunitySection = () => {
                   ))}
             </div>
 
-            <Link
-              href="/community"
-              className="mt-2 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-[12px] font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:border-[#FF9933]/60 hover:bg-orange-50 hover:text-[#FF9933]"
-            >
-              View all communities
-              <svg
-                className="h-3.5 w-3.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2.5}
+            <motion.div variants={fadeUp}>
+              <Link
+                href="/community"
+                className="mt-2 inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-[12px] font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:border-[#FF9933]/60 hover:bg-orange-50 hover:text-[#FF9933]"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </Link>
-          </div>
+                View all communities
+                <svg
+                  className="h-3.5 w-3.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </Link>
+            </motion.div>
+          </motion.div>
 
           {/* Map */}
-          <div className="order-first lg:order-none h-[260px] sm:h-[360px] md:h-[420px] lg:h-[500px]">
+          <motion.div
+            variants={fadeUp}
+            className="order-first lg:order-none h-[260px] sm:h-[360px] md:h-[420px] lg:h-[500px]"
+          >
             <KoreaMap />
-          </div>
+          </motion.div>
         </div>
       </div>
 
       <style>{`
         @keyframes fade-up { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
       `}</style>
-    </section>
+    </motion.section>
   );
 };
 

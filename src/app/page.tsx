@@ -6,7 +6,7 @@ import {
   Hero,
   UpcomingEvent,
   VoiceOfCommunitySection,
-} from "@/components/organisms";
+} from "@/components/organisms/home";
 
 export default function Home() {
   return (

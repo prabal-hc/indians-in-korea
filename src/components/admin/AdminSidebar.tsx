@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  BadgeInfo,
   CalendarDays,
   Goal,
   Home,
@@ -12,6 +13,7 @@ import {
   LogOut,
   Megaphone,
   Menu,
+  MessageSquareQuote,
   Sparkles,
   Users,
 } from "lucide-react";
@@ -23,6 +25,12 @@ const navItems = [
   { label: "Communities", href: "/admin/communities", icon: Users },
   { label: "Gallery", href: "/admin/gallery", icon: Image },
   { label: "Announcements", href: "/admin/announcements", icon: Megaphone },
+  { label: "About Us", href: "/admin/about", icon: BadgeInfo },
+  {
+    label: "Voice of Community",
+    href: "/admin/testimonial",
+    icon: MessageSquareQuote,
+  },
   { label: "Homepage", href: "/admin/homepage", icon: Sparkles },
 ];
 

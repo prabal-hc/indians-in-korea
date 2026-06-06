@@ -210,6 +210,7 @@ const Navbar = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="flex-shrink-0"
+            id="navbar-logo"
           >
             <Link
               href="/"
@@ -256,8 +257,7 @@ const Navbar = () => {
             animate="visible"
             className="hidden lg:flex items-center gap-3"
           >
-            {/* SEARCH */}
-            <motion.div variants={fadeUp} className="relative">
+            {/* <motion.div variants={fadeUp} className="relative">
               <Search
                 size={15}
                 className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
@@ -280,10 +280,10 @@ const Navbar = () => {
                   }
                 `}
               />
-            </motion.div>
+            </motion.div> */}
 
             {/* JOIN US CTA */}
-            <motion.div variants={fadeUp}>
+            {/* <motion.div variants={fadeUp}>
               <motion.button
                 whileHover={{ scale: 1.04, y: -1 }}
                 whileTap={{ scale: 0.97 }}
@@ -301,7 +301,7 @@ const Navbar = () => {
                 <span className="absolute inset-0 translate-x-[-110%] group-hover:translate-x-[110%] transition-transform duration-700 bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 pointer-events-none" />
                 Join Us
               </motion.button>
-            </motion.div>
+            </motion.div> */}
           </motion.div>
 
           {/* MOBILE HAMBURGER */}

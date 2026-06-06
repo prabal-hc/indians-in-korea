@@ -259,8 +259,8 @@ export const UpcomingEvent = () => {
 
   const displayFeatured = featured ?? upcoming[0] ?? null;
   const sideEvent = featured
-    ? upcoming.find((event) => event.id !== featured.id) ?? null
-    : upcoming[1] ?? null;
+    ? (upcoming.find((event) => event.id !== featured.id) ?? null)
+    : (upcoming[1] ?? null);
 
   return (
     <section className="w-full bg-slate-50/80">

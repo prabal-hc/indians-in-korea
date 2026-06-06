@@ -799,7 +799,10 @@ const HeroFloatCard = ({
     transition={{ duration: 0.65, delay, ease: [0.16, 1, 0.3, 1] }}
     className={`absolute hidden lg:flex items-center gap-2.5 bg-white/90 backdrop-blur-sm border border-stone-100 rounded-2xl px-3.5 py-2.5 shadow-lg ${className}`}
     style={{
-      animation: `floatCard ${3.5 + delay}s ease-in-out infinite`,
+      animationName: "floatCard",
+      animationDuration: `${3.5 + delay}s`,
+      animationTimingFunction: "ease-in-out",
+      animationIterationCount: "infinite",
       animationDelay: `${delay * 0.5}s`,
     }}
   >
@@ -1222,9 +1225,10 @@ export default function ResourcesPageContent() {
             transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
             className="inline-flex mb-7 pt-5 sm:pt-0"
             style={{
-              animation: heroInView
-                ? "badgeFloat 3.8s ease-in-out infinite"
-                : "none",
+              animationName: heroInView ? "badgeFloat" : "none",
+              animationDuration: "3.8s",
+              animationTimingFunction: "ease-in-out",
+              animationIterationCount: "infinite",
               animationDelay: "0.8s",
             }}
           >
@@ -1234,9 +1238,10 @@ export default function ResourcesPageContent() {
                 background:
                   "linear-gradient(135deg, #fff7ed, #ffedd5 60%, #fed7aa)",
                 border: "1px solid rgba(234,88,12,0.22)",
-                animation: heroInView
-                  ? "glowBreath 3.2s ease-in-out infinite"
-                  : "none",
+                animationName: heroInView ? "glowBreath" : "none",
+                animationDuration: "3.2s",
+                animationTimingFunction: "ease-in-out",
+                animationIterationCount: "infinite",
                 animationDelay: "1s",
               }}
             >
@@ -1246,7 +1251,10 @@ export default function ResourcesPageContent() {
                 style={{
                   background:
                     "linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)",
-                  animation: "shimmerSweep 3s ease-in-out infinite",
+                  animationName: "shimmerSweep",
+                  animationDuration: "3s",
+                  animationTimingFunction: "ease-in-out",
+                  animationIterationCount: "infinite",
                   animationDelay: "1.5s",
                 }}
               />
@@ -1444,7 +1452,10 @@ export default function ResourcesPageContent() {
               height: p.size,
               background: "rgba(255,255,255,0.12)",
               filter: "blur(20px)",
-              animation: `floatCard ${5 + p.delay}s ease-in-out infinite`,
+              animationName: "floatCard",
+              animationDuration: `${5 + p.delay}s`,
+              animationTimingFunction: "ease-in-out",
+              animationIterationCount: "infinite",
               animationDelay: `${p.delay}s`,
             }}
           />
