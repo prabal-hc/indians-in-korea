@@ -58,7 +58,7 @@ export default function AdminGalleryPage() {
         subtitle="Manage visual highlights, captions, and gallery assets."
       />
 
-      <div className="grid gap-4 sm:grid-cols-[1.2fr_0.8fr]">
+      {/* <div className="grid gap-4 sm:grid-cols-[1.2fr_0.8fr]">
         <SearchBar
           value={search}
           onChange={setSearch}
@@ -80,7 +80,7 @@ export default function AdminGalleryPage() {
             ))}
           </select>
         </div>
-      </div>
+      </div> */}
 
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <p className="text-sm text-slate-600">

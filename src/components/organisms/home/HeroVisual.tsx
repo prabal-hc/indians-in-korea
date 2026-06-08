@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import type { AnnouncementItem } from "@/services/admin/announcements.service";
 import Image from "next/image";
 import gsap from "gsap";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ICON COMPONENTS (unchanged from original)
+// ICON COMPONENTS
 // ─────────────────────────────────────────────────────────────────────────────
 
 const MegaphoneIcon = () => (
@@ -40,53 +41,8 @@ const NewsIcon = () => (
   </svg>
 );
 
-const FloatingCard = ({
-  title,
-  subtitle,
-  icon,
-}: {
-  title: string;
-  subtitle?: string;
-  icon?: React.ReactNode | string;
-}) => (
-  <div className="flex items-center gap-2.5 bg-white rounded-2xl shadow-xl px-3.5 py-2.5 min-w-[160px] max-w-[230px] border border-gray-100">
-    {icon && (
-      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-orange-50 text-sm">
-        {typeof icon === "string" ? <span>{icon}</span> : icon}
-      </div>
-    )}
-    <div className="flex flex-col min-w-0">
-      <span className="text-[13px] font-semibold text-gray-800 leading-tight truncate">
-        {title}
-      </span>
-      {subtitle && (
-        <span className="text-[11px] text-gray-400 leading-tight mt-0.5 truncate">
-          {subtitle}
-        </span>
-      )}
-    </div>
-  </div>
-);
-
-const GraduationIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M12 3L2 9l10 6 10-6-10-6z"
-      stroke="#60a5fa"
-      strokeWidth="1.8"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M6 12v5c0 2.2 2.7 4 6 4s6-1.8 6-4v-5"
-      stroke="#60a5fa"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
 // ─────────────────────────────────────────────────────────────────────────────
-// LIVE DOT — enhanced with layered pulse
+// LIVE DOT
 // ─────────────────────────────────────────────────────────────────────────────
 
 const LiveDot = ({ color = "#ef4444" }: { color?: string }) => (
@@ -99,7 +55,6 @@ const LiveDot = ({ color = "#ef4444" }: { color?: string }) => (
       flexShrink: 0,
     }}
   >
-    {/* Outer ring pulse */}
     <span
       style={{
         position: "absolute",
@@ -110,7 +65,6 @@ const LiveDot = ({ color = "#ef4444" }: { color?: string }) => (
         animation: "livePingOuter 2s ease-in-out infinite",
       }}
     />
-    {/* Inner glow pulse */}
     <span
       style={{
         position: "absolute",
@@ -146,7 +100,7 @@ const LiveDot = ({ color = "#ef4444" }: { color?: string }) => (
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FLASH NEWS CARD — enhanced glassmorphism + hover glow
+// FLASH NEWS CARD
 // ─────────────────────────────────────────────────────────────────────────────
 
 const FlashNewsCard = ({
@@ -206,10 +160,8 @@ const FlashNewsCard = ({
         overflow: "hidden",
         cursor: "default",
         willChange: "transform",
-        transition: "border-color 0.3s ease",
       }}
     >
-      {/* Left accent bar — animated shimmer */}
       <div
         style={{
           position: "absolute",
@@ -224,7 +176,6 @@ const FlashNewsCard = ({
           animation: "accentShimmer 2.5s ease-in-out infinite",
         }}
       />
-      {/* Subtle inner glow */}
       <div
         style={{
           position: "absolute",
@@ -294,7 +245,7 @@ const FlashNewsCard = ({
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// TICKER CARD — enhanced with smoother transitions + glass
+// TICKER CARD
 // ─────────────────────────────────────────────────────────────────────────────
 
 const TickerCard = ({ items, label }: { items: string[]; label: string }) => {
@@ -303,6 +254,7 @@ const TickerCard = ({ items, label }: { items: string[]; label: string }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (items.length <= 1) return;
     const t = setInterval(() => {
       setPhase("out");
       setTimeout(() => {
@@ -426,27 +378,29 @@ const TickerCard = ({ items, label }: { items: string[]; label: string }) => {
       >
         {items[idx]}
       </div>
-      <div style={{ display: "flex", gap: 4, marginTop: 8 }}>
-        {items.map((_, i) => (
-          <div
-            key={i}
-            style={{
-              height: 3,
-              width: i === idx ? 20 : 6,
-              borderRadius: 2,
-              background: i === idx ? "#6366f1" : "#e2e8f0",
-              transition: "all 0.4s cubic-bezier(0.4,0,0.2,1)",
-              boxShadow: i === idx ? "0 0 6px rgba(99,102,241,0.4)" : "none",
-            }}
-          />
-        ))}
-      </div>
+      {items.length > 1 && (
+        <div style={{ display: "flex", gap: 4, marginTop: 8 }}>
+          {items.map((_, i) => (
+            <div
+              key={i}
+              style={{
+                height: 3,
+                width: i === idx ? 20 : 6,
+                borderRadius: 2,
+                background: i === idx ? "#6366f1" : "#e2e8f0",
+                transition: "all 0.4s cubic-bezier(0.4,0,0.2,1)",
+                boxShadow: i === idx ? "0 0 6px rgba(99,102,241,0.4)" : "none",
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// BREAKING CARD — enhanced glass + hover
+// BREAKING CARD
 // ─────────────────────────────────────────────────────────────────────────────
 
 const BreakingCard = ({ text, label }: { text: string; label: string }) => {
@@ -563,7 +517,7 @@ const BreakingCard = ({ text, label }: { text: string; label: string }) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AMBIENT BLOB — soft moving background gradient
+// AMBIENT BLOB
 // ─────────────────────────────────────────────────────────────────────────────
 
 const AmbientBlob = ({
@@ -590,7 +544,6 @@ const AmbientBlob = ({
       yoyo: true,
       ease: "sine.inOut",
     });
-    // Subtle scale breathing
     gsap.to(ref.current, {
       scale: 1.08 + Math.random() * 0.08,
       duration: dur * 0.8,
@@ -621,7 +574,7 @@ const AmbientBlob = ({
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CURSOR SPOTLIGHT — soft radial glow following the mouse
+// CURSOR SPOTLIGHT
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CursorSpotlight = ({
@@ -640,10 +593,7 @@ const CursorSpotlight = ({
 
     const onMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
-      posRef.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      };
+      posRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     };
 
     const animate = () => {
@@ -652,25 +602,21 @@ const CursorSpotlight = ({
           x: parseFloat(spot.style.left) || 0,
           y: parseFloat(spot.style.top) || 0,
         };
-        const lerped = {
-          x: cur.x + (posRef.current.x - cur.x) * 0.09,
-          y: cur.y + (posRef.current.y - cur.y) * 0.09,
-        };
-        spot.style.left = `${lerped.x}px`;
-        spot.style.top = `${lerped.y}px`;
+        spot.style.left = `${cur.x + (posRef.current.x - cur.x) * 0.09}px`;
+        spot.style.top = `${cur.y + (posRef.current.y - cur.y) * 0.09}px`;
       }
       rafRef.current = requestAnimationFrame(animate);
     };
-
-    container.addEventListener("mousemove", onMove);
-    rafRef.current = requestAnimationFrame(animate);
 
     const onEnter = () =>
       gsap.to(spot, { opacity: 1, duration: 0.4, ease: "power2.out" });
     const onLeave = () =>
       gsap.to(spot, { opacity: 0, duration: 0.6, ease: "power2.out" });
+
+    container.addEventListener("mousemove", onMove);
     container.addEventListener("mouseenter", onEnter);
     container.addEventListener("mouseleave", onLeave);
+    rafRef.current = requestAnimationFrame(animate);
 
     return () => {
       container.removeEventListener("mousemove", onMove);
@@ -701,24 +647,23 @@ const CursorSpotlight = ({
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ANIMATED RINGS — premium atmospheric with shimmer + depth
+// ANIMATED RINGS
 // ─────────────────────────────────────────────────────────────────────────────
 
 const AnimatedRings = ({ size }: { size: number }) => {
-  const ring1Ref = useRef<HTMLDivElement>(null); // Inner breathing ring
-  const ring2Ref = useRef<HTMLDivElement>(null); // Mid breathing ring
-  const ring3Ref = useRef<HTMLDivElement>(null); // Outer soft ring
-  const ring4Ref = useRef<HTMLDivElement>(null); // Sonar pulse A
-  const ring5Ref = useRef<HTMLDivElement>(null); // Sonar pulse B
-  const ring6Ref = useRef<HTMLDivElement>(null); // Sonar pulse C (new, offset)
-  const spinCWRef = useRef<HTMLDivElement>(null); // Clockwise dashed
-  const spinCCWRef = useRef<HTMLDivElement>(null); // Counter-clockwise dashed
-  const spinCW2Ref = useRef<HTMLDivElement>(null); // Slow CW large ring
-  const glowRingRef = useRef<HTMLDivElement>(null); // Atmospheric glow halo
+  const ring1Ref = useRef<HTMLDivElement>(null);
+  const ring2Ref = useRef<HTMLDivElement>(null);
+  const ring3Ref = useRef<HTMLDivElement>(null);
+  const ring4Ref = useRef<HTMLDivElement>(null);
+  const ring5Ref = useRef<HTMLDivElement>(null);
+  const ring6Ref = useRef<HTMLDivElement>(null);
+  const spinCWRef = useRef<HTMLDivElement>(null);
+  const spinCCWRef = useRef<HTMLDivElement>(null);
+  const spinCW2Ref = useRef<HTMLDivElement>(null);
+  const glowRingRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // ── Breathing rings (organic, non-uniform timing) ──────────────────
       gsap.to(ring1Ref.current, {
         scale: 1.055,
         opacity: 0.72,
@@ -745,8 +690,6 @@ const AnimatedRings = ({ size }: { size: number }) => {
         ease: "sine.inOut",
         delay: 1.2,
       });
-
-      // ── Atmospheric glow halo — very slow ambient breathe ─────────────
       gsap.to(glowRingRef.current, {
         opacity: 0.18,
         scale: 1.06,
@@ -757,7 +700,6 @@ const AnimatedRings = ({ size }: { size: number }) => {
         delay: 0.5,
       });
 
-      // ── Sonar pulses — staggered, organic timing ───────────────────────
       const sonar = (el: HTMLDivElement | null, delay: number, dur: number) => {
         if (!el) return;
         gsap.set(el, { scale: 0.95, opacity: 0.5 });
@@ -774,7 +716,6 @@ const AnimatedRings = ({ size }: { size: number }) => {
       sonar(ring5Ref.current, 1.45, 3.1);
       sonar(ring6Ref.current, 2.2, 2.7);
 
-      // ── Dual-direction rotation — smooth, premium pacing ──────────────
       gsap.to(spinCWRef.current, {
         rotation: 360,
         duration: 22,
@@ -812,7 +753,6 @@ const AnimatedRings = ({ size }: { size: number }) => {
 
   return (
     <>
-      {/* Atmospheric glow halo — outermost, very soft */}
       <div
         ref={glowRingRef}
         style={{
@@ -825,8 +765,6 @@ const AnimatedRings = ({ size }: { size: number }) => {
           opacity: 0.12,
         }}
       />
-
-      {/* Sonar pulse rings */}
       <div
         ref={ring4Ref}
         style={{
@@ -857,8 +795,6 @@ const AnimatedRings = ({ size }: { size: number }) => {
           zIndex: 24,
         }}
       />
-
-      {/* Rotating dashed ring — CW */}
       <div
         ref={spinCWRef}
         style={{
@@ -869,8 +805,6 @@ const AnimatedRings = ({ size }: { size: number }) => {
           zIndex: 26,
         }}
       />
-
-      {/* Inner breathing ring — most visible */}
       <div
         ref={ring1Ref}
         style={{
@@ -884,8 +818,6 @@ const AnimatedRings = ({ size }: { size: number }) => {
           opacity: 0.58,
         }}
       />
-
-      {/* Mid breathing ring */}
       <div
         ref={ring2Ref}
         style={{
@@ -898,8 +830,6 @@ const AnimatedRings = ({ size }: { size: number }) => {
           opacity: 0.42,
         }}
       />
-
-      {/* Counter-clockwise dashed ring */}
       <div
         ref={spinCCWRef}
         style={{
@@ -910,8 +840,6 @@ const AnimatedRings = ({ size }: { size: number }) => {
           zIndex: 25,
         }}
       />
-
-      {/* Outer very slow CW ring */}
       <div
         ref={spinCW2Ref}
         style={{
@@ -922,8 +850,6 @@ const AnimatedRings = ({ size }: { size: number }) => {
           zIndex: 23,
         }}
       />
-
-      {/* Outer breathing ring — subtlest */}
       <div
         ref={ring3Ref}
         style={{
@@ -943,7 +869,7 @@ const AnimatedRings = ({ size }: { size: number }) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CYCLING HERO IMAGE — enhanced with breathing, atmospheric overlay, glow
+// CYCLING HERO IMAGE
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface CyclingImageProps {
@@ -959,20 +885,19 @@ const CyclingImage = ({
 }: CyclingImageProps) => {
   const [current, setCurrent] = useState(0);
   const [next, setNext] = useState<number | null>(null);
-  const [fading, setFading] = useState(false);
+  const [sliding, setSliding] = useState(false);
 
-  const containerRef = useRef<HTMLDivElement>(null);
   const currentLayerRef = useRef<HTMLDivElement>(null);
   const nextLayerRef = useRef<HTMLDivElement>(null);
   const breatheRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const dotsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Subtle breathing scale animation on image
+  // Breathing lives on the outermost wrapper — outside overflow:hidden — so it never clips
   useEffect(() => {
     if (!breatheRef.current) return;
     gsap.to(breatheRef.current, {
-      scale: 1.04,
+      scale: 1.03,
       duration: 5.5,
       repeat: -1,
       yoyo: true,
@@ -980,7 +905,6 @@ const CyclingImage = ({
     });
   }, []);
 
-  // Ambient glow pulse
   useEffect(() => {
     if (!glowRef.current) return;
     gsap.to(glowRef.current, {
@@ -996,33 +920,37 @@ const CyclingImage = ({
   useEffect(() => {
     if (images.length <= 1) return;
     const timer = setInterval(() => {
+      if (sliding) return; // Prevent overlapping transitions
       const nextIdx = (current + 1) % images.length;
       setNext(nextIdx);
-      setFading(true);
+      setSliding(true);
 
-      // Next layer: scale down from slight zoom, fade in
-      gsap.set(nextLayerRef.current, { opacity: 0, scale: 1.08 });
-      gsap.to(nextLayerRef.current, {
-        opacity: 1,
-        scale: 1,
-        duration: 0.85,
-        ease: "power3.out",
-      });
-      // Current layer: subtle scale down + fade out
+      const dur = 0.9;
+      const ease = "power3.inOut";
+
+      // Stage incoming image: starts fully off-screen to the RIGHT
+      gsap.set(nextLayerRef.current, { x: size, opacity: 1 });
+
+      // Slide current LEFT out, slide next LEFT in — simultaneous
       gsap.to(currentLayerRef.current, {
-        opacity: 0,
-        scale: 0.94,
-        duration: 0.75,
-        ease: "power3.in",
+        x: -size,
+        duration: dur,
+        ease,
+      });
+      gsap.to(nextLayerRef.current, {
+        x: 0,
+        duration: dur,
+        ease,
         onComplete: () => {
           setCurrent(nextIdx);
           setNext(null);
-          setFading(false);
-          gsap.set(currentLayerRef.current, { opacity: 1, scale: 1 });
+          setSliding(false);
+          // Reset current layer so it's ready for the next transition
+          gsap.set(currentLayerRef.current, { x: 0 });
         },
       });
 
-      // Dot indicators with smooth width transition
+      // Update dot indicators
       dotsRef.current.forEach((dot, i) => {
         if (!dot) return;
         gsap.to(dot, {
@@ -1035,11 +963,12 @@ const CyclingImage = ({
       });
     }, intervalMs);
     return () => clearInterval(timer);
-  }, [current, images.length, intervalMs]);
+  }, [current, images.length, intervalMs, size, sliding]);
 
   return (
+    // breatheRef is the outermost wrapper — breathing scale happens before overflow:hidden
     <div
-      ref={containerRef}
+      ref={breatheRef}
       style={{
         position: "relative",
         width: size,
@@ -1050,7 +979,6 @@ const CyclingImage = ({
         willChange: "transform",
       }}
     >
-      {/* Layered ambient glow behind image */}
       <div
         ref={glowRef}
         style={{
@@ -1066,8 +994,6 @@ const CyclingImage = ({
           willChange: "transform, opacity",
         }}
       />
-
-      {/* Image container with inner shadow ring */}
       <div
         style={{
           position: "relative",
@@ -1075,41 +1001,43 @@ const CyclingImage = ({
           height: "100%",
           borderRadius: "50%",
           overflow: "hidden",
+          // Dark fallback — never shows because both layers always cover 100% width
+          background: "#0a0f1e",
           boxShadow:
             "0 0 0 5px rgba(155,195,255,0.20), 0 0 0 12px rgba(130,175,240,0.09), 0 28px 70px rgba(0,0,0,0.32), inset 0 0 0 1px rgba(255,255,255,0.08)",
           zIndex: 1,
         }}
       >
-        {/* Breathing wrapper */}
+        {/* Current image — slides out to the left */}
         <div
-          ref={breatheRef}
+          ref={currentLayerRef}
           style={{ position: "absolute", inset: 0, willChange: "transform" }}
         >
-          <div ref={currentLayerRef} style={{ position: "absolute", inset: 0 }}>
-            <Image
-              src={images[current]}
-              alt="Hero"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-          {fading && next !== null && (
-            <div
-              ref={nextLayerRef}
-              style={{ position: "absolute", inset: 0, opacity: 0 }}
-            >
-              <Image
-                src={images[next]}
-                alt="Hero next"
-                fill
-                className="object-cover"
-              />
-            </div>
-          )}
+          <Image
+            src={images[current]}
+            alt="Hero"
+            fill
+            className="object-cover"
+            priority
+          />
         </div>
 
-        {/* Cinematic inner gradient overlay — depth + atmosphere */}
+        {/* Incoming image — slides in from the right, only mounted during transition */}
+        {next !== null && (
+          <div
+            ref={nextLayerRef}
+            style={{ position: "absolute", inset: 0, willChange: "transform" }}
+          >
+            <Image
+              src={images[next]}
+              alt="Hero next"
+              fill
+              className="object-cover"
+            />
+          </div>
+        )}
+
+        {/* Cinematic overlay — always on top */}
         <div
           style={{
             position: "absolute",
@@ -1164,86 +1092,51 @@ const CyclingImage = ({
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CONFIG (unchanged from original)
+// POSITION GENERATOR
 // ─────────────────────────────────────────────────────────────────────────────
 
-type FloatingCardItem = {
-  id: number;
-  title: string;
-  subtitle?: string;
-  icon?: React.ReactNode | string;
-  position?:
-    | "top-right"
-    | "middle-right"
-    | "bottom-center"
-    | "top-left"
-    | "bottom-left";
-};
+function generateCardPositions(
+  count: number,
+  imageRadius: number,
+): { x: number; y: number }[] {
+  if (count === 0) return [];
 
-const CARD_POSITIONS = [
-  { x: 140, y: -165, type: "flash", cardIdx: 0 },
-  { x: 175, y: -55, type: "ticker", cardIdx: 0 },
-  { x: -90, y: 145, type: "breaking", cardIdx: 0 },
-];
+  // Orbit just outside the image circle edge
+  // imageRadius is circleSize/2, so orbit = imageRadius + small gap for the card to sit beside it
+  const orbitRadius = imageRadius + 20;
 
-const CARD_POSITION_PRESETS: Record<string, { x: number; y: number }> = {
-  "top-right": { x: 135, y: -125 },
-  "middle-right": { x: 155, y: 10 },
-  "bottom-center": { x: 10, y: 175 },
-  "top-left": { x: -140, y: -70 },
-  "bottom-left": { x: -130, y: 150 },
-};
+  // Angular slots (degrees from top = 0°, clockwise)
+  // Avoids 270° (pure left) and 90° (pure right) dead zones where cards clip the image
+  const angleSlots = [
+    -50, // top-left
+    40, // top-right
+    130, // bottom-right
+    220, // bottom-left
+    -10, // near top
+    170, // near bottom
+    75, // right
+    285, // left
+  ];
 
-const getDynamicCardPositions = (cards: FloatingCardItem[]) =>
-  cards.map((card, index) => {
-    const preset =
-      card.position && CARD_POSITION_PRESETS[card.position]
-        ? CARD_POSITION_PRESETS[card.position]
-        : index === 0
-          ? CARD_POSITION_PRESETS["top-right"]
-          : index === 1
-            ? CARD_POSITION_PRESETS["middle-right"]
-            : CARD_POSITION_PRESETS["bottom-center"];
-
+  return Array.from({ length: Math.min(count, angleSlots.length) }, (_, i) => {
+    const angleRad = (angleSlots[i] * Math.PI) / 180;
     return {
-      x: preset.x,
-      y: preset.y,
-      type: "card" as const,
-      cardIdx: index,
+      x: Math.sin(angleRad) * orbitRadius,
+      y: -Math.cos(angleRad) * orbitRadius,
     };
   });
+}
 
-const defaultCards: FloatingCardItem[] = [
-  //   {
-  //     id: 1,
-  //     title: "Live Connections",
-  //     subtitle: "842 online now",
-  //     icon: <LiveConnectionIcon />,
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "Bengali Association",
-  //     subtitle: "Cultural",
-  //     icon: <AssociationIcon />,
-  //   },
-  //   { id: 3, title: "Tamil Nanbargal", subtitle: "Social", icon: <GroupIcon /> },
-];
+// ─────────────────────────────────────────────────────────────────────────────
+// CARD TYPE CYCLE
+// ─────────────────────────────────────────────────────────────────────────────
 
-const FLASH_NEWS = {
-  headline:
-    "IIK hosts its biggest Diwali celebration in Seoul — 3,000 attendees!",
-  tag: "2m ago",
-};
+const CARD_TYPES = ["flash", "ticker", "breaking"] as const;
+type CardType = (typeof CARD_TYPES)[number];
 
-const TICKER_ITEMS = [
-  "New Kannada chapter launched in Incheon 🎉",
-  "IIK Holi Fest registrations now open!",
-  "Job fair for Indian professionals — June 14",
-  "Monthly meetup: Pangyo tech hub, Sat 6pm",
-];
-
-const BREAKING_TEXT =
-  "India–Korea cultural exchange program expanded to 5 new cities";
+// ─────────────────────────────────────────────────────────────────────────────
+// DEFAULT IMAGES
+// ─────────────────────────────────────────────────────────────────────────────
 
 const defaultImages = [
   "/images/city_lights.jpg",
@@ -1258,14 +1151,8 @@ const defaultImages = [
 
 interface HeroVisualProps {
   images?: string[];
-  floatingCards?: FloatingCardItem[];
   imageIntervalMs?: number;
-  flashNews?: { headline: string; tag: string };
-  flashLabel?: string;
-  tickerItems?: string[];
-  tickerLabel?: string;
-  breakingText?: string;
-  breakingLabel?: string;
+  announcements?: AnnouncementItem[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1274,47 +1161,28 @@ interface HeroVisualProps {
 
 export const HeroVisual = ({
   images,
-  floatingCards = defaultCards,
   imageIntervalMs = 2000,
-  flashNews = FLASH_NEWS,
-  flashLabel = "⚡ FLASH",
-  tickerItems = TICKER_ITEMS,
-  tickerLabel = "IIK UPDATES",
-  breakingText = BREAKING_TEXT,
-  breakingLabel = "BREAKING",
+  announcements = [],
 }: HeroVisualProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const elementRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const basePositions = useRef<{ x: number; y: number }[]>([]);
+  const storedBasePositions = useRef<{ x: number; y: number }[]>([]);
   const [circleSize, setCircleSize] = useState(360);
-  const tlRef = useRef<gsap.core.Timeline | null>(null);
-
-  const scale = circleSize / 360;
-
-  const dynamicCardPositions = useMemo(
-    () => getDynamicCardPositions(floatingCards),
-    [floatingCards],
-  );
-
-  const scaledCardPositions = useMemo(
-    () =>
-      [...CARD_POSITIONS, ...dynamicCardPositions].map((pos) => ({
-        ...pos,
-        x: pos.x * scale,
-        y: pos.y * scale,
-      })),
-    [scale, dynamicCardPositions],
-  );
 
   const resolvedImages = images && images.length > 0 ? images : defaultImages;
 
-  // ── Responsive size ───────────────────────────────────────────────────────
+  // Derive card positions from announcements count
+  // No extra scale needed — circleSize is already the real pixel size
+  const cardPositions = useMemo(() => {
+    return generateCardPositions(announcements.length, circleSize / 2);
+  }, [announcements.length, circleSize]);
+
+  // ── Responsive size ─────────────────────────────────────────────────────
   useEffect(() => {
     const element = containerRef.current;
     if (!element) return;
     const updateSize = () => {
-      const width = element.clientWidth;
-      setCircleSize(Math.min(Math.max(width, 280), 900));
+      setCircleSize(Math.min(Math.max(element.clientWidth, 280), 900));
     };
     updateSize();
     const ro = new ResizeObserver(updateSize);
@@ -1322,43 +1190,44 @@ export const HeroVisual = ({
     return () => ro.disconnect();
   }, []);
 
-  // ── ENTRANCE ANIMATION TIMELINE — orchestrated, cinematic sequence ────────
+  // ── Entrance animation ──────────────────────────────────────────────────
   useEffect(() => {
+    if (cardPositions.length === 0) return;
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      tlRef.current = tl;
 
-      // 1. Rings are always visible (CSS based), just ensure cards start hidden
-      elementRefs.current.forEach((el) => {
-        if (el) gsap.set(el, { opacity: 0, scale: 0.75 });
-      });
-
-      // 2. Cards stagger in from different directions with cinematic feel
-      scaledCardPositions.forEach((pos, i) => {
+      cardPositions.forEach((pos, i) => {
         const el = elementRefs.current[i];
         if (!el) return;
 
-        // Starting offset directions per card for variety
-        const directions = [
-          { x: pos.x + 30, y: pos.y - 20 }, // flash: from top-right
-          { x: pos.x + 30, y: pos.y + 10 }, // ticker: from right
-          { x: pos.x - 20, y: pos.y + 25 }, // breaking: from bottom-left
-        ];
+        // Offset x/y so the card center sits on the orbit point
+        // Card is ~220px wide, ~80px tall on average — subtract half
+        const cx = pos.x - el.offsetWidth / 2;
+        const cy = pos.y - el.offsetHeight / 2;
 
-        basePositions.current[i] = { x: pos.x, y: pos.y };
+        storedBasePositions.current[i] = { x: cx, y: cy };
+
+        // Varied entrance directions per card
+        const offsets = [
+          { x: cx + 30, y: cy - 20 },
+          { x: cx + 30, y: cy + 10 },
+          { x: cx - 20, y: cy + 25 },
+        ];
+        const offset = offsets[i % offsets.length];
+
         gsap.set(el, {
-          x: directions[i]?.x ?? pos.x,
-          y: directions[i]?.y ?? pos.y,
+          x: offset.x,
+          y: offset.y,
           opacity: 0,
           scale: 0.78,
           filter: "blur(4px)",
         });
-
         tl.to(
           el,
           {
-            x: pos.x,
-            y: pos.y,
+            x: cx,
+            y: cy,
             opacity: 1,
             scale: 1,
             filter: "blur(0px)",
@@ -1369,17 +1238,19 @@ export const HeroVisual = ({
         );
       });
     });
-    return () => ctx.revert();
-  }, [scaledCardPositions]);
 
-  // ── FLOAT ANIMATION — organic, layered timing ─────────────────────────────
+    return () => ctx.revert();
+  }, [cardPositions]);
+
+  // ── Float animation ─────────────────────────────────────────────────────
   useEffect(() => {
+    if (cardPositions.length === 0) return;
+
     const ctx = gsap.context(() => {
-      scaledCardPositions.forEach((_, i) => {
+      cardPositions.forEach((_, i) => {
         const el = elementRefs.current[i];
         if (!el) return;
 
-        // Vertical float
         gsap.to(el, {
           y: `+=${gsap.utils.random(10, 20)}`,
           duration: gsap.utils.random(2.4, 4.0),
@@ -1389,7 +1260,6 @@ export const HeroVisual = ({
           delay: i * 0.45,
         });
 
-        // Subtle lateral drift (very small)
         gsap.to(el, {
           x: `+=${gsap.utils.random(-4, 4)}`,
           duration: gsap.utils.random(3.5, 5.5),
@@ -1400,40 +1270,36 @@ export const HeroVisual = ({
         });
       });
     });
-    return () => ctx.revert();
-  }, [scaledCardPositions]);
 
-  // ── MOUSE PARALLAX — improved depth layering ──────────────────────────────
+    return () => ctx.revert();
+  }, [cardPositions]);
+
+  // ── Mouse parallax ──────────────────────────────────────────────────────
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    // Per-card parallax depth factor (varies for 3D feel)
-    const depthFactors = [0.022, 0.016, 0.019];
+    const depthFactors = [
+      0.022, 0.016, 0.019, 0.018, 0.02, 0.015, 0.021, 0.017,
+    ];
 
     const handleMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const dx = e.clientX - cx;
-      const dy = e.clientY - cy;
+      const dx = e.clientX - (rect.left + rect.width / 2);
+      const dy = e.clientY - (rect.top + rect.height / 2);
 
       elementRefs.current.forEach((el, i) => {
         if (!el) return;
         const factor = depthFactors[i] ?? 0.018;
-        const base = basePositions.current[i];
+        const base = storedBasePositions.current[i];
         if (!base) return;
 
-        // Magnetic repulsion when cursor is very close
         const elRect = el.getBoundingClientRect();
-        const elCx = elRect.left + elRect.width / 2;
-        const elCy = elRect.top + elRect.height / 2;
-        const edx = e.clientX - elCx;
-        const edy = e.clientY - elCy;
+        const edx = e.clientX - (elRect.left + elRect.width / 2);
+        const edy = e.clientY - (elRect.top + elRect.height / 2);
         const dist = Math.sqrt(edx * edx + edy * edy);
 
         if (dist < 90) {
-          // Magnetic: push away slightly
           gsap.to(el, {
             x: base.x - edx * 0.22,
             y: base.y - edy * 0.22,
@@ -1442,7 +1308,6 @@ export const HeroVisual = ({
             overwrite: "auto",
           });
         } else {
-          // Normal parallax drift
           gsap.to(el, {
             x: base.x + dx * factor,
             y: base.y + dy * factor,
@@ -1456,7 +1321,7 @@ export const HeroVisual = ({
 
     const handleLeave = () => {
       elementRefs.current.forEach((el, i) => {
-        const base = basePositions.current[i];
+        const base = storedBasePositions.current[i];
         if (!el || !base) return;
         gsap.to(el, {
           x: base.x,
@@ -1476,54 +1341,64 @@ export const HeroVisual = ({
     };
   }, []);
 
-  // ── Render floating cards ─────────────────────────────────────────────────
-  const renderCard = (pos: (typeof scaledCardPositions)[0], i: number) => {
+  // ── Render one card per announcement ───────────────────────────────────
+  const renderCard = (announcement: AnnouncementItem, i: number) => {
+    const type: CardType = CARD_TYPES[i % CARD_TYPES.length];
+
     const ref = (el: HTMLDivElement | null) => {
       elementRefs.current[i] = el;
     };
+
     const wrapper = (children: React.ReactNode) => (
       <div
-        key={`card-${i}`}
+        key={announcement.id}
         ref={ref}
-        className="absolute will-change-transform"
-        style={{ zIndex: 100 }}
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          zIndex: 100,
+          willChange: "transform",
+          // GSAP will set x/y to offset from this center anchor
+        }}
       >
         {children}
       </div>
     );
 
-    if (pos.type === "flash")
+    if (type === "flash") {
       return wrapper(
         <FlashNewsCard
-          label={flashLabel}
-          headline={flashNews.headline}
-          tag={flashNews.tag}
-        />,
-      );
-    if (pos.type === "ticker")
-      return wrapper(<TickerCard items={tickerItems} label={tickerLabel} />);
-    if (pos.type === "breaking")
-      return wrapper(
-        <BreakingCard text={breakingText} label={breakingLabel} />,
-      );
-    if (pos.type === "card") {
-      const card = floatingCards[pos.cardIdx!];
-      if (!card) return null;
-      return wrapper(
-        <FloatingCard
-          title={card.title}
-          subtitle={card.subtitle}
-          icon={card.icon}
+          label={`⚡ ${announcement.title.toUpperCase()}`}
+          headline={announcement.description}
+          tag="live"
         />,
       );
     }
-    if (pos.type === "icon") {
+
+    if (type === "ticker") {
+      // Split on sentence boundaries for multi-item ticker, fallback to single item
+      const items = announcement.description
+        .split(/(?<=[.!?])\s+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
       return wrapper(
-        <div className="w-10 h-10 rounded-xl bg-white shadow-md flex items-center justify-center text-blue-400">
-          <GraduationIcon />
-        </div>,
+        <TickerCard
+          items={items.length > 1 ? items : [announcement.description]}
+          label={announcement.title.toUpperCase()}
+        />,
       );
     }
+
+    if (type === "breaking") {
+      return wrapper(
+        <BreakingCard
+          text={announcement.description}
+          label={announcement.title.toUpperCase()}
+        />,
+      );
+    }
+
     return null;
   };
 
@@ -1533,7 +1408,7 @@ export const HeroVisual = ({
       className="relative w-full max-w-[380px] sm:max-w-[450px] lg:max-w-[560px] xl:max-w-[720px] pt-10 mx-auto aspect-square flex items-center justify-center"
       style={{ overflow: "visible" }}
     >
-      {/* Ambient background blobs — subtle moving gradients */}
+      {/* Ambient background blobs */}
       <div
         style={{
           position: "absolute",
@@ -1576,8 +1451,10 @@ export const HeroVisual = ({
         intervalMs={imageIntervalMs}
       />
 
-      {/* Floating cards */}
-      {scaledCardPositions.map((pos, i) => renderCard(pos, i))}
+      {/* One card per announcement */}
+      {announcements.map((announcement, i) =>
+        cardPositions[i] ? renderCard(announcement, i) : null,
+      )}
     </div>
   );
 };

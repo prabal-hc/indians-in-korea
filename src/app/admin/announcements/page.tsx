@@ -58,11 +58,11 @@ export default function AdminAnnouncementsPage() {
       />
 
       <div className="grid gap-4">
-        <SearchBar
+        {/* <SearchBar
           value={search}
           onChange={setSearch}
           placeholder="Search announcements by title, description, or order..."
-        />
+        /> */}
       </div>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">

@@ -22,15 +22,13 @@ export default function AdminEditEventPage() {
         setValues({
           title: event.title,
           category: event.category,
+          status: event.status === "Published" ? "Published" : "Draft",
           date: event.date,
+          time: event.time || "",
           location: event.location,
           description: event.description,
           imageUrl: event.imageUrl || "",
-          isActive: event.status === "Published",
-          time: event.time || "",
           attendees: event.attendees || "0",
-          tag: event.tag || "🎉",
-          isFeatured: event.isFeatured || false,
         });
       }
       setLoading(false);
@@ -49,8 +47,18 @@ export default function AdminEditEventPage() {
       ) : values ? (
         <EventForm
           initialData={values}
-          onSubmit={async (updated) => {
-            await eventsService.update(id, updated);
+          onSubmit={async (updated: EventFormValues) => {
+            await eventsService.update(id, {
+              title: updated.title,
+              category: updated.category,
+              status: updated.status,
+              date: updated.date,
+              time: updated.time || undefined,
+              location: updated.location,
+              description: updated.description,
+              imageUrl: updated.imageUrl || undefined,
+              attendees: updated.attendees || "0",
+            });
             router.push("/admin/events");
           }}
           submitLabel="Update event"

@@ -58,7 +58,7 @@ export default function AdminEventsPage() {
         subtitle="Manage event listings, publish statuses, and scheduling details."
       />
 
-      <div className="grid gap-4 sm:grid-cols-[1.2fr_0.8fr]">
+      {/* <div className="grid gap-4 sm:grid-cols-[1.2fr_0.8fr]">
         <SearchBar
           value={search}
           onChange={setSearch}
@@ -80,7 +80,7 @@ export default function AdminEventsPage() {
             ))}
           </select>
         </div>
-      </div>
+      </div> */}
 
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <p className="text-sm text-slate-600">

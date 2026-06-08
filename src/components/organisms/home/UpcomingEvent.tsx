@@ -46,56 +46,6 @@ const ArrowIcon = () => (
     />
   </svg>
 );
-const CricketIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-    <circle cx="14" cy="14" r="11" stroke="#f97316" strokeWidth="1.6" />
-    <path
-      d="M9 19l6-6M11 10l7 7"
-      stroke="#f97316"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    />
-    <circle cx="9.5" cy="9.5" r="2" fill="#f97316" />
-  </svg>
-);
-const TerminalIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-    <rect
-      x="3"
-      y="6"
-      width="22"
-      height="16"
-      rx="3"
-      stroke="#3b82f6"
-      strokeWidth="1.6"
-    />
-    <path
-      d="M8 12l4 3-4 3M15 18h5"
-      stroke="#3b82f6"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-const TheaterIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-    <circle cx="10" cy="13" r="6" stroke="#22c55e" strokeWidth="1.6" />
-    <circle cx="18" cy="13" r="6" stroke="#22c55e" strokeWidth="1.6" />
-    <path
-      d="M8 13c0 2 1 3 2 3s2-1 2-3"
-      stroke="#22c55e"
-      strokeWidth="1.4"
-      strokeLinecap="round"
-    />
-    <path
-      d="M16 11c0-2 1-3 2-3s2 1 2 3"
-      stroke="#22c55e"
-      strokeWidth="1.4"
-      strokeLinecap="round"
-    />
-  </svg>
-);
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const formatDate = (dateStr: string) => {
@@ -177,7 +127,7 @@ const FeaturedCard = ({ event }: { event: EventItem }) => {
             <div className="mt-1 text-white/60 text-xs">{event.location}</div>
           </div>
           <Link
-            href={`/events`}
+            href="/events"
             className="shrink-0 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-slate-900 transition-all duration-200"
           >
             <ArrowIcon />
@@ -208,7 +158,6 @@ const SideCard = ({ event }: { event: EventItem }) => {
         </div>
       </div>
       <div className="mt-4 flex items-center gap-2">
-        <span className="text-2xl">{event.tag}</span>
         <h3 className="text-[17px] font-semibold text-slate-800 leading-snug">
           {event.title}
         </h3>
@@ -231,7 +180,7 @@ export const UpcomingEvent = () => {
 
   useEffect(() => {
     const load = async () => {
-      const [feat, events] = await Promise.all([getFeatured(), getUpcoming(6)]);
+      const [feat, events] = await Promise.all([getFeatured(), getUpcoming(2)]);
       setFeatured(feat);
       setUpcoming(events);
       setLoading(false);
@@ -248,28 +197,35 @@ export const UpcomingEvent = () => {
             <Skeleton className="flex-1 h-72 rounded-2xl" />
             <Skeleton className="lg:w-[300px] h-72 rounded-2xl" />
           </div>
-          <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-44 rounded-2xl" />
-            ))}
-          </div>
         </div>
       </section>
     );
 
   const displayFeatured = featured ?? upcoming[0] ?? null;
   const sideEvent = featured
-    ? (upcoming.find((event) => event.id !== featured.id) ?? null)
+    ? (upcoming.find((e) => e.id !== featured.id) ?? null)
     : (upcoming[1] ?? null);
+
+  if (!displayFeatured && !sideEvent) return null;
 
   return (
     <section className="w-full bg-slate-50/80">
-      <div className="mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 px-4 py-12 sm:px-6 md:px-8 lg:px-10">
+      <div className="mx-2 sm:mx-4 md:mx-6 lg:mx-8 xl:mx-10 py-15 px-4 sm:px-8 lg:px-16">
         {/* Header */}
         <div className="flex items-end justify-between mb-6">
           <div>
-            <h2 className="text-3xl font-bold text-orange-500 tracking-tight">
-              Upcoming Events
+            <h2 className="font-playfair text-[36px] font-bold leading-[1.15] text-slate-900 sm:text-[40px]">
+              Upcoming{" "}
+              <em
+                className="italic"
+                style={{
+                  background: "linear-gradient(135deg,#FF9933,#ea580c)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                Events
+              </em>
             </h2>
             <p className="mt-1.5 text-sm text-slate-500">
               Join the next gathering in your city.
@@ -283,134 +239,11 @@ export const UpcomingEvent = () => {
           </Link>
         </div>
 
-        {/* Featured + side */}
-        {(displayFeatured || sideEvent) && (
-          <div className="flex flex-col lg:flex-row gap-4">
-            {displayFeatured && <FeaturedCard event={displayFeatured} />}
-            {sideEvent && <SideCard event={sideEvent} />}
-          </div>
-        )}
-
-        {/* Bottom category tiles — dynamic based on events */}
-        {(() => {
-          const categoryMap = new Map<
-            string,
-            {
-              count: number;
-              icon: React.ReactNode;
-              color: string;
-              bgColor: string;
-            }
-          >();
-
-          const categoryConfig: Record<
-            string,
-            { icon: React.ReactNode; color: string; bgColor: string }
-          > = {
-            Sports: {
-              icon: <CricketIcon />,
-              color: "#f97316",
-              bgColor: "bg-orange-50",
-            },
-            Professional: {
-              icon: <TerminalIcon />,
-              color: "#3b82f6",
-              bgColor: "bg-blue-50",
-            },
-            Cultural: {
-              icon: <TheaterIcon />,
-              color: "#22c55e",
-              bgColor: "bg-green-50",
-            },
-          };
-
-          upcoming.forEach((event) => {
-            const category = event.category || "General";
-            if (!categoryMap.has(category)) {
-              categoryMap.set(category, {
-                count: 0,
-                icon: categoryConfig[category]?.icon || <CricketIcon />,
-                color: categoryConfig[category]?.color || "#f97316",
-                bgColor: categoryConfig[category]?.bgColor || "bg-orange-50",
-              });
-            }
-            const data = categoryMap.get(category)!;
-            data.count += 1;
-          });
-
-          const categories = Array.from(categoryMap.entries());
-
-          return (
-            <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {categories.map(([category, data], idx) => (
-                <div
-                  key={category}
-                  className={`${
-                    idx === 0 ? "col-span-2" : ""
-                  } relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/70 backdrop-blur-sm p-5 flex flex-col justify-between hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 min-h-[180px]`}
-                >
-                  <div
-                    className={`w-11 h-11 rounded-xl ${data.bgColor} flex items-center justify-center`}
-                  >
-                    {data.icon}
-                  </div>
-                  <div className="mt-4">
-                    <h4 className="text-[15px] font-semibold text-slate-800">
-                      {category}
-                    </h4>
-                    <p className="mt-1 text-[13px] text-slate-500">
-                      {data.count} event{data.count !== 1 ? "s" : ""} coming up
-                      in this category.
-                    </p>
-                  </div>
-                  {idx === 0 && (
-                    <div className="mt-4 flex items-center gap-1.5">
-                      <span className="text-[13px] font-bold text-slate-800">
-                        {data.count}+ Events
-                      </span>
-                      <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
-                    </div>
-                  )}
-                  <div className="absolute bottom-0 right-0 w-28 h-28 opacity-[0.06]">
-                    <svg viewBox="0 0 100 100" fill="none">
-                      <circle
-                        cx="70"
-                        cy="70"
-                        r="40"
-                        stroke={data.color}
-                        strokeWidth="2"
-                      />
-                      <path
-                        d="M50 80L70 50 90 80"
-                        stroke={data.color}
-                        strokeWidth="2"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              ))}
-            </div>
-          );
-        })()}
-
-        {/* Upcoming event chips */}
-        {upcoming.length > 1 && (
-          <div className="mt-4 flex flex-wrap gap-3">
-            {upcoming.slice(1, 5).map((ev) => (
-              <div
-                key={ev.id}
-                className="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:border-orange-300 hover:text-orange-600 transition-colors cursor-pointer"
-              >
-                <span>{ev.tag}</span>
-                <span>{ev.title}</span>
-                <span className="text-slate-400 text-xs">·</span>
-                <span className="text-slate-400 text-xs">
-                  {formatDate(ev.date)}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
+        {/* Featured + side — the only two cards */}
+        <div className="flex flex-col lg:flex-row gap-4">
+          {displayFeatured && <FeaturedCard event={displayFeatured} />}
+          {sideEvent && <SideCard event={sideEvent} />}
+        </div>
       </div>
     </section>
   );

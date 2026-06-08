@@ -214,7 +214,7 @@ export const AboutSection = () => {
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       variants={stagger}
-      className="relative w-full overflow-hidden bg-gradient-to-br from-orange-50/60 via-white to-green-50/40 py-20 px-4 sm:px-8 lg:px-16"
+      className="relative w-full overflow-hidden bg-gradient-to-br from-orange-50/60 via-white to-green-50/40 py-15 px-4 sm:px-8 lg:px-16"
     >
       {/* Ambient blobs */}
       <div
@@ -231,7 +231,7 @@ export const AboutSection = () => {
           {/* ── LEFT ── */}
           <motion.div variants={fadeLeft}>
             {/* Badge */}
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-2">
+            {/* <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-2">
               <span className="flex gap-[3px]">
                 {["#FF9933", "#e2e8f0", "#138808"].map((c) => (
                   <span
@@ -246,12 +246,11 @@ export const AboutSection = () => {
               </span>
             </div>
 
-            {/* Tricolor rule */}
             <div className="mb-4 flex h-[3.5px] w-14 overflow-hidden rounded-full">
               <div className="flex-1 bg-[#FF9933]" />
               <div className="flex-1 bg-slate-200" />
               <div className="flex-1 bg-[#138808]" />
-            </div>
+            </div> */}
 
             <h2 className="font-playfair text-[36px] font-bold leading-[1.15] text-slate-900 sm:text-[40px]">
               We provide our{" "}

@@ -349,7 +349,7 @@ export const CommunitySection = () => {
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       variants={stagger}
-      className="relative w-full overflow-hidden bg-gradient-to-br from-orange-50/70 via-white to-green-50/50 px-3 py-10 sm:px-6 sm:py-14 lg:px-16"
+      className="relative w-full overflow-hidden bg-gradient-to-br from-orange-50/70 via-white to-green-50/50 py-15 px-4 sm:px-8 lg:px-16"
     >
       <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#FF9933]/6 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[#138808]/5 blur-3xl" />
@@ -358,17 +358,27 @@ export const CommunitySection = () => {
         <div className="grid items-center gap-8 lg:grid-cols-2">
           {/* Left */}
           <motion.div variants={fadeUp} className="flex flex-col gap-5">
-            <TricolorBar />
-            <motion.p
+            {/* <TricolorBar /> */}
+            {/* <motion.p
               variants={fadeUp}
               className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#138808]"
             >
               Indians in Korea · IIK
-            </motion.p>
-            <h2 className="font-playfair text-3xl sm:text-4xl lg:text-[38px] font-bold leading-tight text-slate-900">
-              Find Your <span className="text-[#FF9933]">Tribe</span>
+            </motion.p> */}
+            <h2 className="font-playfair text-[36px] font-bold leading-[1.15] text-slate-900 sm:text-[40px]">
+              Find Your{" "}
+              <em
+                className="italic"
+                style={{
+                  background: "linear-gradient(135deg,#FF9933,#ea580c)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                Tribe
+              </em>
             </h2>
-            <p className="max-w-full sm:max-w-sm text-sm leading-relaxed text-slate-500">
+            <p className="max-w-full sm:max-w-sm mt-4 text-[13px] leading-[1.85] text-slate-500 ">
               Whether you're a student at SNU, an engineer in Pangyo, or a Tamil
               in Seoul — there's an IIK community waiting for you.
             </p>

@@ -19,19 +19,19 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { label: "Dashboard", href: "/admin/dashboard", icon: Home },
-  { label: "Events", href: "/admin/events", icon: CalendarDays },
-  { label: "Sports", href: "/admin/sports", icon: Goal },
-  { label: "Communities", href: "/admin/communities", icon: Users },
-  { label: "Gallery", href: "/admin/gallery", icon: Image },
+  // { label: "Dashboard", href: "/admin/dashboard", icon: Home },
   { label: "Announcements", href: "/admin/announcements", icon: Megaphone },
   { label: "About Us", href: "/admin/about", icon: BadgeInfo },
+  { label: "Communities", href: "/admin/communities", icon: Users },
+  { label: "Events", href: "/admin/events", icon: CalendarDays },
+  // { label: "Sports", href: "/admin/sports", icon: Goal },
+  { label: "Gallery", href: "/admin/gallery", icon: Image },
+  { label: "Homepage", href: "/admin/homepage", icon: Sparkles },
   {
     label: "Voice of Community",
     href: "/admin/testimonial",
     icon: MessageSquareQuote,
   },
-  { label: "Homepage", href: "/admin/homepage", icon: Sparkles },
 ];
 
 interface AdminSidebarProps {

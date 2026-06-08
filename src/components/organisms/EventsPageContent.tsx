@@ -244,7 +244,7 @@ export default function EventsPageContent() {
           getAll(),
         ]);
         setFeatured(feat);
-        setUpcomingEvents(events.filter((e) => !e.isFeatured).slice(0, 6));
+        setUpcomingEvents(events.slice(0, 6));
         setAllEvents(all);
         const pastYears = Array.from(
           new Set(
@@ -601,7 +601,7 @@ export default function EventsPageContent() {
                     transition={{ delay: 0.6, duration: 0.5, ease: EASE_SOFT }}
                     className="absolute top-4 left-4 rounded-full bg-orange-500 px-3 py-1 text-[10px] sm:text-xs font-bold text-white uppercase tracking-widest shadow-md shadow-orange-500/30"
                   >
-                    {featured?.tag ?? "🪔"} Featured Event
+                    {getCategoryEmoji(featured?.category ?? "")} Featured Event
                   </motion.div>
                   <div className="absolute bottom-5 left-5 right-5">
                     <p className="text-xs uppercase tracking-widest text-orange-300 font-semibold">
@@ -667,11 +667,11 @@ export default function EventsPageContent() {
                   <span className="text-orange-500">2026</span>
                 </h2>
               </div>
-              <p className="text-sm xl:text-base text-gray-500 max-w-sm leading-relaxed">
+              {/* <p className="text-sm xl:text-base text-gray-500 max-w-sm leading-relaxed">
                 {upcomingEvents.length > 0
                   ? `${upcomingEvents.length} upcoming experiences for the Indian community in Korea.`
                   : "Vibrant experiences designed for the Indian community in Korea."}
-              </p>
+              </p> */}
             </motion.div>
 
             {/* ── Loading skeletons ── */}
@@ -723,7 +723,7 @@ export default function EventsPageContent() {
                       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-tr from-transparent via-white/5 to-transparent pointer-events-none" />
                       <div className="absolute top-4 left-4 flex items-center gap-2">
                         <span className="text-2xl">
-                          {upcomingEvents[0]?.tag ?? "🎉"}
+                          {getCategoryEmoji(upcomingEvents[0]?.category ?? "")}
                         </span>
                         <motion.span
                           className="rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-gray-700 uppercase tracking-wide shadow-sm"
@@ -798,7 +798,7 @@ export default function EventsPageContent() {
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-gray-900/75 to-transparent" />
                           <div className="absolute top-3 left-3 text-xl">
-                            {ev.tag ?? "🎉"}
+                            {getCategoryEmoji(ev.category)}
                           </div>
                           <div className="absolute top-3 right-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[10px] font-bold text-gray-700 uppercase tracking-wide">
                             {ev.category}
@@ -851,7 +851,7 @@ export default function EventsPageContent() {
                           <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
                           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-white/6 to-transparent pointer-events-none" />
                           <div className="absolute top-3 left-3 text-xl">
-                            {ev.tag ?? "🎉"}
+                            {getCategoryEmoji(ev.category)}
                           </div>
                           <div className="absolute top-3 right-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[10px] font-bold text-gray-700 uppercase">
                             {ev.category}
