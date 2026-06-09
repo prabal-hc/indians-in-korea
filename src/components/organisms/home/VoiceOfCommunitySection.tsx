@@ -56,7 +56,6 @@ const VoiceCard = ({ item }: { item: TestimonialItem }) => {
         <div className="flex-1 scale-y-0 origin-top transition-transform duration-[380ms] [cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-y-100 bg-[#138808]" />
       </div>
 
-      {/* Decorative quote mark */}
       <span className="pointer-events-none absolute right-4 top-2 font-serif text-[72px] leading-none text-[#FF9933] opacity-[0.07] transition-opacity duration-300 group-hover:opacity-[0.14]">
         "
       </span>
@@ -217,7 +216,7 @@ export const VoiceOfCommunitySection = () => {
         variants={fadeUp}
         className="mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 mb-12 px-4 sm:px-8 lg:px-16"
       >
-        <motion.div
+        {/* <motion.div
           variants={fadeUp}
           className="mb-4 flex h-[3px] w-12 overflow-hidden rounded-full"
         >
@@ -230,13 +229,22 @@ export const VoiceOfCommunitySection = () => {
           className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#138808]"
         >
           Voice of Community
-        </motion.p>
+        </motion.p> */}
         <motion.h2
           variants={fadeUp}
-          className="mt-3 font-playfair text-[36px] font-bold leading-[1.15] text-slate-900 sm:text-[40px]"
+          className="font-playfair text-[36px] font-bold leading-[1.15] text-slate-900 sm:text-[40px]"
         >
           Real stories from{" "}
-          <em className="italic text-[#FF9933]">our members</em>
+          <em
+            className="italic"
+            style={{
+              background: "linear-gradient(135deg,#FF9933,#ea580c)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            our members
+          </em>
           <br />
           across Korea.
         </motion.h2>

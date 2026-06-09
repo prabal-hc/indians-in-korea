@@ -378,7 +378,7 @@ export const CommunitySection = () => {
                 Tribe
               </em>
             </h2>
-            <p className="max-w-full sm:max-w-sm mt-4 text-[13px] leading-[1.85] text-slate-500 ">
+            <p className="max-w-full sm:max-w-sm mt-2 text-[13px] leading-[1.85] text-slate-500 ">
               Whether you're a student at SNU, an engineer in Pangyo, or a Tamil
               in Seoul — there's an IIK community waiting for you.
             </p>
