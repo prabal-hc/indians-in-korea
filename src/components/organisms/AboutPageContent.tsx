@@ -504,7 +504,7 @@ export const AboutPageContent = () => {
               {socials.map((s) => (
                 <Link
                   key={s.id}
-                  href={s.href}
+                  href={s.href ?? "#"}
                   target="_blank"
                   className="inline-flex items-center gap-3 rounded-full border border-gray-200 bg-white px-6 py-3.5 text-sm font-semibold text-gray-700 shadow-sm hover:border-orange-300 hover:text-orange-600 transition-all"
                 >

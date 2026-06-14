@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import type { BoardMember, ContactItem } from "@/services/admin/about.service";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface AboutFormValues {
   headline: string;
@@ -17,16 +20,35 @@ export interface AboutFormValues {
   visionItems: string[];
 }
 
-interface AboutFormProps {
-  initialData?: AboutFormValues;
-  onSubmit: (values: AboutFormValues) => void;
-  submitLabel?: string;
+export interface BoardFormValues {
+  members: BoardMember[];
 }
 
+export interface ContactFormValues {
+  contacts: ContactItem[];
+}
+
+interface AboutFormProps {
+  // Tab 1 — content
+  initialContent?: AboutFormValues;
+  onSubmitContent: (values: AboutFormValues) => Promise<void>;
+  // Tab 2 — board
+  initialBoard?: BoardMember[];
+  onSubmitBoard: (members: BoardMember[]) => Promise<void>;
+  // Tab 3 — contacts
+  initialContacts?: ContactItem[];
+  onSubmitContacts: (contacts: ContactItem[]) => Promise<void>;
+  saving?: boolean;
+}
+
+// ─── Shared field classes ─────────────────────────────────────────────────────
+
 const field =
-  "w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200";
+  "w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slateate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200";
 const textarea =
   "w-full rounded-[28px] border border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200";
+
+// ─── Section wrapper ──────────────────────────────────────────────────────────
 
 const Section = ({
   title,
@@ -43,13 +65,35 @@ const Section = ({
   </div>
 );
 
-export function AboutForm({
-  initialData,
+// ─── Save button ──────────────────────────────────────────────────────────────
+
+const SaveBtn = ({ label, saving }: { label: string; saving?: boolean }) => (
+  <div className="flex justify-end pt-2">
+    <button
+      type="submit"
+      disabled={saving}
+      className="inline-flex items-center gap-2 rounded-3xl bg-orange-500 px-8 py-3 text-sm font-bold text-white transition hover:bg-orange-600 hover:shadow-lg hover:shadow-orange-200 disabled:opacity-60"
+    >
+      {saving ? "Saving…" : label}
+    </button>
+  </div>
+);
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TAB 1 — Content + Vision
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function ContentForm({
+  initial,
   onSubmit,
-  submitLabel = "Save About Us",
-}: AboutFormProps) {
+  saving,
+}: {
+  initial?: AboutFormValues;
+  onSubmit: (v: AboutFormValues) => Promise<void>;
+  saving?: boolean;
+}) {
   const [values, setValues] = useState<AboutFormValues>(
-    initialData ?? {
+    initial ?? {
       headline: "",
       subheadline: "",
       description: "",
@@ -92,9 +136,9 @@ export function AboutForm({
         e.preventDefault();
         if (validate()) onSubmit(values);
       }}
-      className="space-y-10 rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm"
+      className="space-y-10"
     >
-      {/* ── Hero ── */}
+      {/* Hero copy */}
       <Section title="Hero">
         <label className="space-y-2 block">
           <span className="text-sm font-semibold text-slate-900">Headline</span>
@@ -155,7 +199,7 @@ export function AboutForm({
         </label>
       </Section>
 
-      {/* ── Stats ── */}
+      {/* Stats */}
       <Section title="Stats">
         <div className="grid gap-4 sm:grid-cols-3">
           <label className="space-y-2 block">
@@ -192,7 +236,7 @@ export function AboutForm({
         </div>
       </Section>
 
-      {/* ── CTA ── */}
+      {/* CTA */}
       <Section title="Call to Action Button">
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-2 block">
@@ -222,7 +266,7 @@ export function AboutForm({
         </div>
       </Section>
 
-      {/* ── Vision ── */}
+      {/* Vision */}
       <Section title="Vision Items">
         <p className="text-xs text-slate-400 -mt-2">
           Numbered cards in the "Our Vision" section.
@@ -263,7 +307,7 @@ export function AboutForm({
         </div>
       </Section>
 
-      {/* ── Hero image ── */}
+      {/* Hero image */}
       <Section title="Hero Image">
         <ImageUploader
           label=""
@@ -273,14 +317,719 @@ export function AboutForm({
         />
       </Section>
 
-      <div className="flex justify-end pt-2">
-        <button
-          type="submit"
-          className="inline-flex items-center gap-2 rounded-3xl bg-orange-500 px-8 py-3 text-sm font-bold text-white transition hover:bg-orange-600 hover:shadow-lg hover:shadow-orange-200"
-        >
-          {submitLabel}
-        </button>
-      </div>
+      <SaveBtn label="Save Content" saving={saving} />
     </form>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TAB 2 — Board (about_board)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const TYPE_OPTIONS = [
+  { value: "board", label: "Board member" },
+  { value: "advisor", label: "Advisor" },
+  { value: "core", label: "Core member" },
+] as const;
+
+const TYPE_COLORS: Record<string, string> = {
+  board: "bg-orange-100 text-orange-700 border-orange-200",
+  advisor: "bg-blue-50 text-blue-700 border-blue-200",
+  core: "bg-green-50 text-green-700 border-green-200",
+};
+
+const emptyMember = (): Omit<BoardMember, "id"> & { _key: string } => ({
+  _key: String(Date.now() + Math.random()),
+  name: "",
+  initials: "",
+  role: "",
+  profession: "",
+  type: "board",
+  imageUrl: "",
+  displayOrder: 0,
+  isActive: true,
+});
+
+function BoardForm({
+  initial,
+  onSubmit,
+  saving,
+}: {
+  initial?: BoardMember[];
+  onSubmit: (members: BoardMember[]) => Promise<void>;
+  saving?: boolean;
+}) {
+  const [members, setMembers] = useState<(BoardMember & { _key?: string })[]>(
+    initial?.map((m) => ({ ...m, _key: m.id })) ?? [],
+  );
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+
+  const update = (i: number, key: keyof BoardMember, value: any) =>
+    setMembers((prev) =>
+      prev.map((m, j) => (j === i ? { ...m, [key]: value } : m)),
+    );
+
+  const remove = (i: number) =>
+    setMembers((prev) => prev.filter((_, j) => j !== i));
+
+  const add = () => {
+    setMembers((prev) => [...prev, emptyMember() as any]);
+    setOpenIdx(members.length);
+  };
+
+  const autoInitials = (name: string) =>
+    name
+      .split(" ")
+      .map((w) => w[0] ?? "")
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+
+  const grouped = {
+    board: members.filter((m) => m.type === "board"),
+    advisor: members.filter((m) => m.type === "advisor"),
+    core: members.filter((m) => m.type === "core"),
+  };
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit(members.filter((m) => m.name.trim()) as BoardMember[]);
+      }}
+      className="space-y-8"
+    >
+      {/* Summary counts */}
+      <div className="grid grid-cols-3 gap-3">
+        {TYPE_OPTIONS.map(({ value, label }) => (
+          <div
+            key={value}
+            className={`rounded-2xl border px-4 py-3 text-center ${TYPE_COLORS[value]}`}
+          >
+            <p className="text-lg font-bold">{grouped[value].length}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wide mt-0.5">
+              {label}s
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Member rows */}
+      <div className="space-y-2">
+        {members.map((member, i) => (
+          <div
+            key={member._key ?? i}
+            className="rounded-2xl border border-slate-200 bg-white overflow-hidden"
+          >
+            {/* Collapsed header */}
+            <button
+              type="button"
+              onClick={() => setOpenIdx(openIdx === i ? null : i)}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition text-left"
+            >
+              <div
+                className={`w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center text-xs font-bold border ${TYPE_COLORS[member.type]}`}
+              >
+                {member.initials || "??"}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-slate-900 truncate">
+                  {member.name || (
+                    <span className="text-slate-400 font-normal">
+                      Unnamed member
+                    </span>
+                  )}
+                </p>
+                <p className="text-xs text-slate-400 truncate">
+                  {member.role || "No role set"}
+                </p>
+              </div>
+              <span
+                className={`text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full border ${TYPE_COLORS[member.type]}`}
+              >
+                {member.type}
+              </span>
+              <svg
+                className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 ${openIdx === i ? "rotate-180" : ""}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            {/* Expanded fields */}
+            {openIdx === i && (
+              <div className="border-t border-slate-100 p-4 space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="space-y-1.5 block">
+                    <span className="text-xs font-semibold text-slate-700">
+                      Full name *
+                    </span>
+                    <input
+                      value={member.name}
+                      onChange={(e) => {
+                        update(i, "name", e.target.value);
+                        if (!member.initials)
+                          update(i, "initials", autoInitials(e.target.value));
+                      }}
+                      className={field}
+                      placeholder="Prof. Nagendra Kaushik"
+                    />
+                  </label>
+                  <label className="space-y-1.5 block">
+                    <span className="text-xs font-semibold text-slate-700">
+                      Initials (2 chars)
+                    </span>
+                    <input
+                      value={member.initials}
+                      onChange={(e) =>
+                        update(
+                          i,
+                          "initials",
+                          e.target.value.toUpperCase().slice(0, 2),
+                        )
+                      }
+                      className={field}
+                      placeholder="NK"
+                      maxLength={2}
+                    />
+                  </label>
+                  <label className="space-y-1.5 block">
+                    <span className="text-xs font-semibold text-slate-700">
+                      Role / Title *
+                    </span>
+                    <input
+                      value={member.role}
+                      onChange={(e) => update(i, "role", e.target.value)}
+                      className={field}
+                      placeholder="President"
+                    />
+                  </label>
+                  <label className="space-y-1.5 block">
+                    <span className="text-xs font-semibold text-slate-700">
+                      Profession / Organisation
+                    </span>
+                    <input
+                      value={member.profession ?? ""}
+                      onChange={(e) => update(i, "profession", e.target.value)}
+                      className={field}
+                      placeholder="Professor, Kwangwoon University"
+                    />
+                  </label>
+                  <label className="space-y-1.5 block">
+                    <span className="text-xs font-semibold text-slate-700">
+                      Type
+                    </span>
+                    <select
+                      value={member.type}
+                      onChange={(e) =>
+                        update(i, "type", e.target.value as BoardMember["type"])
+                      }
+                      className={field}
+                    >
+                      {TYPE_OPTIONS.map((t) => (
+                        <option key={t.value} value={t.value}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="space-y-1.5 block">
+                    <span className="text-xs font-semibold text-slate-700">
+                      Display order
+                    </span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={member.displayOrder}
+                      onChange={(e) =>
+                        update(i, "displayOrder", Number(e.target.value))
+                      }
+                      className={field}
+                    />
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={member.isActive}
+                      onChange={(e) => update(i, "isActive", e.target.checked)}
+                      className="w-4 h-4 accent-orange-500"
+                    />
+                    <span className="text-xs font-semibold text-slate-700">
+                      Active (visible on page)
+                    </span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => remove(i)}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-500 border border-rose-200 bg-rose-50 px-3 py-1.5 rounded-full hover:bg-rose-100 transition"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={add}
+        className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-orange-300 px-5 py-2 text-xs font-semibold text-orange-500 hover:bg-orange-50 transition"
+      >
+        + Add member
+      </button>
+
+      <SaveBtn label="Save Board" saving={saving} />
+    </form>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TAB 3 — Contacts (about_contacts)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const BG_OPTIONS = [
+  { label: "Orange", value: "bg-orange-50 border-orange-200" },
+  { label: "Blue", value: "bg-blue-50 border-blue-200" },
+  { label: "Green", value: "bg-green-50 border-green-200" },
+  { label: "Yellow", value: "bg-yellow-50 border-yellow-200" },
+  { label: "Purple", value: "bg-purple-50 border-purple-200" },
+];
+
+const emptyContact = (): Omit<ContactItem, "id"> & { _key: string } => ({
+  _key: String(Date.now() + Math.random()),
+  label: "",
+  value: "",
+  type: "info",
+  emoji: "",
+  href: "",
+  bgClass: "bg-orange-50 border-orange-200",
+  displayOrder: 0,
+  isActive: true,
+});
+
+function ContactsForm({
+  initial,
+  onSubmit,
+  saving,
+}: {
+  initial?: ContactItem[];
+  onSubmit: (contacts: ContactItem[]) => Promise<void>;
+  saving?: boolean;
+}) {
+  const [contacts, setContacts] = useState<(ContactItem & { _key?: string })[]>(
+    initial?.map((c) => ({ ...c, _key: c.id })) ?? [],
+  );
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+
+  const update = (i: number, key: keyof ContactItem, value: any) =>
+    setContacts((prev) =>
+      prev.map((c, j) => (j === i ? { ...c, [key]: value } : c)),
+    );
+
+  const remove = (i: number) =>
+    setContacts((prev) => prev.filter((_, j) => j !== i));
+
+  const add = (type: "info" | "social") => {
+    setContacts((prev) => [...prev, { ...emptyContact(), type } as any]);
+    setOpenIdx(contacts.length);
+  };
+
+  const infoContacts = contacts.filter((c) => c.type === "info");
+  const socialContacts = contacts.filter((c) => c.type === "social");
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit(contacts.filter((c) => c.label.trim()) as ContactItem[]);
+      }}
+      className="space-y-8"
+    >
+      {/* Summary */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center">
+          <p className="text-lg font-bold text-slate-800">
+            {infoContacts.length}
+          </p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 mt-0.5">
+            Info cards
+          </p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center">
+          <p className="text-lg font-bold text-slate-800">
+            {socialContacts.length}
+          </p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 mt-0.5">
+            Social links
+          </p>
+        </div>
+      </div>
+
+      {/* Info contacts section */}
+      <Section title="Info cards (Address, Email, etc.)">
+        <div className="space-y-2">
+          {contacts.map((contact, i) => {
+            if (contact.type !== "info") return null;
+            return (
+              <div
+                key={contact._key ?? i}
+                className="rounded-2xl border border-slate-200 bg-white overflow-hidden"
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenIdx(openIdx === i ? null : i)}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition text-left"
+                >
+                  <div
+                    className={`w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center text-sm border ${contact.bgClass}`}
+                  >
+                    {contact.emoji || "📌"}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-slate-900 truncate">
+                      {contact.label || (
+                        <span className="text-slate-400 font-normal">
+                          Untitled
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-xs text-slate-400 truncate">
+                      {contact.value || "No value"}
+                    </p>
+                  </div>
+                  <svg
+                    className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 ${openIdx === i ? "rotate-180" : ""}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {openIdx === i && (
+                  <div className="border-t border-slate-100 p-4 space-y-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <label className="space-y-1.5 block">
+                        <span className="text-xs font-semibold text-slate-700">
+                          Label *
+                        </span>
+                        <input
+                          value={contact.label}
+                          onChange={(e) => update(i, "label", e.target.value)}
+                          className={field}
+                          placeholder="Address"
+                        />
+                      </label>
+                      <label className="space-y-1.5 block">
+                        <span className="text-xs font-semibold text-slate-700">
+                          Value *
+                        </span>
+                        <input
+                          value={contact.value}
+                          onChange={(e) => update(i, "value", e.target.value)}
+                          className={field}
+                          placeholder="Seoul, South Korea"
+                        />
+                      </label>
+                      <label className="space-y-1.5 block">
+                        <span className="text-xs font-semibold text-slate-700">
+                          Link / href (optional)
+                        </span>
+                        <input
+                          value={contact.href ?? ""}
+                          onChange={(e) => update(i, "href", e.target.value)}
+                          className={field}
+                          placeholder="mailto:..."
+                        />
+                      </label>
+                      <label className="space-y-1.5 block">
+                        <span className="text-xs font-semibold text-slate-700">
+                          Card background
+                        </span>
+                        <select
+                          value={contact.bgClass}
+                          onChange={(e) => update(i, "bgClass", e.target.value)}
+                          className={field}
+                        >
+                          {BG_OPTIONS.map((o) => (
+                            <option key={o.value} value={o.value}>
+                              {o.label}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="space-y-1.5 block">
+                        <span className="text-xs font-semibold text-slate-700">
+                          Display order
+                        </span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={contact.displayOrder}
+                          onChange={(e) =>
+                            update(i, "displayOrder", Number(e.target.value))
+                          }
+                          className={field}
+                        />
+                      </label>
+                    </div>
+                    <div className="flex items-center justify-between pt-1">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={contact.isActive}
+                          onChange={(e) =>
+                            update(i, "isActive", e.target.checked)
+                          }
+                          className="w-4 h-4 accent-orange-500"
+                        />
+                        <span className="text-xs font-semibold text-slate-700">
+                          Active
+                        </span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => remove(i)}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-500 border border-rose-200 bg-rose-50 px-3 py-1.5 rounded-full hover:bg-rose-100 transition"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <button
+          type="button"
+          onClick={() => add("info")}
+          className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-slate-300 px-5 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-50 transition"
+        >
+          + Add info card
+        </button>
+      </Section>
+
+      {/* Social links section */}
+      <Section title="Social links (Facebook, Telegram, etc.)">
+        <div className="space-y-2">
+          {contacts.map((contact, i) => {
+            if (contact.type !== "social") return null;
+            return (
+              <div
+                key={contact._key ?? i}
+                className="rounded-2xl border border-slate-200 bg-white overflow-hidden"
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenIdx(openIdx === i ? null : i)}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition text-left"
+                >
+                  <div className="w-9 h-9 flex-shrink-0 rounded-xl flex items-center justify-center text-sm border border-slate-200 bg-slate-50">
+                    {contact.emoji || "🔗"}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-slate-900 truncate">
+                      {contact.label || (
+                        <span className="text-slate-400 font-normal">
+                          Untitled link
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-xs text-slate-400 truncate">
+                      {contact.href || "No URL set"}
+                    </p>
+                  </div>
+                  <svg
+                    className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 ${openIdx === i ? "rotate-180" : ""}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {openIdx === i && (
+                  <div className="border-t border-slate-100 p-4 space-y-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <label className="space-y-1.5 block">
+                        <span className="text-xs font-semibold text-slate-700">
+                          Label *
+                        </span>
+                        <input
+                          value={contact.label}
+                          onChange={(e) => update(i, "label", e.target.value)}
+                          className={field}
+                          placeholder="Facebook Group"
+                        />
+                      </label>
+                      <label className="space-y-1.5 block">
+                        <span className="text-xs font-semibold text-slate-700">
+                          Emoji icon
+                        </span>
+                        <input
+                          value={contact.emoji ?? ""}
+                          onChange={(e) => update(i, "emoji", e.target.value)}
+                          className={field}
+                          placeholder="📘"
+                          maxLength={4}
+                        />
+                      </label>
+                      <label className="space-y-1.5 block sm:col-span-2">
+                        <span className="text-xs font-semibold text-slate-700">
+                          URL *
+                        </span>
+                        <input
+                          value={contact.href ?? ""}
+                          onChange={(e) => update(i, "href", e.target.value)}
+                          className={field}
+                          placeholder="https://facebook.com/groups/IIK2002/"
+                        />
+                      </label>
+                      <label className="space-y-1.5 block">
+                        <span className="text-xs font-semibold text-slate-700">
+                          Display order
+                        </span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={contact.displayOrder}
+                          onChange={(e) =>
+                            update(i, "displayOrder", Number(e.target.value))
+                          }
+                          className={field}
+                        />
+                      </label>
+                    </div>
+                    <div className="flex items-center justify-between pt-1">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={contact.isActive}
+                          onChange={(e) =>
+                            update(i, "isActive", e.target.checked)
+                          }
+                          className="w-4 h-4 accent-orange-500"
+                        />
+                        <span className="text-xs font-semibold text-slate-700">
+                          Active
+                        </span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => remove(i)}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-500 border border-rose-200 bg-rose-50 px-3 py-1.5 rounded-full hover:bg-rose-100 transition"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <button
+          type="button"
+          onClick={() => add("social")}
+          className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-orange-300 px-5 py-2 text-xs font-semibold text-orange-500 hover:bg-orange-50 transition"
+        >
+          + Add social link
+        </button>
+      </Section>
+
+      <SaveBtn label="Save Contacts" saving={saving} />
+    </form>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN EXPORT — Tab shell
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const TABS = [
+  { id: "board", label: "Board & Team" },
+  { id: "contacts", label: "Contacts & Links" },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
+
+export function AboutForm({
+  initialContent,
+  onSubmitContent,
+  initialBoard,
+  onSubmitBoard,
+  initialContacts,
+  onSubmitContacts,
+  saving,
+}: AboutFormProps) {
+  const [activeTab, setActiveTab] = useState<TabId>("board");
+
+  return (
+    <div className="rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
+      {/* Tab bar */}
+      <div className="flex border-b border-slate-200 bg-slate-50">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 px-4 py-4 text-sm font-semibold transition-colors relative ${
+              activeTab === tab.id
+                ? "text-orange-600 bg-white"
+                : "text-slate-500 hover:text-slate-700 hover:bg-white/60"
+            }`}
+          >
+            {tab.label}
+            {activeTab === tab.id && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-orange-500 rounded-t-full" />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      <div className="p-8">
+        {activeTab === "board" && (
+          <BoardForm
+            initial={initialBoard}
+            onSubmit={onSubmitBoard}
+            saving={saving}
+          />
+        )}
+        {activeTab === "contacts" && (
+          <ContactsForm
+            initial={initialContacts}
+            onSubmit={onSubmitContacts}
+            saving={saving}
+          />
+        )}
+      </div>
+    </div>
   );
 }

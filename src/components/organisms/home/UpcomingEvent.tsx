@@ -145,7 +145,7 @@ const SideCard = ({ event }: { event: EventItem }) => {
   const month = d.toLocaleDateString("en-US", { month: "short" }).toUpperCase();
   const city = event.location.split(",")[0];
   return (
-    <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white/70 backdrop-blur-sm p-5 w-full lg:w-[300px] xl:w-[320px] shrink-0 shadow-sm hover:shadow-md transition-shadow duration-200">
+    <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 w-full lg:w-[300px] xl:w-[320px] shrink-0 shadow-sm hover:shadow-md transition-shadow duration-200">
       <div className="flex items-start justify-between gap-3">
         <CityBadge city={city} />
         <div className="text-right shrink-0">
@@ -157,7 +157,7 @@ const SideCard = ({ event }: { event: EventItem }) => {
           </p>
         </div>
       </div>
-      <div className="mt-4 flex items-center gap-2">
+      <div className="mt-4">
         <h3 className="text-[17px] font-semibold text-slate-800 leading-snug">
           {event.title}
         </h3>
@@ -190,7 +190,10 @@ export const UpcomingEvent = () => {
 
   if (loading)
     return (
-      <section className="w-full bg-slate-50/80">
+      <section
+        className="w-full bg-gradient-to-br from-orange-100/80 via-orange-50 to-amber-100/60 border-t border-orange-200"
+        style={{ position: "relative", zIndex: 10 }}
+      >
         <div className="mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 px-4 py-12">
           <Skeleton className="h-8 w-48 mb-6" />
           <div className="flex flex-col lg:flex-row gap-4">
@@ -209,7 +212,10 @@ export const UpcomingEvent = () => {
   if (!displayFeatured && !sideEvent) return null;
 
   return (
-    <section className="w-full bg-slate-50/80">
+    <section
+      className="w-full bg-gradient-to-br from-orange-100 via-orange-50 to-amber-100 border-t border-orange-200"
+      style={{ position: "relative", zIndex: 10 }}
+    >
       <div className="mx-2 sm:mx-4 md:mx-6 lg:mx-8 xl:mx-10 py-15 px-4 sm:px-8 lg:px-16">
         {/* Header */}
         <div className="flex items-end justify-between mb-6">
@@ -239,7 +245,7 @@ export const UpcomingEvent = () => {
           </Link>
         </div>
 
-        {/* Featured + side — the only two cards */}
+        {/* Cards */}
         <div className="flex flex-col lg:flex-row gap-4">
           {displayFeatured && <FeaturedCard event={displayFeatured} />}
           {sideEvent && <SideCard event={sideEvent} />}

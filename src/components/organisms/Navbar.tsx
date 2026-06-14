@@ -14,7 +14,6 @@ const navItems = [
   { name: "Community", href: "/community" },
   { name: "Events", href: "/events" },
   { name: "Resources", href: "/resources" },
-  // { name: "Blog", href: "#" },
   { name: "Contact", href: "/contact" },
   { name: "Magazines", href: "/magazines" },
 ];
@@ -35,9 +34,7 @@ const navbarVariants = {
 };
 
 const staggerChildren = {
-  visible: {
-    transition: { staggerChildren: 0.06, delayChildren: 0.2 },
-  },
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.2 } },
 };
 
 const fadeUp = {
@@ -97,34 +94,54 @@ const ScrollProgressBar = () => {
   );
 };
 
-// ─── NavLink ─────────────────────────────────────────────────────────────────
+// ─── NavLink ──────────────────────────────────────────────────────────────────
 const NavLink = ({
   item,
   isActive,
+  heroMode,
 }: {
   item: { name: string; href: string };
   isActive: boolean;
+  heroMode: boolean;
 }) => (
   <motion.li variants={fadeUp} className="relative">
     <Link
       href={item.href}
-      className={`relative flex flex-col items-center gap-0.5 text-sm font-medium transition-colors duration-200 py-1 px-0.5 group ${
-        isActive ? "text-orange-500" : "text-gray-600 hover:text-gray-900"
-      }`}
+      className={`
+        relative flex flex-col items-center gap-0.5 text-sm font-medium
+        transition-colors duration-300 py-1 px-0.5 group
+        ${
+          heroMode
+            ? isActive
+              ? "text-orange-400"
+              : "text-white/75 hover:text-white"
+            : isActive
+              ? "text-orange-500"
+              : "text-gray-600 hover:text-gray-900"
+        }
+      `}
       aria-current={isActive ? "page" : undefined}
     >
       <span className="relative transition-all duration-200 group-hover:tracking-wide">
         {item.name}
       </span>
+
       {isActive && (
         <motion.span
           layoutId="active-nav-indicator"
-          className="absolute -bottom-1 left-0 w-full h-0.5 rounded-full bg-orange-500"
+          className={`absolute -bottom-1 left-0 w-full h-0.5 rounded-full ${
+            heroMode ? "bg-orange-400" : "bg-orange-500"
+          }`}
           transition={easings.spring}
         />
       )}
       {!isActive && (
-        <span className="absolute -bottom-1 left-0 h-0.5 w-0 rounded-full bg-gray-300 group-hover:w-full transition-all duration-300 ease-out" />
+        <span
+          className={`absolute -bottom-1 left-0 h-0.5 w-0 rounded-full group-hover:w-full
+            transition-all duration-300 ease-out
+            ${heroMode ? "bg-white/40" : "bg-gray-300"}
+          `}
+        />
       )}
     </Link>
   </motion.li>
@@ -134,28 +151,40 @@ const NavLink = ({
 const Navbar = () => {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
+  const [scrolled, setScrolled] = useState(false); // past hero (~100vh)
+  const [hidden, setHidden] = useState(false); // hide on scroll-down
+  const [heroMode, setHeroMode] = useState(true); // transparent over hero
   const lastScrollY = useRef(0);
 
   const isActive = (href: string) => href !== "#" && pathname === href;
 
+  // ── Scroll listener ────────────────────────────────────────────────────
   useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY;
-      setScrolled(currentY > 24);
-      if (currentY > lastScrollY.current && currentY > 100) {
+      const vh = window.innerHeight;
+
+      // Hero mode: fully transparent while inside the hero viewport
+      setHeroMode(currentY < vh * 0.72);
+
+      // "Scrolled" = past ~80px — determines glass density
+      setScrolled(currentY > 80);
+
+      // Hide navbar when scrolling down fast, show on scroll up
+      if (currentY > lastScrollY.current && currentY > 140) {
         setHidden(true);
       } else {
         setHidden(false);
       }
+
       lastScrollY.current = currentY;
     };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close mobile menu on desktop resize
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) setOpen(false);
@@ -163,6 +192,24 @@ const Navbar = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Lock body scroll while menu is open
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  // ── Bar background style ───────────────────────────────────────────────
+  // heroMode      → fully transparent, no border, no shadow
+  // scrolled      → dense frosted glass (white/92), stronger shadow
+  // between       → light frosted glass (white/78)
+  const barCls = heroMode
+    ? "bg-transparent border-transparent shadow-none"
+    : scrolled
+      ? "bg-white/92 backdrop-blur-xl border-gray-200/80 shadow-[0_4px_24px_rgba(0,0,0,0.10)]"
+      : "bg-white/78 backdrop-blur-md border-gray-100/50 shadow-[0_2px_12px_rgba(0,0,0,0.05)]";
 
   return (
     <motion.div
@@ -175,34 +222,32 @@ const Navbar = () => {
         transition: "transform 0.38s cubic-bezier(0.22, 1, 0.36, 1)",
       }}
     >
-      {/* ── Fixed Full-Width Bar ──────────────────────────────────────────── */}
+      {/* ── Bar ─────────────────────────────────────────────────────────── */}
       <div
         className={`
           relative w-full overflow-hidden border-b
           transition-all duration-500 ease-out
-          ${
-            scrolled
-              ? "bg-white/92 backdrop-blur-xl border-gray-200/80 shadow-[0_4px_24px_rgba(0,0,0,0.10)]"
-              : "bg-white/78 backdrop-blur-md border-gray-100/50 shadow-[0_2px_12px_rgba(0,0,0,0.05)]"
-          }
+          ${barCls}
         `}
       >
-        {/* Top-to-bottom sheen */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/50 to-transparent pointer-events-none" />
-
-        {/* Warm atmospheric tint — right edge */}
-        <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-orange-50/25 to-transparent pointer-events-none" />
+        {/* Sheen — only in white mode */}
+        {!heroMode && (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-b from-white/50 to-transparent pointer-events-none" />
+            <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-orange-50/25 to-transparent pointer-events-none" />
+          </>
+        )}
 
         {/* ── Nav Row ──────────────────────────────────────────────────── */}
         <div
           className={`
-            relative mx-auto  flex items-center justify-between
+            relative mx-auto flex items-center justify-between
             px-6 lg:px-10
             transition-all duration-400
-            ${scrolled ? "py-2.5" : "py-3.5"}
+            ${scrolled && !heroMode ? "py-2.5" : "py-3.5"}
           `}
         >
-          {/* LEFT: LOGO */}
+          {/* LOGO */}
           <motion.div
             initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -210,7 +255,6 @@ const Navbar = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="flex-shrink-0"
-            id="navbar-logo"
           >
             <Link
               href="/"
@@ -220,14 +264,27 @@ const Navbar = () => {
               <Image
                 src="/images/iik.png"
                 alt="Indians in Korea"
-                width={scrolled ? 35 : 40}
+                width={scrolled && !heroMode ? 35 : 40}
                 height={60}
                 className="object-contain transition-all duration-400"
                 priority
               />
-              <span className="hidden lg:inline ml-3 font-semibold text-lg text-gray-700">
-                <span className="text-orange-600">INDIANS</span> IN{" "}
-                <span className="text-[#138808]">KOREA</span>
+              <span
+                className={`hidden lg:inline ml-3 font-semibold text-lg transition-colors duration-500 ${
+                  heroMode ? "text-white/90" : "text-gray-700"
+                }`}
+              >
+                <span
+                  className={heroMode ? "text-orange-400" : "text-orange-600"}
+                >
+                  INDIANS
+                </span>{" "}
+                IN{" "}
+                <span
+                  className={heroMode ? "text-green-400" : "text-[#138808]"}
+                >
+                  KOREA
+                </span>
               </span>
             </Link>
           </motion.div>
@@ -245,68 +302,50 @@ const Navbar = () => {
                   key={item.name}
                   item={item}
                   isActive={isActive(item.href)}
+                  heroMode={heroMode}
                 />
               ))}
             </motion.ul>
           </LayoutGroup>
 
-          {/* RIGHT: SEARCH + CTA */}
+          {/* RIGHT: JOIN US CTA */}
           <motion.div
             variants={staggerChildren}
             initial="hidden"
             animate="visible"
             className="hidden lg:flex items-center gap-3"
           >
-            {/* <motion.div variants={fadeUp} className="relative">
-              <Search
-                size={15}
-                className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
-                  searchFocused ? "text-orange-400" : "text-gray-400"
-                }`}
-              />
-              <input
-                type="text"
-                placeholder="Search community..."
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => setSearchFocused(false)}
+            <motion.div variants={fadeUp}>
+              <Link
+                href="/join"
                 className={`
-                  h-9 pl-10 pr-4 rounded-full text-sm
-                  bg-gray-100/70 border text-gray-700 placeholder:text-gray-400
-                  outline-none transition-all duration-300
+                  relative overflow-hidden inline-flex items-center
+                  text-sm font-semibold px-5 py-2 rounded-full
+                  transition-all duration-300 group
                   ${
-                    searchFocused
-                      ? "w-64 xl:w-72 bg-white border-orange-300 ring-2 ring-orange-100 shadow-[0_0_16px_rgba(249,115,22,0.1)]"
-                      : "w-52 xl:w-60 border-gray-200/80 hover:bg-gray-100 hover:border-gray-300"
+                    heroMode
+                      ? "bg-orange-500/20 hover:bg-orange-500/30 text-orange-300 border border-orange-400/30 hover:border-orange-400/60 backdrop-blur-sm"
+                      : "bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white shadow-[0_4px_14px_rgba(234,88,12,0.35)] hover:shadow-[0_6px_22px_rgba(234,88,12,0.45)]"
                   }
                 `}
-              />
-            </motion.div> */}
-
-            {/* JOIN US CTA */}
-            {/* <motion.div variants={fadeUp}>
-              <motion.button
-                whileHover={{ scale: 1.04, y: -1 }}
-                whileTap={{ scale: 0.97 }}
-                className="
-                  relative overflow-hidden
-                  bg-gradient-to-br from-orange-500 to-orange-600
-                  hover:from-orange-500 hover:to-orange-700
-                  text-white text-sm font-semibold
-                  px-5 py-2 rounded-full
-                  shadow-[0_4px_14px_rgba(234,88,12,0.35)]
-                  hover:shadow-[0_6px_22px_rgba(234,88,12,0.45)]
-                  transition-shadow duration-300 group
-                "
               >
-                <span className="absolute inset-0 translate-x-[-110%] group-hover:translate-x-[110%] transition-transform duration-700 bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 pointer-events-none" />
+                <span className="absolute inset-0 translate-x-[-110%] group-hover:translate-x-[110%] transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 pointer-events-none" />
                 Join Us
-              </motion.button>
-            </motion.div> */}
+              </Link>
+            </motion.div>
           </motion.div>
 
           {/* MOBILE HAMBURGER */}
           <motion.button
-            className="lg:hidden relative w-9 h-9 flex items-center justify-center rounded-full bg-gray-100/80 hover:bg-gray-200/80 transition-colors"
+            className={`
+              lg:hidden relative w-9 h-9 flex items-center justify-center rounded-full
+              transition-colors duration-300
+              ${
+                heroMode
+                  ? "bg-white/10 hover:bg-white/20 border border-white/20"
+                  : "bg-gray-100/80 hover:bg-gray-200/80"
+              }
+            `}
             onClick={() => setOpen(!open)}
             whileTap={{ scale: 0.92 }}
             aria-label={open ? "Close menu" : "Open menu"}
@@ -320,7 +359,10 @@ const Navbar = () => {
                   exit={{ rotate: 45, opacity: 0 }}
                   transition={{ duration: 0.18 }}
                 >
-                  <X size={17} className="text-gray-700" />
+                  <X
+                    size={17}
+                    className={heroMode ? "text-white" : "text-gray-700"}
+                  />
                 </motion.span>
               ) : (
                 <motion.span
@@ -330,18 +372,21 @@ const Navbar = () => {
                   exit={{ rotate: -45, opacity: 0 }}
                   transition={{ duration: 0.18 }}
                 >
-                  <Menu size={17} className="text-gray-700" />
+                  <Menu
+                    size={17}
+                    className={heroMode ? "text-white" : "text-gray-700"}
+                  />
                 </motion.span>
               )}
             </AnimatePresence>
           </motion.button>
         </div>
 
-        {/* Scroll progress bar */}
-        <ScrollProgressBar />
+        {/* Scroll progress — only in white mode so it's visible */}
+        {!heroMode && <ScrollProgressBar />}
       </div>
 
-      {/* ── Mobile Menu (full-width dropdown) ────────────────────────────── */}
+      {/* ── Mobile Menu ───────────────────────────────────────────────────── */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -404,13 +449,16 @@ const Navbar = () => {
               </div>
 
               {/* MOBILE CTA */}
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                className="relative overflow-hidden w-full bg-gradient-to-br from-orange-500 to-orange-600 text-white font-semibold text-sm py-2.5 rounded-xl shadow-[0_4px_14px_rgba(234,88,12,0.3)] transition-shadow duration-200 group"
-              >
-                <span className="absolute inset-0 translate-x-[-110%] group-active:translate-x-[110%] transition-transform duration-600 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12" />
-                Join Us
-              </motion.button>
+              <motion.div whileTap={{ scale: 0.97 }}>
+                <Link
+                  href="/join"
+                  onClick={() => setOpen(false)}
+                  className="relative overflow-hidden flex items-center justify-center w-full bg-gradient-to-br from-orange-500 to-orange-600 text-white font-semibold text-sm py-2.5 rounded-xl shadow-[0_4px_14px_rgba(234,88,12,0.3)] transition-shadow duration-200 group"
+                >
+                  <span className="absolute inset-0 translate-x-[-110%] group-active:translate-x-[110%] transition-transform duration-600 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12" />
+                  Join Us
+                </Link>
+              </motion.div>
             </div>
           </motion.div>
         )}

@@ -390,7 +390,7 @@ export function HigherEducationModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/60 px-0 pb-0 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6"
+      className="fixed inset-0 z-200 flex items-end justify-center bg-slate-950/60 px-0 pb-0 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6"
       onClick={onClose}
       role="dialog"
       aria-modal="true"

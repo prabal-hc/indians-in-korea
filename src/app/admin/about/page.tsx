@@ -7,45 +7,92 @@ import {
   AboutForm,
   type AboutFormValues,
 } from "@/components/admin/forms/AboutForm";
-import { getAboutPageData, saveAbout } from "@/services/admin/about.service";
+import {
+  getAboutPageData,
+  saveAbout,
+  saveBoardMembers,
+  saveContacts,
+  type BoardMember,
+  type ContactItem,
+} from "@/services/admin/about.service";
 
 export default function AdminAboutPage() {
-  const [values, setValues] = useState<AboutFormValues | null>(null);
+  const [contentValues, setContentValues] = useState<AboutFormValues | null>(
+    null,
+  );
+  const [boardValues, setBoardValues] = useState<BoardMember[]>([]);
+  const [contactValues, setContactValues] = useState<ContactItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [success, setSuccess] = useState("");
   const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    getAboutPageData().then(({ content, vision }) => {
-      if (content) {
-        setValues({
-          headline: content.headline,
-          subheadline: content.subheadline,
-          description: content.description,
-          mission: content.mission,
-          established: content.established,
-          members: content.members,
-          events: content.events,
-          ctaLabel: content.ctaLabel,
-          ctaUrl: content.ctaUrl,
-          heroImage: content.heroImage,
-          visionItems:
-            vision.length > 0
-              ? vision.map((v) => v.content)
-              : Array(8).fill(""),
-        });
-      }
-      setLoading(false);
-    });
+    getAboutPageData().then(
+      ({ content, vision, board, advisors, core, contacts, socials }) => {
+        if (content) {
+          setContentValues({
+            headline: content.headline,
+            subheadline: content.subheadline ?? "",
+            description: content.description ?? "",
+            mission: content.mission ?? "",
+            established: content.established ?? "",
+            members: content.members ?? "",
+            events: content.events ?? "",
+            ctaLabel: content.ctaLabel ?? "",
+            ctaUrl: content.ctaUrl ?? "",
+            heroImage: content.heroImage ?? "",
+            visionItems:
+              vision.length > 0
+                ? vision.map((v) => v.content)
+                : Array(8).fill(""),
+          });
+        }
+        // Merge all board types for the board tab
+        setBoardValues([...board, ...advisors, ...core]);
+        // Merge all contact types for the contacts tab
+        setContactValues([...contacts, ...socials]);
+        setLoading(false);
+      },
+    );
   }, []);
 
-  const handleSubmit = async (updated: AboutFormValues) => {
+  const flash = (msg: string) => {
+    setSuccess(msg);
+    setTimeout(() => setSuccess(""), 3500);
+  };
+
+  const handleSaveContent = async (updated: AboutFormValues) => {
     setSaving(true);
     try {
       await saveAbout(updated);
-      setValues(updated);
-      setSuccess("Saved successfully.");
-      setTimeout(() => setSuccess(""), 3500);
+      setContentValues(updated);
+      flash("Content saved successfully.");
+    } catch {
+      alert("Save failed. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveBoard = async (members: BoardMember[]) => {
+    setSaving(true);
+    try {
+      await saveBoardMembers(members);
+      setBoardValues(members);
+      flash("Board saved successfully.");
+    } catch {
+      alert("Save failed. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveContacts = async (contacts: ContactItem[]) => {
+    setSaving(true);
+    try {
+      await saveContacts(contacts);
+      setContactValues(contacts);
+      flash("Contacts saved successfully.");
     } catch {
       alert("Save failed. Please try again.");
     } finally {
@@ -57,7 +104,7 @@ export default function AdminAboutPage() {
     <div className="space-y-8">
       <PageTitle
         title="About Us"
-        subtitle="Manage hero copy, stats, mission, vision, and CTA."
+        subtitle="Manage content, board members, and contact links."
       />
 
       {success && (
@@ -68,16 +115,15 @@ export default function AdminAboutPage() {
 
       {loading ? (
         <LoadingSkeleton rows={6} columns={1} />
-      ) : values ? (
-        <AboutForm
-          initialData={values}
-          onSubmit={handleSubmit}
-          submitLabel={saving ? "Saving…" : "Save About Us"}
-        />
       ) : (
         <AboutForm
-          onSubmit={handleSubmit}
-          submitLabel={saving ? "Saving…" : "Create About Us"}
+          initialContent={contentValues ?? undefined}
+          onSubmitContent={handleSaveContent}
+          initialBoard={boardValues}
+          onSubmitBoard={handleSaveBoard}
+          initialContacts={contactValues}
+          onSubmitContacts={handleSaveContacts}
+          saving={saving}
         />
       )}
     </div>
