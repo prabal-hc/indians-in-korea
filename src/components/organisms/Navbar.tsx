@@ -150,27 +150,33 @@ const NavLink = ({
 // ─── Main Navbar ──────────────────────────────────────────────────────────────
 const Navbar = () => {
   const pathname = usePathname();
+  const isHome = pathname === "/";
+
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false); // past hero (~100vh)
-  const [hidden, setHidden] = useState(false); // hide on scroll-down
-  const [heroMode, setHeroMode] = useState(true); // transparent over hero
+  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [heroMode, setHeroMode] = useState(isHome); // transparent only on home
   const lastScrollY = useRef(0);
 
   const isActive = (href: string) => href !== "#" && pathname === href;
 
   // ── Scroll listener ────────────────────────────────────────────────────
   useEffect(() => {
+    // Non-home pages: always white, skip scroll logic
+    if (!isHome) {
+      setHeroMode(false);
+      setScrolled(false);
+      setHidden(false);
+      return;
+    }
+
     const handleScroll = () => {
       const currentY = window.scrollY;
       const vh = window.innerHeight;
 
-      // Hero mode: fully transparent while inside the hero viewport
       setHeroMode(currentY < vh * 0.72);
-
-      // "Scrolled" = past ~80px — determines glass density
       setScrolled(currentY > 80);
 
-      // Hide navbar when scrolling down fast, show on scroll up
       if (currentY > lastScrollY.current && currentY > 140) {
         setHidden(true);
       } else {
@@ -180,9 +186,12 @@ const Navbar = () => {
       lastScrollY.current = currentY;
     };
 
+    // Set initial state on mount
+    handleScroll();
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isHome]);
 
   // Close mobile menu on desktop resize
   useEffect(() => {
@@ -202,9 +211,6 @@ const Navbar = () => {
   }, [open]);
 
   // ── Bar background style ───────────────────────────────────────────────
-  // heroMode      → fully transparent, no border, no shadow
-  // scrolled      → dense frosted glass (white/92), stronger shadow
-  // between       → light frosted glass (white/78)
   const barCls = heroMode
     ? "bg-transparent border-transparent shadow-none"
     : scrolled
@@ -382,7 +388,7 @@ const Navbar = () => {
           </motion.button>
         </div>
 
-        {/* Scroll progress — only in white mode so it's visible */}
+        {/* Scroll progress — only in white mode */}
         {!heroMode && <ScrollProgressBar />}
       </div>
 

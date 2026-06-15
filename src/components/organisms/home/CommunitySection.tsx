@@ -120,20 +120,23 @@ const CommunityRow = ({
 
 // ─── Korea Map (unchanged SVG) ────────────────────────────────────────────────
 const KoreaMap = () => (
-  <div className="relative h-full w-full overflow-hidden rounded-3xl border border-slate-100 bg-gradient-to-br from-orange-50/60 via-white to-green-50/50">
+  <div className="relative h-full w-full overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    {/* Glow blobs */}
     <div
-      className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-[#FF9933]/10 blur-3xl"
+      className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-[#FF9933]/15 blur-3xl"
       style={{ animation: "pulse-slow 5s ease-in-out infinite" }}
     />
     <div
-      className="pointer-events-none absolute -bottom-12 -left-12 h-56 w-56 rounded-full bg-[#138808]/8 blur-3xl"
+      className="pointer-events-none absolute -bottom-12 -left-12 h-56 w-56 rounded-full bg-[#138808]/15 blur-3xl"
       style={{ animation: "pulse-slow-2 6s ease-in-out infinite" }}
     />
+
     <svg
       viewBox="0 0 400 420"
       xmlns="http://www.w3.org/2000/svg"
       className="h-full w-full"
     >
+      {/* Dot grid */}
       {Array.from({ length: 15 }, (_, row) =>
         Array.from({ length: 14 }, (_, col) => (
           <circle
@@ -141,28 +144,35 @@ const KoreaMap = () => (
             cx={20 + col * 27}
             cy={20 + row * 28}
             r="1.2"
-            fill="#E2E8F0"
+            fill="#334155"
           />
         )),
       )}
+
+      {/* Korea mainland */}
       <path
         d="M180,40 L190,38 L205,42 L218,48 L228,58 L232,72 L238,88 L242,105 L244,122 L240,140 L236,155 L232,172 L228,188 L222,205 L216,220 L208,235 L200,250 L192,263 L184,275 L176,285 L168,295 L160,305 L155,315 L152,328 L154,340 L158,352 L160,360 L156,368 L148,372 L140,370 L134,362 L130,352 L132,340 L136,328 L138,316 L134,304 L126,295 L118,288 L112,278 L108,266 L106,252 L108,238 L112,224 L116,210 L118,196 L116,182 L112,168 L108,154 L106,140 L108,126 L112,112 L118,98 L126,86 L136,74 L148,62 L160,52 L172,44 Z"
-        fill="#F1F5F9"
-        stroke="#CBD5E1"
+        fill="#1e293b"
+        stroke="#475569"
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
+
+      {/* Jeju island */}
       <ellipse
         cx="160"
         cy="395"
         rx="22"
         ry="13"
-        fill="#F1F5F9"
-        stroke="#CBD5E1"
+        fill="#1e293b"
+        stroke="#475569"
         strokeWidth="1"
       />
-      <circle cx="210" cy="148" r="38" fill="#FF9933" fillOpacity="0.08" />
-      <circle cx="215" cy="290" r="30" fill="#138808" fillOpacity="0.07" />
+
+      {/* Glow halos */}
+      <circle cx="210" cy="148" r="38" fill="#FF9933" fillOpacity="0.06" />
+      <circle cx="215" cy="290" r="30" fill="#138808" fillOpacity="0.06" />
+
       {/* Seoul pin */}
       <g style={{ animation: "popIn 0.4s 0.9s ease both", opacity: 0 }}>
         <circle cx="210" cy="148" r="12" fill="#FF9933" fillOpacity="0.2">
@@ -190,9 +200,10 @@ const KoreaMap = () => (
             width="118"
             height="42"
             rx="10"
-            fill="white"
-            stroke="#FFE0B2"
-            strokeWidth="1"
+            fill="#0f172a"
+            stroke="#FF9933"
+            strokeWidth="0.8"
+            strokeOpacity="0.4"
           />
           <text
             x="230"
@@ -208,19 +219,21 @@ const KoreaMap = () => (
             x="230"
             y="162"
             fontSize="10"
-            fill="#94A3B8"
+            fill="#64748b"
             fontFamily="DM Sans, sans-serif"
           >
             Bengali · Marathi · KTN
           </text>
         </g>
       </g>
+
       {/* Pangyo */}
       <g style={{ animation: "popIn 0.4s 1.1s ease both", opacity: 0 }}>
         <circle cx="218" cy="168" r="4" fill="#138808" />
         <circle cx="218" cy="168" r="2" fill="white" />
       </g>
-      {/* Busan */}
+
+      {/* Busan pin */}
       <g style={{ animation: "popIn 0.4s 1.3s ease both", opacity: 0 }}>
         <circle cx="215" cy="290" r="10" fill="#138808" fillOpacity="0.15">
           <animate
@@ -249,9 +262,10 @@ const KoreaMap = () => (
             width="94"
             height="38"
             rx="10"
-            fill="white"
-            stroke="#BBF7D0"
-            strokeWidth="1"
+            fill="#0f172a"
+            stroke="#138808"
+            strokeWidth="0.8"
+            strokeOpacity="0.4"
           />
           <text
             x="233"
@@ -267,13 +281,14 @@ const KoreaMap = () => (
             x="233"
             y="305"
             fontSize="10"
-            fill="#94A3B8"
+            fill="#64748b"
             fontFamily="DM Sans, sans-serif"
           >
             Arts &amp; Culture
           </text>
         </g>
       </g>
+
       {/* Uijeongbu */}
       <g style={{ animation: "popIn 0.4s 1.5s ease both", opacity: 0 }}>
         <circle cx="200" cy="120" r="3.5" fill="#FF9933" />
@@ -284,9 +299,10 @@ const KoreaMap = () => (
           width="116"
           height="38"
           rx="10"
-          fill="white"
-          stroke="#FFE0B2"
-          strokeWidth="1"
+          fill="#0f172a"
+          stroke="#FF9933"
+          strokeWidth="0.8"
+          strokeOpacity="0.4"
         />
         <text
           x="86"
@@ -302,25 +318,28 @@ const KoreaMap = () => (
           x="86"
           y="135"
           fontSize="10"
-          fill="#94A3B8"
+          fill="#64748b"
           fontFamily="DM Sans, sans-serif"
         >
           ISKCON Korea Temple
         </text>
       </g>
+
+      {/* Label */}
       <text
         x="200"
         y="413"
         textAnchor="middle"
         fontSize="10"
         fontWeight="700"
-        fill="#CBD5E1"
+        fill="#475569"
         letterSpacing="6"
         fontFamily="DM Sans, sans-serif"
       >
         SOUTH KOREA
       </text>
     </svg>
+
     <style>{`
       @keyframes popIn { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
       @keyframes pulse-slow { 0%,100%{transform:scale(1);opacity:0.7} 50%{transform:scale(1.15);opacity:1} }

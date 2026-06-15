@@ -881,7 +881,7 @@ export const Hero = () => {
             </Link>
 
             <Link
-              href="/join"
+              href="/contact"
               onMouseEnter={onBtnEnter}
               onMouseLeave={onBtnLeave}
               style={{
