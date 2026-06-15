@@ -35,7 +35,7 @@ const mapEvent = (item: any): EventItem => ({
   time: item.time ?? "",
   location: item.location,
   description: item.description ?? "",
-  imageUrl: item.image_url ?? "",
+  imageUrl: item.image_url || null,
   attendees: item.attendees ?? "0",
 });
 
