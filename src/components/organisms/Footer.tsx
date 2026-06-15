@@ -21,7 +21,7 @@ const InlineFlag = () => (
 
 // ─── Newsletter signup ─────────────────────────────────────────────────────────
 const Newsletter = () => (
-  <div className="rounded-[14px] border border-white/8 bg-white/4 p-5 min-w-[280px]">
+  <div className="rounded-[14px] border border-white/8 bg-white/4 p-4 sm:p-5 w-full sm:min-w-[260px] sm:max-w-[340px]">
     <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.06em] text-[#FF9933]">
       <svg
         className="inline-block mr-1.5 mb-0.5 h-3 w-3"
@@ -40,13 +40,13 @@ const Newsletter = () => (
     <p className="mb-3 text-[13px] leading-[1.5] text-[#8a9580]">
       Get IIK updates, events &amp; stories in your inbox.
     </p>
-    <div className="flex gap-2">
+    <div className="flex flex-col xs:flex-row gap-2">
       <input
         type="email"
         placeholder="your@email.com"
         className="flex-1 rounded-[8px] border border-white/10 bg-white/7 px-3 py-2 text-[12.5px] text-[#e8e4dc] placeholder:text-[#555] outline-none focus:border-[#FF9933]/40"
       />
-      <button className="rounded-[8px] bg-[#FF9933] px-4 py-2 text-[12px] font-bold text-[#1a0a00] transition-colors hover:bg-[#e8871f]">
+      <button className="rounded-[8px] bg-[#FF9933] px-4 py-2 text-[12px] font-bold text-[#1a0a00] transition-colors hover:bg-[#e8871f] whitespace-nowrap">
         Subscribe
       </button>
     </div>
@@ -57,16 +57,16 @@ const Newsletter = () => (
 type NavLink = { label: string; href: string; icon: React.ReactNode };
 
 const NavColumn = ({ title, links }: { title: string; links: NavLink[] }) => (
-  <div className="flex flex-col gap-[18px] border-r border-white/5 py-10 last:border-r-0 [&+&]:pl-8">
+  <div className="flex flex-col gap-[14px] sm:gap-[18px] py-6 sm:py-10">
     <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#555]">
       {title}
     </p>
-    <ul className="flex flex-col gap-3">
+    <ul className="flex flex-col gap-2.5 sm:gap-3">
       {links.map((link) => (
         <li key={link.label}>
           <Link
             href={link.href}
-            className="group flex items-center gap-2 text-[13.5px] text-[#a0a89a] transition-colors hover:text-[#FF9933]"
+            className="group flex items-center gap-2 text-[13px] sm:text-[13.5px] text-[#a0a89a] transition-colors hover:text-[#FF9933]"
           >
             <span className="opacity-50 group-hover:opacity-100 transition-opacity">
               {link.icon}
@@ -105,7 +105,7 @@ const SocialBtn = ({
   </a>
 );
 
-// ─── SVG icons (inline, no external deps) ────────────────────────────────────
+// ─── SVG icons ────────────────────────────────────────────────────────────────
 const Icon = {
   Users: () => (
     <svg
@@ -379,8 +379,8 @@ export const Footer = () => {
       <TricolorBar />
 
       {/* ── Hero zone ── */}
-      <div className="border-b border-white/6 px-10 py-12 sm:px-12">
-        <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
+      <div className="border-b border-white/6 px-5 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
           {/* Brand */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-3">
@@ -392,13 +392,13 @@ export const Footer = () => {
                 className="object-contain"
                 priority
               />
-              <span className="text-[20px] font-bold tracking-[0.01em]">
+              <span className="text-[18px] sm:text-[20px] font-bold tracking-[0.01em]">
                 <span className="text-[#FF9933]">INDIANS</span>
                 <span className="text-[#f5f0e8]"> IN </span>
                 <span className="text-[#22c55e]">KOREA</span>
               </span>
             </div>
-            <p className="max-w-[260px] text-[13px] leading-[1.6] text-[#8a9580]">
+            <p className="max-w-[280px] text-[13px] leading-[1.6] text-[#8a9580]">
               Building a vibrant community of Indians across Korea — every city,
               every story.
             </p>
@@ -408,63 +408,83 @@ export const Footer = () => {
             </span>
           </div>
 
-          {/* Newsletter */}
-          <Newsletter />
+          {/* Newsletter — full width on mobile, constrained on larger */}
+          <div className="w-full sm:w-auto sm:flex-shrink-0">
+            <Newsletter />
+          </div>
         </div>
       </div>
 
       {/* ── Nav columns ── */}
-      <div className="grid grid-cols-2 px-10 sm:px-12 lg:grid-cols-4">
-        <NavColumn title="Community" links={communityLinks} />
-        <NavColumn title="Resources" links={resourceLinks} />
-        <NavColumn title="About" links={aboutLinks} />
+      {/*
+        Mobile:     2-col grid (Community | Resources on row 1, About | Connect on row 2)
+        Tablet md:  2-col grid, wider padding
+        Desktop lg: 4-col grid
+      */}
+      <div className="grid grid-cols-2 gap-x-4 px-5 sm:px-8 lg:grid-cols-4 lg:gap-x-0 lg:px-12">
+        {/* Community */}
+        <div className="border-b border-white/5 lg:border-b-0 lg:border-r lg:pr-8">
+          <NavColumn title="Community" links={communityLinks} />
+        </div>
 
-        {/* Connect column */}
-        <div className="flex flex-col gap-4 py-10 lg:pl-8">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#555]">
-            Connect
-          </p>
+        {/* Resources */}
+        <div className="border-b border-white/5 pl-4 sm:pl-6 lg:border-b-0 lg:border-r lg:pl-8 lg:pr-8">
+          <NavColumn title="Resources" links={resourceLinks} />
+        </div>
 
-          <div className="flex items-start gap-2.5">
-            <IconChip>
-              <Icon.Mail />
-            </IconChip>
-            <a
-              href="mailto:hello@indiansinkorea.com"
-              className="mt-1.5 text-[12.5px] leading-[1.5] text-[#a0a89a] transition-colors hover:text-[#FF9933]"
-            >
-              hello@indiansinkorea.com
-            </a>
-          </div>
+        {/* About */}
+        <div className="pl-4 sm:pl-6 lg:border-r lg:pl-8 lg:pr-8">
+          <NavColumn title="About" links={aboutLinks} />
+        </div>
 
-          <div className="flex items-start gap-2.5">
-            <IconChip>
-              <Icon.MapPin />
-            </IconChip>
-            <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[#8a9580]">
-              Seoul, South Korea
+        {/* Connect */}
+        <div className="pl-4 sm:pl-6 lg:pl-8">
+          <div className="flex flex-col gap-4 py-6 sm:py-10">
+            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#555]">
+              Connect
             </p>
-          </div>
 
-          <div className="mt-2 flex gap-2">
-            <SocialBtn href="#" label="Facebook">
-              <Icon.Facebook />
-            </SocialBtn>
-            <SocialBtn href="#" label="Twitter">
-              <Icon.Twitter />
-            </SocialBtn>
-            <SocialBtn href="#" label="Instagram">
-              <Icon.Instagram />
-            </SocialBtn>
-            <SocialBtn href="#" label="YouTube">
-              <Icon.YouTube />
-            </SocialBtn>
+            <div className="flex items-start gap-2.5">
+              <IconChip>
+                <Icon.Mail />
+              </IconChip>
+              <a
+                href="mailto:hello@indiansinkorea.com"
+                className="mt-1.5 text-[11.5px] sm:text-[12.5px] leading-[1.5] text-[#a0a89a] transition-colors hover:text-[#FF9933] break-all"
+              >
+                hello@indiansinkorea.com
+              </a>
+            </div>
+
+            <div className="flex items-start gap-2.5">
+              <IconChip>
+                <Icon.MapPin />
+              </IconChip>
+              <p className="mt-1.5 text-[12.5px] leading-[1.5] text-[#8a9580]">
+                Seoul, South Korea
+              </p>
+            </div>
+
+            <div className="mt-1 flex flex-wrap gap-2">
+              <SocialBtn href="#" label="Facebook">
+                <Icon.Facebook />
+              </SocialBtn>
+              <SocialBtn href="#" label="Twitter">
+                <Icon.Twitter />
+              </SocialBtn>
+              <SocialBtn href="#" label="Instagram">
+                <Icon.Instagram />
+              </SocialBtn>
+              <SocialBtn href="#" label="YouTube">
+                <Icon.YouTube />
+              </SocialBtn>
+            </div>
           </div>
         </div>
       </div>
 
       {/* ── Bottom bar ── */}
-      <div className="flex flex-col gap-3 border-t border-white/6 px-10 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-12">
+      <div className="flex flex-col gap-3 border-t border-white/6 px-5 py-5 sm:px-8 sm:flex-row sm:items-center sm:justify-between lg:px-12">
         <p className="flex items-center gap-2 text-[12px] text-[#555]">
           <InlineFlag />© 2002–{new Date().getFullYear()} Indians in Korea ·
           Made with
@@ -473,7 +493,7 @@ export const Footer = () => {
           </span>
           for the diaspora
         </p>
-        <div className="flex gap-5">
+        <div className="flex flex-wrap gap-4 sm:gap-5">
           <Link
             href="#"
             className="text-[12px] text-[#555] transition-colors hover:text-[#FF9933]"
