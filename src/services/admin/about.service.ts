@@ -190,9 +190,7 @@ export async function saveAbout(values: AboutContent): Promise<void> {
     .limit(1)
     .maybeSingle();
 
-  if (existingError) {
-    throw existingError;
-  }
+  if (existingError) throw existingError;
 
   const payload = {
     headline: values.headline,
@@ -212,9 +210,7 @@ export async function saveAbout(values: AboutContent): Promise<void> {
     const { error } = await db
       .from("about_content")
       .update(payload)
-      .eq("id", existing.id)
-      .select();
-
+      .eq("id", existing.id);
     if (error) throw error;
   } else {
     const { error } = await db.from("about_content").insert([payload]);
@@ -222,43 +218,134 @@ export async function saveAbout(values: AboutContent): Promise<void> {
   }
 }
 
+// ─── Board members ────────────────────────────────────────────────────────────
+// Strategy:
+//   • Members with a real UUID id  → upsert (update existing row)
+//   • Members with a temp _key id  → insert as new rows
+//   • Rows in DB whose id is NOT in the submitted list → delete by id
 export async function saveBoardMembers(members: BoardMember[]): Promise<void> {
   const db = getSupabase();
 
-  const rows = members.map((member, index) => ({
-    name: member.name,
-    initials: member.initials || toInitials(member.name),
-    role: member.role,
-    profession: member.profession ?? null,
-    type: member.type,
-    image_url: member.imageUrl ?? null,
-    display_order: member.displayOrder ?? index,
-    is_active: member.isActive ?? true,
-  }));
+  // Fetch all current IDs so we know what to delete
+  const { data: existing, error: fetchErr } = await db
+    .from("about_board")
+    .select("id");
+  if (fetchErr) throw fetchErr;
 
-  await db.from("about_board").delete();
-  if (rows.length > 0) {
+  const existingIds = new Set((existing ?? []).map((r: any) => r.id));
+
+  // Partition into persisted (have a real DB id) vs brand-new
+  const UUID_RE =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const persisted = members.filter((m) => UUID_RE.test(m.id));
+  const brandNew = members.filter((m) => !UUID_RE.test(m.id));
+
+  // IDs to delete = rows in DB that are no longer in the submitted list
+  const keptIds = new Set(persisted.map((m) => m.id));
+  const toDelete = [...existingIds].filter((id) => !keptIds.has(id));
+
+  // 1️⃣ Delete removed rows (each with a real WHERE clause)
+  if (toDelete.length > 0) {
+    const { error } = await db.from("about_board").delete().in("id", toDelete); // ✅ WHERE id IN (...)
+    if (error) throw error;
+  }
+
+  // 2️⃣ Upsert rows that already exist in the DB
+  if (persisted.length > 0) {
+    const rows = persisted.map((m, i) => ({
+      id: m.id, // required for upsert match
+      name: m.name,
+      initials: m.initials || toInitials(m.name),
+      role: m.role,
+      profession: m.profession ?? null,
+      type: m.type,
+      image_url: m.imageUrl ?? null,
+      display_order: m.displayOrder ?? i,
+      is_active: m.isActive ?? true,
+    }));
+    const { error } = await db
+      .from("about_board")
+      .upsert(rows, { onConflict: "id" });
+    if (error) throw error;
+  }
+
+  // 3️⃣ Insert truly new members (no id yet)
+  if (brandNew.length > 0) {
+    const rows = brandNew.map((m, i) => ({
+      name: m.name,
+      initials: m.initials || toInitials(m.name),
+      role: m.role,
+      profession: m.profession ?? null,
+      type: m.type,
+      image_url: m.imageUrl ?? null,
+      display_order: m.displayOrder ?? persisted.length + i,
+      is_active: m.isActive ?? true,
+    }));
     const { error } = await db.from("about_board").insert(rows);
     if (error) throw error;
   }
 }
 
+// ─── Contacts ─────────────────────────────────────────────────────────────────
+// Same strategy as board members above.
 export async function saveContacts(contacts: ContactItem[]): Promise<void> {
   const db = getSupabase();
 
-  const rows = contacts.map((contact, index) => ({
-    label: contact.label,
-    value: contact.value,
-    type: contact.type,
-    emoji: contact.emoji ?? null,
-    href: contact.href ?? null,
-    bg_class: contact.bgClass ?? "bg-orange-50 border-orange-200",
-    display_order: contact.displayOrder ?? index,
-    is_active: contact.isActive ?? true,
-  }));
+  const { data: existing, error: fetchErr } = await db
+    .from("about_contacts")
+    .select("id");
+  if (fetchErr) throw fetchErr;
 
-  await db.from("about_contacts").delete();
-  if (rows.length > 0) {
+  const existingIds = new Set((existing ?? []).map((r: any) => r.id));
+
+  const UUID_RE =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const persisted = contacts.filter((c) => UUID_RE.test(c.id));
+  const brandNew = contacts.filter((c) => !UUID_RE.test(c.id));
+
+  const keptIds = new Set(persisted.map((c) => c.id));
+  const toDelete = [...existingIds].filter((id) => !keptIds.has(id));
+
+  // 1️⃣ Delete removed contacts
+  if (toDelete.length > 0) {
+    const { error } = await db
+      .from("about_contacts")
+      .delete()
+      .in("id", toDelete); // ✅ WHERE id IN (...)
+    if (error) throw error;
+  }
+
+  // 2️⃣ Upsert existing contacts
+  if (persisted.length > 0) {
+    const rows = persisted.map((c, i) => ({
+      id: c.id,
+      label: c.label,
+      value: c.value,
+      type: c.type,
+      emoji: c.emoji ?? null,
+      href: c.href ?? null,
+      bg_class: c.bgClass ?? "bg-orange-50 border-orange-200",
+      display_order: c.displayOrder ?? i,
+      is_active: c.isActive ?? true,
+    }));
+    const { error } = await db
+      .from("about_contacts")
+      .upsert(rows, { onConflict: "id" });
+    if (error) throw error;
+  }
+
+  // 3️⃣ Insert new contacts
+  if (brandNew.length > 0) {
+    const rows = brandNew.map((c, i) => ({
+      label: c.label,
+      value: c.value,
+      type: c.type,
+      emoji: c.emoji ?? null,
+      href: c.href ?? null,
+      bg_class: c.bgClass ?? "bg-orange-50 border-orange-200",
+      display_order: c.displayOrder ?? persisted.length + i,
+      is_active: c.isActive ?? true,
+    }));
     const { error } = await db.from("about_contacts").insert(rows);
     if (error) throw error;
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import type { BoardMember, ContactItem } from "@/services/admin/about.service";
 
@@ -29,13 +29,10 @@ export interface ContactFormValues {
 }
 
 interface AboutFormProps {
-  // Tab 1 — content
   initialContent?: AboutFormValues;
   onSubmitContent: (values: AboutFormValues) => Promise<void>;
-  // Tab 2 — board
   initialBoard?: BoardMember[];
   onSubmitBoard: (members: BoardMember[]) => Promise<void>;
-  // Tab 3 — contacts
   initialContacts?: ContactItem[];
   onSubmitContacts: (contacts: ContactItem[]) => Promise<void>;
   saving?: boolean;
@@ -44,7 +41,7 @@ interface AboutFormProps {
 // ─── Shared field classes ─────────────────────────────────────────────────────
 
 const field =
-  "w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slateate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200";
+  "w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200";
 const textarea =
   "w-full rounded-[28px] border border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200";
 
@@ -109,6 +106,11 @@ function ContentForm({
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // ✅ Sync when parent re-fetches and passes fresh initial
+  useEffect(() => {
+    if (initial) setValues(initial);
+  }, [initial]);
+
   const set = (key: keyof AboutFormValues, value: any) =>
     setValues((v) => ({ ...v, [key]: value }));
 
@@ -138,7 +140,6 @@ function ContentForm({
       }}
       className="space-y-10"
     >
-      {/* Hero copy */}
       <Section title="Hero">
         <label className="space-y-2 block">
           <span className="text-sm font-semibold text-slate-900">Headline</span>
@@ -199,7 +200,6 @@ function ContentForm({
         </label>
       </Section>
 
-      {/* Stats */}
       <Section title="Stats">
         <div className="grid gap-4 sm:grid-cols-3">
           <label className="space-y-2 block">
@@ -236,7 +236,6 @@ function ContentForm({
         </div>
       </Section>
 
-      {/* CTA */}
       <Section title="Call to Action Button">
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-2 block">
@@ -266,7 +265,6 @@ function ContentForm({
         </div>
       </Section>
 
-      {/* Vision */}
       <Section title="Vision Items">
         <p className="text-xs text-slate-400 -mt-2">
           Numbered cards in the "Our Vision" section.
@@ -307,7 +305,6 @@ function ContentForm({
         </div>
       </Section>
 
-      {/* Hero image */}
       <Section title="Hero Image">
         <ImageUploader
           label=""
@@ -338,8 +335,10 @@ const TYPE_COLORS: Record<string, string> = {
   core: "bg-green-50 text-green-700 border-green-200",
 };
 
-const emptyMember = (): Omit<BoardMember, "id"> & { _key: string } => ({
-  _key: String(Date.now() + Math.random()),
+const emptyMember = (): BoardMember & { _key: string } => ({
+  // ✅ Use a non-UUID temp id so the service can detect it as brand-new
+  id: `new_${Date.now()}_${Math.random()}`,
+  _key: `new_${Date.now()}_${Math.random()}`,
   name: "",
   initials: "",
   role: "",
@@ -360,21 +359,35 @@ function BoardForm({
   saving?: boolean;
 }) {
   const [members, setMembers] = useState<(BoardMember & { _key?: string })[]>(
-    initial?.map((m) => ({ ...m, _key: m.id })) ?? [],
+    () => initial?.map((m) => ({ ...m, _key: m.id })) ?? [],
   );
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+
+  // ✅ Re-sync local state whenever parent passes fresh data (after save + re-fetch)
+  useEffect(() => {
+    if (initial) {
+      setMembers(initial.map((m) => ({ ...m, _key: m.id })));
+      setOpenIdx(null);
+    }
+  }, [initial]);
 
   const update = (i: number, key: keyof BoardMember, value: any) =>
     setMembers((prev) =>
       prev.map((m, j) => (j === i ? { ...m, [key]: value } : m)),
     );
 
-  const remove = (i: number) =>
+  const remove = (i: number) => {
     setMembers((prev) => prev.filter((_, j) => j !== i));
+    setOpenIdx(null);
+  };
 
+  // ✅ Fixed stale closure: derive next length inside setter
   const add = () => {
-    setMembers((prev) => [...prev, emptyMember() as any]);
-    setOpenIdx(members.length);
+    setMembers((prev) => {
+      const next = [...prev, emptyMember()];
+      setOpenIdx(next.length - 1);
+      return next;
+    });
   };
 
   const autoInitials = (name: string) =>
@@ -399,7 +412,6 @@ function BoardForm({
       }}
       className="space-y-8"
     >
-      {/* Summary counts */}
       <div className="grid grid-cols-3 gap-3">
         {TYPE_OPTIONS.map(({ value, label }) => (
           <div
@@ -414,14 +426,12 @@ function BoardForm({
         ))}
       </div>
 
-      {/* Member rows */}
       <div className="space-y-2">
         {members.map((member, i) => (
           <div
             key={member._key ?? i}
             className="rounded-2xl border border-slate-200 bg-white overflow-hidden"
           >
-            {/* Collapsed header */}
             <button
               type="button"
               onClick={() => setOpenIdx(openIdx === i ? null : i)}
@@ -464,7 +474,6 @@ function BoardForm({
               </svg>
             </button>
 
-            {/* Expanded fields */}
             {openIdx === i && (
               <div className="border-t border-slate-100 p-4 space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -608,11 +617,14 @@ const BG_OPTIONS = [
   { label: "Purple", value: "bg-purple-50 border-purple-200" },
 ];
 
-const emptyContact = (): Omit<ContactItem, "id"> & { _key: string } => ({
-  _key: String(Date.now() + Math.random()),
+const emptyContact = (
+  type: "info" | "social",
+): ContactItem & { _key: string } => ({
+  id: `new_${Date.now()}_${Math.random()}`,
+  _key: `new_${Date.now()}_${Math.random()}`,
   label: "",
   value: "",
-  type: "info",
+  type,
   emoji: "",
   href: "",
   bgClass: "bg-orange-50 border-orange-200",
@@ -630,21 +642,35 @@ function ContactsForm({
   saving?: boolean;
 }) {
   const [contacts, setContacts] = useState<(ContactItem & { _key?: string })[]>(
-    initial?.map((c) => ({ ...c, _key: c.id })) ?? [],
+    () => initial?.map((c) => ({ ...c, _key: c.id })) ?? [],
   );
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+
+  // ✅ Re-sync local state whenever parent passes fresh data (after save + re-fetch)
+  useEffect(() => {
+    if (initial) {
+      setContacts(initial.map((c) => ({ ...c, _key: c.id })));
+      setOpenIdx(null);
+    }
+  }, [initial]);
 
   const update = (i: number, key: keyof ContactItem, value: any) =>
     setContacts((prev) =>
       prev.map((c, j) => (j === i ? { ...c, [key]: value } : c)),
     );
 
-  const remove = (i: number) =>
+  const remove = (i: number) => {
     setContacts((prev) => prev.filter((_, j) => j !== i));
+    setOpenIdx(null);
+  };
 
+  // ✅ Fixed stale closure: derive next length inside setter
   const add = (type: "info" | "social") => {
-    setContacts((prev) => [...prev, { ...emptyContact(), type } as any]);
-    setOpenIdx(contacts.length);
+    setContacts((prev) => {
+      const next = [...prev, emptyContact(type)];
+      setOpenIdx(next.length - 1);
+      return next;
+    });
   };
 
   const infoContacts = contacts.filter((c) => c.type === "info");
@@ -658,7 +684,6 @@ function ContactsForm({
       }}
       className="space-y-8"
     >
-      {/* Summary */}
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-center">
           <p className="text-lg font-bold text-slate-800">
@@ -678,7 +703,6 @@ function ContactsForm({
         </div>
       </div>
 
-      {/* Info contacts section */}
       <Section title="Info cards (Address, Email, etc.)">
         <div className="space-y-2">
           {contacts.map((contact, i) => {
@@ -829,7 +853,6 @@ function ContactsForm({
         </button>
       </Section>
 
-      {/* Social links section */}
       <Section title="Social links (Facebook, Telegram, etc.)">
         <div className="space-y-2">
           {contacts.map((contact, i) => {
@@ -992,7 +1015,6 @@ export function AboutForm({
 
   return (
     <div className="rounded-[32px] border border-slate-200 bg-white shadow-sm overflow-hidden">
-      {/* Tab bar */}
       <div className="flex border-b border-slate-200 bg-slate-50">
         {TABS.map((tab) => (
           <button
@@ -1013,7 +1035,6 @@ export function AboutForm({
         ))}
       </div>
 
-      {/* Tab content */}
       <div className="p-8">
         {activeTab === "board" && (
           <BoardForm

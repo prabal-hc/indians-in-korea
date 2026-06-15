@@ -205,7 +205,11 @@ export const VoiceOfCommunitySection = () => {
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
       variants={stagger}
-      className="relative w-full overflow-hidden bg-green-50/40 py-20"
+      className="relative w-full overflow-hidden py-24"
+      style={{
+        background:
+          "linear-gradient(135deg, #FFF8F1 0%, #FFFFFF 45%, #F0FDF4 100%)",
+      }}
     >
       {/* Fade edges */}
       <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-20 z-10 bg-gradient-to-r from-orange-50/60 to-transparent" />
