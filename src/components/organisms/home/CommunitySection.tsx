@@ -5,6 +5,9 @@ import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { getFeatured, type CommunityItem } from "@/services/community.service";
 
+// ── All GSAP ScrollTrigger work is now handled by SmoothScrollProvider.
+// We just tag elements with the right utility classes.
+
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 const fadeUp = {
@@ -22,7 +25,6 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 const tagColorClass = (accent: string) => {
   const map: Record<string, { tag: string; arrow: string }> = {
     "#ea580c": {
@@ -53,19 +55,10 @@ const tagColorClass = (accent: string) => {
   return map[accent] ?? map["#ea580c"];
 };
 
-const TricolorBar = () => (
-  <div className="flex h-[3px] w-12 overflow-hidden rounded-full">
-    <div className="flex-1 bg-[#FF9933]" />
-    <div className="flex-1 border-y border-slate-200 bg-white" />
-    <div className="flex-1 bg-[#138808]" />
-  </div>
-);
-
 const Sk = ({ className }: { className?: string }) => (
   <div className={`animate-pulse bg-orange-100/50 rounded-2xl ${className}`} />
 );
 
-// ─── Community row ────────────────────────────────────────────────────────────
 const CommunityRow = ({
   community,
   index,
@@ -118,10 +111,9 @@ const CommunityRow = ({
   );
 };
 
-// ─── Korea Map (unchanged SVG) ────────────────────────────────────────────────
+// ─── Korea Map ────────────────────────────────────────────────────────────────
 const KoreaMap = () => (
   <div className="relative h-full w-full overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-    {/* Glow blobs */}
     <div
       className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-[#FF9933]/15 blur-3xl"
       style={{ animation: "pulse-slow 5s ease-in-out infinite" }}
@@ -136,7 +128,6 @@ const KoreaMap = () => (
       xmlns="http://www.w3.org/2000/svg"
       className="h-full w-full"
     >
-      {/* Dot grid */}
       {Array.from({ length: 15 }, (_, row) =>
         Array.from({ length: 14 }, (_, col) => (
           <circle
@@ -149,7 +140,6 @@ const KoreaMap = () => (
         )),
       )}
 
-      {/* Korea mainland */}
       <path
         d="M180,40 L190,38 L205,42 L218,48 L228,58 L232,72 L238,88 L242,105 L244,122 L240,140 L236,155 L232,172 L228,188 L222,205 L216,220 L208,235 L200,250 L192,263 L184,275 L176,285 L168,295 L160,305 L155,315 L152,328 L154,340 L158,352 L160,360 L156,368 L148,372 L140,370 L134,362 L130,352 L132,340 L136,328 L138,316 L134,304 L126,295 L118,288 L112,278 L108,266 L106,252 L108,238 L112,224 L116,210 L118,196 L116,182 L112,168 L108,154 L106,140 L108,126 L112,112 L118,98 L126,86 L136,74 L148,62 L160,52 L172,44 Z"
         fill="#1e293b"
@@ -158,7 +148,6 @@ const KoreaMap = () => (
         strokeLinejoin="round"
       />
 
-      {/* Jeju island */}
       <ellipse
         cx="160"
         cy="395"
@@ -169,11 +158,9 @@ const KoreaMap = () => (
         strokeWidth="1"
       />
 
-      {/* Glow halos */}
       <circle cx="210" cy="148" r="38" fill="#FF9933" fillOpacity="0.06" />
       <circle cx="215" cy="290" r="30" fill="#138808" fillOpacity="0.06" />
 
-      {/* Seoul pin */}
       <g style={{ animation: "popIn 0.4s 0.9s ease both", opacity: 0 }}>
         <circle cx="210" cy="148" r="12" fill="#FF9933" fillOpacity="0.2">
           <animate
@@ -227,13 +214,11 @@ const KoreaMap = () => (
         </g>
       </g>
 
-      {/* Pangyo */}
       <g style={{ animation: "popIn 0.4s 1.1s ease both", opacity: 0 }}>
         <circle cx="218" cy="168" r="4" fill="#138808" />
         <circle cx="218" cy="168" r="2" fill="white" />
       </g>
 
-      {/* Busan pin */}
       <g style={{ animation: "popIn 0.4s 1.3s ease both", opacity: 0 }}>
         <circle cx="215" cy="290" r="10" fill="#138808" fillOpacity="0.15">
           <animate
@@ -289,7 +274,6 @@ const KoreaMap = () => (
         </g>
       </g>
 
-      {/* Uijeongbu */}
       <g style={{ animation: "popIn 0.4s 1.5s ease both", opacity: 0 }}>
         <circle cx="200" cy="120" r="3.5" fill="#FF9933" />
         <circle cx="200" cy="120" r="1.5" fill="white" />
@@ -325,7 +309,6 @@ const KoreaMap = () => (
         </text>
       </g>
 
-      {/* Label */}
       <text
         x="200"
         y="413"
@@ -370,21 +353,15 @@ export const CommunitySection = () => {
       variants={stagger}
       className="relative w-full overflow-hidden bg-gradient-to-br from-orange-50/70 via-white to-green-50/50 py-15 px-4 sm:px-8 lg:px-16"
     >
-      <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#FF9933]/6 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[#138808]/5 blur-3xl" />
+      <div className="gsap-blob-up pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#FF9933]/6 blur-3xl" />
+      <div className="gsap-blob-down pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[#138808]/5 blur-3xl" />
 
       <div className="relative mx-auto w-full max-w-7xl">
         <div className="grid items-center gap-8 lg:grid-cols-2">
           {/* Left */}
           <motion.div variants={fadeUp} className="flex flex-col gap-5">
-            {/* <TricolorBar /> */}
-            {/* <motion.p
-              variants={fadeUp}
-              className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#138808]"
-            >
-              Indians in Korea · IIK
-            </motion.p> */}
-            <h2 className="font-playfair text-[36px] font-bold leading-[1.15] text-slate-900 sm:text-[40px]">
+            {/* gsap-reveal-heading → animated by SmoothScrollProvider */}
+            <h2 className="gsap-reveal-heading font-playfair text-[36px] font-bold leading-[1.15] text-slate-900 sm:text-[40px]">
               Find Your{" "}
               <em
                 className="italic"
@@ -397,13 +374,16 @@ export const CommunitySection = () => {
                 Tribe
               </em>
             </h2>
-            <p className="max-w-full sm:max-w-sm mt-2 text-[13px] leading-[1.85] text-slate-500 ">
+            <p className="gsap-reveal-para max-w-full sm:max-w-sm mt-2 text-[13px] leading-[1.85] text-slate-500">
               Whether you're a student at SNU, an engineer in Pangyo, or a Tamil
               in Seoul — there's an IIK community waiting for you.
             </p>
 
-            {/* Rows */}
-            <div className="flex flex-col gap-3 mt-1">
+            {/*
+              gsap-slide-left → SmoothScrollProvider slides list in from left.
+              (Also keeps the CSS animation on individual rows for a nice double-tap.)
+            */}
+            <div className="gsap-slide-left flex flex-col gap-3 mt-1">
               {loading
                 ? [...Array(4)].map((_, i) => <Sk key={i} className="h-16" />)
                 : communities.map((c, i) => (
@@ -434,10 +414,13 @@ export const CommunitySection = () => {
             </motion.div>
           </motion.div>
 
-          {/* Map */}
+          {/*
+            gsap-slide-right → SmoothScrollProvider slides the map in from right
+            and applies a gentle parallax scrub as you scroll past.
+          */}
           <motion.div
             variants={fadeUp}
-            className="order-first lg:order-none h-[260px] sm:h-[360px] md:h-[420px] lg:h-[500px]"
+            className="gsap-slide-right order-first lg:order-none h-[260px] sm:h-[360px] md:h-[420px] lg:h-[500px]"
           >
             <KoreaMap />
           </motion.div>

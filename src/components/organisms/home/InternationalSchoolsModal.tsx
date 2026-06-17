@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import { ModalPortal } from "./ModalPortal";
 
 interface InternationalSchoolsModalProps {
   open: boolean;
@@ -643,6 +644,17 @@ export function InternationalSchoolsModal({
     }
   }, [open]);
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   if (!open) return null;
 
   const filtered = (activeTab === "schools" ? SCHOOLS : PRESCHOOLS).filter(
@@ -658,193 +670,195 @@ export function InternationalSchoolsModal({
   );
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/60 px-0 pb-0 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label="International Schools in Korea"
-    >
+    <ModalPortal>
       <div
-        className="flex w-full max-w-4xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-slate-50 shadow-2xl shadow-slate-900/20 sm:max-h-[90vh] sm:rounded-3xl"
-        style={{ maxHeight: "92vh" }}
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/60 px-0 pb-0 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6"
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-label="International Schools in Korea"
       >
-        {/* Header */}
-        <div className="relative shrink-0 overflow-hidden bg-white px-6 pb-0 pt-6 sm:px-8 sm:pt-8">
-          {/* Decorative stripe */}
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
-
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-green-200 bg-gradient-to-br from-green-50 to-emerald-100 text-2xl shadow-sm">
-                🏫
-              </div>
-              <div>
-                <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-[#138808]">
-                  IIK Directory
-                </p>
-                <h2 className="mt-0.5 text-xl font-bold text-slate-900 sm:text-2xl">
-                  International Schools in Korea
-                </h2>
-                <p className="mt-1 text-xs text-slate-500">
-                  {SCHOOLS.length} schools · {PRESCHOOLS.length} foreign
-                  pre-schools · curated for Indian families
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-500 transition hover:bg-slate-200"
-            >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          {/* Tabs */}
-          <div className="mt-5 flex gap-1 border-b border-slate-100">
-            {(["schools", "preschools"] as const).map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => {
-                  setActiveTab(tab);
-                  setBranch("All");
-                  setSearch("");
-                }}
-                className={`relative pb-3 pr-4 text-sm font-semibold transition-colors ${
-                  activeTab === tab
-                    ? "text-slate-900"
-                    : "text-slate-400 hover:text-slate-600"
-                }`}
-              >
-                {tab === "schools"
-                  ? "International Schools"
-                  : "Foreign Pre-Schools"}
-                {activeTab === tab && (
-                  <span className="absolute bottom-0 left-0 right-4 h-0.5 rounded-full bg-orange-500" />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="shrink-0 border-b border-slate-100 bg-white px-6 py-3 sm:px-8">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="relative flex-1">
-              <svg
-                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search by name, city, or address…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm text-slate-800 placeholder-slate-400 outline-none ring-0 transition focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100"
-              />
-            </div>
-            {activeTab === "schools" && (
-              <select
-                value={branch}
-                onChange={(e) => setBranch(e.target.value)}
-                className="rounded-xl border border-slate-200 bg-slate-50 py-2 pl-3 pr-8 text-sm text-slate-700 outline-none transition focus:border-orange-300 focus:ring-2 focus:ring-orange-100"
-              >
-                {ALL_BRANCHES.map((b) => (
-                  <option key={b} value={b}>
-                    {b === "All" ? "All regions" : b}
-                  </option>
-                ))}
-              </select>
-            )}
-            <span className="shrink-0 text-xs text-slate-400">
-              {filtered.length} result{filtered.length !== 1 ? "s" : ""}
-            </span>
-          </div>
-        </div>
-
-        {/* School Grid */}
         <div
-          ref={scrollRef}
-          className="flex-1 overflow-y-auto overscroll-contain px-6 py-5 sm:px-8"
+          className="flex w-full max-w-4xl flex-col overflow-y-auto overscroll-contain rounded-t-3xl border border-slate-200 bg-slate-50 shadow-2xl shadow-slate-900/20 sm:max-h-[90vh] sm:rounded-3xl"
+          style={{ maxHeight: "92vh" }}
+          onClick={(e) => e.stopPropagation()}
         >
-          {filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <span className="text-4xl">🔍</span>
-              <p className="mt-3 text-sm font-semibold text-slate-600">
-                No schools found
-              </p>
-              <p className="mt-1 text-xs text-slate-400">
-                Try adjusting your search or region filter.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {filtered.map((school) => (
-                <SchoolCard key={school.name} school={school} />
-              ))}
-            </div>
-          )}
-        </div>
+          {/* Header */}
+          <div className="relative shrink-0 overflow-hidden bg-white px-6 pb-0 pt-6 sm:px-8 sm:pt-8">
+            {/* Decorative stripe */}
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
 
-        {/* Footer */}
-        <div className="shrink-0 border-t border-slate-100 bg-white px-6 py-4 sm:px-8">
-          <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-            <p className="text-xs text-slate-400">
-              Data sourced from{" "}
-              <a
-                href="https://indiansinkorea.com/inspire/international-schools/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-slate-600 underline underline-offset-2 hover:text-orange-600"
-              >
-                Indians in Korea (IIK)
-              </a>{" "}
-              · Est. 2002 · 12,000+ members
-            </p>
-            <div className="flex items-center gap-2">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-green-200 bg-gradient-to-br from-green-50 to-emerald-100 text-2xl shadow-sm">
+                  🏫
+                </div>
+                <div>
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-[#138808]">
+                    IIK Directory
+                  </p>
+                  <h2 className="mt-0.5 text-xl font-bold text-slate-900 sm:text-2xl">
+                    International Schools in Korea
+                  </h2>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {SCHOOLS.length} schools · {PRESCHOOLS.length} foreign
+                    pre-schools · curated for Indian families
+                  </p>
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex h-9 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                aria-label="Close"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-500 transition hover:bg-slate-200"
               >
-                Close
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
               </button>
-              <Link
-                href="/contact"
-                className="inline-flex h-9 items-center justify-center rounded-full bg-orange-500 px-5 text-sm font-semibold text-white shadow-md shadow-orange-200/40 transition hover:bg-orange-600 active:scale-95"
-              >
-                Contact IIK
-              </Link>
+            </div>
+
+            {/* Tabs */}
+            <div className="mt-5 flex gap-1 border-b border-slate-100">
+              {(["schools", "preschools"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => {
+                    setActiveTab(tab);
+                    setBranch("All");
+                    setSearch("");
+                  }}
+                  className={`relative pb-3 pr-4 text-sm font-semibold transition-colors ${
+                    activeTab === tab
+                      ? "text-slate-900"
+                      : "text-slate-400 hover:text-slate-600"
+                  }`}
+                >
+                  {tab === "schools"
+                    ? "International Schools"
+                    : "Foreign Pre-Schools"}
+                  {activeTab === tab && (
+                    <span className="absolute bottom-0 left-0 right-4 h-0.5 rounded-full bg-orange-500" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="shrink-0 border-b border-slate-100 bg-white px-6 py-3 sm:px-8">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <div className="relative flex-1">
+                <svg
+                  className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search by name, city, or address…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm text-slate-800 placeholder-slate-400 outline-none ring-0 transition focus:border-orange-300 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                />
+              </div>
+              {activeTab === "schools" && (
+                <select
+                  value={branch}
+                  onChange={(e) => setBranch(e.target.value)}
+                  className="rounded-xl border border-slate-200 bg-slate-50 py-2 pl-3 pr-8 text-sm text-slate-700 outline-none transition focus:border-orange-300 focus:ring-2 focus:ring-orange-100"
+                >
+                  {ALL_BRANCHES.map((b) => (
+                    <option key={b} value={b}>
+                      {b === "All" ? "All regions" : b}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <span className="shrink-0 text-xs text-slate-400">
+                {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+          </div>
+
+          {/* School Grid */}
+          <div
+            ref={scrollRef}
+            className="flex-1 overflow-y-auto overscroll-contain px-6 py-5 sm:px-8"
+          >
+            {filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <span className="text-4xl">🔍</span>
+                <p className="mt-3 text-sm font-semibold text-slate-600">
+                  No schools found
+                </p>
+                <p className="mt-1 text-xs text-slate-400">
+                  Try adjusting your search or region filter.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {filtered.map((school) => (
+                  <SchoolCard key={school.name} school={school} />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="shrink-0 border-t border-slate-100 bg-white px-6 py-4 sm:px-8">
+            <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+              <p className="text-xs text-slate-400">
+                Data sourced from{" "}
+                <a
+                  href="https://indiansinkorea.com/inspire/international-schools/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-slate-600 underline underline-offset-2 hover:text-orange-600"
+                >
+                  Indians in Korea (IIK)
+                </a>{" "}
+                · Est. 2002 · 12,000+ members
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="inline-flex h-9 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                >
+                  Close
+                </button>
+                <Link
+                  href="/contact"
+                  className="inline-flex h-9 items-center justify-center rounded-full bg-orange-500 px-5 text-sm font-semibold text-white shadow-md shadow-orange-200/40 transition hover:bg-orange-600 active:scale-95"
+                >
+                  Contact IIK
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </ModalPortal>
   );
 }
 

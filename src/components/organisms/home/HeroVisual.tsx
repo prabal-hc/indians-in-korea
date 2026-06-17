@@ -1436,10 +1436,7 @@ export const HeroVisual = ({
         />
       </div>
 
-      {/* Cursor spotlight */}
-      <CursorSpotlight
-        containerRef={containerRef as React.RefObject<HTMLDivElement>}
-      />
+      {/* Cursor spotlight removed */}
 
       {/* Animated concentric rings */}
       <AnimatedRings size={circleSize} />

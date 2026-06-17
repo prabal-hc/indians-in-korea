@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import RootLayoutShell from "@/components/RootLayoutShell";
+import { SmoothScrollProvider } from "@/components/organisms/home/Smoothscrollprovider";
+import Navbar from "@/components/organisms/Navbar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -62,8 +64,20 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body>
-        <RootLayoutShell>{children}</RootLayoutShell>
+      <body style={{ overscrollBehavior: "none", margin: 0 }}>
+        {/*
+          Navbar is position:fixed so it lives OUTSIDE the smoother.
+          It floats above everything via z-50 regardless of the scroll wrapper.
+        */}
+        <Navbar />
+
+        <SmoothScrollProvider>
+          {/*
+            RootLayoutShell should no longer render the Navbar internally.
+            It should only wrap page content (footer, etc.).
+          */}
+          <RootLayoutShell>{children}</RootLayoutShell>
+        </SmoothScrollProvider>
       </body>
     </html>
   );

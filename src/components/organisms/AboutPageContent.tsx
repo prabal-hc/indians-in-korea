@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useRef, useEffect, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import {
-  ArrowRight,
-  Users,
-  Calendar,
-  Globe,
-  Building2,
-  ExternalLink,
-} from "lucide-react";
+  PiArrowRight,
+  PiUsers,
+  PiCalendar,
+  PiGlobe,
+  PiBuildings,
+  PiArrowSquareOut,
+  PiHandshake,
+} from "react-icons/pi";
 import {
   getAboutPageData,
   type AboutPageData,
@@ -67,14 +68,14 @@ export const AboutPageContent = () => {
   const { content, vision, board, advisors, core, contacts, socials } = data!;
 
   const stats = [
-    { value: content?.members ?? "12,000+", label: "Members", icon: Users },
+    { value: content?.members ?? "12,000+", label: "Members", icon: PiUsers },
     {
       value: content?.established ?? "2002",
       label: "Established",
-      icon: Calendar,
+      icon: PiCalendar,
     },
-    { value: "2 Platforms", label: "Facebook & Telegram", icon: Globe },
-    { value: "Non-Profit", label: "Organisation", icon: Building2 },
+    { value: "2 Platforms", label: "Facebook & Telegram", icon: PiGlobe },
+    { value: "Non-Profit", label: "Organisation", icon: PiBuildings },
   ];
 
   return (
@@ -130,7 +131,7 @@ export const AboutPageContent = () => {
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-orange-500 px-7 py-4 text-sm font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-orange-600 hover:-translate-y-0.5"
                 >
                   {content?.ctaLabel ?? "Join on Facebook"}{" "}
-                  <ArrowRight className="h-4 w-4" />
+                  <PiArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/contact"
@@ -183,12 +184,10 @@ export const AboutPageContent = () => {
                 <p className="mt-2 text-sm font-semibold text-gray-800 leading-6">
                   Connecting Indians & Koreans with culture, career & community.
                 </p>
-                <div className="mt-4 flex gap-1">
-                  {["🇮🇳", "🤝", "🇰🇷"].map((e) => (
-                    <span key={e} className="text-xl">
-                      {e}
-                    </span>
-                  ))}
+                <div className="mt-4 flex items-center gap-2">
+                  <span className="text-xl">🇮🇳</span>
+                  <PiHandshake className="h-5 w-5 text-orange-600" />
+                  <span className="text-xl">🇰🇷</span>
                 </div>
               </div>
             </motion.div>
@@ -350,6 +349,11 @@ export const AboutPageContent = () => {
                       </h3>
                       <p className="text-xs font-semibold text-orange-600 mt-0.5 uppercase tracking-wide">
                         {member.role}
+                        {member.koreanTitle && (
+                          <span className="ml-1.5 text-gray-400 normal-case font-medium">
+                            · {member.koreanTitle}
+                          </span>
+                        )}
                       </p>
                       <p className="text-xs text-gray-500 mt-1.5 leading-5">
                         {member.profession}
@@ -386,6 +390,11 @@ export const AboutPageContent = () => {
                         </h4>
                         <p className="text-xs text-orange-600 font-semibold mt-0.5">
                           {a.role}
+                          {a.koreanTitle && (
+                            <span className="ml-1.5 text-orange-400 font-medium normal-case">
+                              · {a.koreanTitle}
+                            </span>
+                          )}
                         </p>
                         <p className="text-xs text-gray-500 mt-1.5 leading-5">
                           {a.profession}
@@ -435,6 +444,11 @@ export const AboutPageContent = () => {
                       <p className="text-xs font-semibold text-gray-800 leading-5">
                         {m.name}
                       </p>
+                      {m.koreanTitle && (
+                        <p className="text-[10px] text-gray-400 mt-0.5">
+                          {m.koreanTitle}
+                        </p>
+                      )}
                       <span className="mt-2 inline-block rounded-full bg-orange-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-orange-600">
                         Core Member
                       </span>

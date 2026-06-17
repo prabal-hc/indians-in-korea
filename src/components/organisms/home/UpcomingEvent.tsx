@@ -1,15 +1,17 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// UpcomingEvent.tsx  — uses global GSAP utility classes
+// ─────────────────────────────────────────────────────────────────────────────
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   getUpcoming,
   getFeatured,
   type EventItem,
 } from "@/services/events.service";
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
 const CalendarIcon = () => (
   <svg
     width="14"
@@ -47,7 +49,6 @@ const ArrowIcon = () => (
   </svg>
 );
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 const formatDate = (dateStr: string) => {
   const d = new Date(dateStr);
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -77,22 +78,16 @@ const CityBadge = ({
   dark?: boolean;
 }) => (
   <span
-    className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide uppercase ${
-      dark
-        ? "bg-black/40 text-white backdrop-blur-sm border border-white/10"
-        : "bg-orange-100 text-orange-700 border border-orange-200"
-    }`}
+    className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide uppercase ${dark ? "bg-black/40 text-white backdrop-blur-sm border border-white/10" : "bg-orange-100 text-orange-700 border border-orange-200"}`}
   >
     {city}
   </span>
 );
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
 const Skeleton = ({ className }: { className?: string }) => (
   <div className={`animate-pulse bg-slate-200 rounded-xl ${className}`} />
 );
 
-// ─── Featured card ────────────────────────────────────────────────────────────
 const FeaturedCard = ({ event }: { event: EventItem }) => {
   const city = event.location.split(",").pop()?.trim() ?? event.location;
   return (
@@ -138,7 +133,6 @@ const FeaturedCard = ({ event }: { event: EventItem }) => {
   );
 };
 
-// ─── Side card ────────────────────────────────────────────────────────────────
 const SideCard = ({ event }: { event: EventItem }) => {
   const d = new Date(event.date);
   const day = d.getDate().toString().padStart(2, "0");
@@ -172,11 +166,11 @@ const SideCard = ({ event }: { event: EventItem }) => {
   );
 };
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 export const UpcomingEvent = () => {
   const [featured, setFeatured] = useState<EventItem | null>(null);
   const [upcoming, setUpcoming] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -213,14 +207,15 @@ export const UpcomingEvent = () => {
 
   return (
     <section
+      ref={sectionRef}
       className="w-full bg-gradient-to-br from-orange-100 via-orange-50 to-amber-100 border-t border-orange-200"
       style={{ position: "relative", zIndex: 10 }}
     >
       <div className="mx-2 sm:mx-4 md:mx-6 lg:mx-8 xl:mx-10 py-15 px-4 sm:px-8 lg:px-16">
-        {/* Header */}
+        {/* gsap-reveal-heading → SmoothScrollProvider animates on scroll */}
         <div className="flex items-end justify-between mb-6">
           <div>
-            <h2 className="font-playfair text-[36px] font-bold leading-[1.15] text-slate-900 sm:text-[40px]">
+            <h2 className="gsap-reveal-heading font-playfair text-[36px] font-bold leading-[1.15] text-slate-900 sm:text-[40px]">
               Upcoming{" "}
               <em
                 className="italic"
@@ -233,7 +228,7 @@ export const UpcomingEvent = () => {
                 Events
               </em>
             </h2>
-            <p className="mt-1.5 text-sm text-slate-500">
+            <p className="gsap-reveal-para mt-1.5 text-sm text-slate-500">
               Join the next gathering in your city.
             </p>
           </div>
@@ -245,8 +240,8 @@ export const UpcomingEvent = () => {
           </Link>
         </div>
 
-        {/* Cards */}
-        <div className="flex flex-col lg:flex-row gap-4">
+        {/* gsap-card-group → staggers the two event cards */}
+        <div className="gsap-card-group flex flex-col lg:flex-row gap-4">
           {displayFeatured && <FeaturedCard event={displayFeatured} />}
           {sideEvent && <SideCard event={sideEvent} />}
         </div>
@@ -254,3 +249,5 @@ export const UpcomingEvent = () => {
     </section>
   );
 };
+
+export default UpcomingEvent;

@@ -549,9 +549,10 @@ function SubmitButton({ loading }: { loading: boolean }) {
           disabled={loading}
           className="w-full flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full font-bold text-sm tracking-wide uppercase text-white transition-all duration-200 disabled:opacity-60 relative z-10"
           style={{
-            background: loading
-              ? "#9ca3af"
+            backgroundImage: loading
+              ? "none"
               : "linear-gradient(135deg,#f97316 0%,#fb923c 50%,#ea580c 100%)",
+            backgroundColor: loading ? "#9ca3af" : "transparent",
             backgroundSize: "200% auto",
             animation: loading ? "none" : "gradShift 3.5s ease-in-out infinite",
           }}
@@ -618,14 +619,25 @@ export default function ContactPageContent() {
     e.preventDefault();
     setLoading(true);
     setSubmitStatus("idle");
+
     try {
-      await new Promise((r) => setTimeout(r, 1500));
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Send failed");
+
       setSubmitStatus("success");
       setFormData({ name: "", email: "", subject: "", message: "" });
       setTimeout(() => setSubmitStatus("idle"), 3500);
-    } catch {
+    } catch (err: any) {
+      console.error(err);
       setSubmitStatus("error");
-      setErrorMessage("Failed to send. Please try again.");
+      setErrorMessage(err.message || "Failed to send. Please try again.");
       setTimeout(() => setSubmitStatus("idle"), 3500);
     } finally {
       setLoading(false);

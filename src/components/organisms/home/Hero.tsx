@@ -422,10 +422,6 @@ export const Hero = () => {
   }, []);
 
   const mouse = useRef({ x: -999, y: -999 });
-  const cursorRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-  const ringPos = useRef({ x: 0, y: 0 });
-  const cursorRafRef = useRef(0);
 
   // ── Intro sequence ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -467,46 +463,9 @@ export const Hero = () => {
   const scrollIndicatorOpacity = Math.max(0, 1 - scrollY / 200);
   const isContentHidden = scrollY > 300;
 
-  // ── Custom cursor ────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (isMobile) return;
-    const onMove = (e: MouseEvent) => {
-      mouse.current = { x: e.clientX, y: e.clientY };
-    };
-    window.addEventListener("mousemove", onMove);
-    const tick = () => {
-      ringPos.current.x += (mouse.current.x - ringPos.current.x) * 0.11;
-      ringPos.current.y += (mouse.current.y - ringPos.current.y) * 0.11;
-      if (cursorRef.current) {
-        cursorRef.current.style.left = `${mouse.current.x}px`;
-        cursorRef.current.style.top = `${mouse.current.y}px`;
-      }
-      if (ringRef.current) {
-        ringRef.current.style.left = `${ringPos.current.x}px`;
-        ringRef.current.style.top = `${ringPos.current.y}px`;
-      }
-      cursorRafRef.current = requestAnimationFrame(tick);
-    };
-    cursorRafRef.current = requestAnimationFrame(tick);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      cancelAnimationFrame(cursorRafRef.current);
-    };
-  }, [isMobile]);
-
-  const onBtnEnter = useCallback(() => {
-    if (!ringRef.current) return;
-    ringRef.current.style.width = "54px";
-    ringRef.current.style.height = "54px";
-    ringRef.current.style.borderColor = "rgba(255,153,51,0.7)";
-  }, []);
-
-  const onBtnLeave = useCallback(() => {
-    if (!ringRef.current) return;
-    ringRef.current.style.width = "32px";
-    ringRef.current.style.height = "32px";
-    ringRef.current.style.borderColor = "rgba(255,255,255,0.3)";
-  }, []);
+  // Custom cursor removed — use default system cursor.
+  const onBtnEnter = useCallback(() => {}, []);
+  const onBtnLeave = useCallback(() => {}, []);
 
   const cs = (delay: number): React.CSSProperties => ({
     opacity: contentVisible ? 1 : 0,
@@ -528,42 +487,7 @@ export const Hero = () => {
 
   return (
     <>
-      {/* Custom cursor — desktop only */}
-      {!isMobile && (
-        <>
-          <div
-            ref={cursorRef}
-            style={{
-              position: "fixed",
-              zIndex: 9999,
-              pointerEvents: "none",
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              background: "#fff",
-              transform: "translate(-50%,-50%)",
-              top: 0,
-              left: 0,
-            }}
-          />
-          <div
-            ref={ringRef}
-            style={{
-              position: "fixed",
-              zIndex: 9998,
-              pointerEvents: "none",
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              border: "1px solid rgba(255,255,255,0.3)",
-              transform: "translate(-50%,-50%)",
-              transition: "width .3s, height .3s, border-color .3s",
-              top: 0,
-              left: 0,
-            }}
-          />
-        </>
-      )}
+      {/* custom cursor removed */}
 
       {/* ── SECTION ── */}
       <section
@@ -575,7 +499,7 @@ export const Hero = () => {
           minHeight: isMobile ? 580 : 640,
           background: "#050710",
           overflow: "hidden",
-          cursor: isMobile ? "auto" : "none",
+          cursor: "auto",
           zIndex: 0,
         }}
       >

@@ -48,6 +48,7 @@ export type BoardMember = {
   initials: string;
   role: string;
   profession?: string | null;
+  koreanTitle?: string | null; // ← new
   type: "board" | "advisor" | "core";
   imageUrl?: string | null;
   displayOrder?: number;
@@ -133,6 +134,7 @@ const mapBoard = (row: any): BoardMember => ({
   initials: row.initials ?? toInitials(row.name),
   role: row.role,
   profession: row.profession ?? null,
+  koreanTitle: row.korean_title ?? null, // ← new
   type: row.type,
   imageUrl: row.image_url ?? null,
   displayOrder: row.display_order ?? 0,
@@ -253,16 +255,18 @@ export async function saveBoardMembers(members: BoardMember[]): Promise<void> {
   // 2️⃣ Upsert rows that already exist in the DB
   if (persisted.length > 0) {
     const rows = persisted.map((m, i) => ({
-      id: m.id, // required for upsert match
+      id: m.id,
       name: m.name,
       initials: m.initials || toInitials(m.name),
       role: m.role,
       profession: m.profession ?? null,
+      korean_title: m.koreanTitle ?? null, // ← new
       type: m.type,
       image_url: m.imageUrl ?? null,
       display_order: m.displayOrder ?? i,
       is_active: m.isActive ?? true,
     }));
+
     const { error } = await db
       .from("about_board")
       .upsert(rows, { onConflict: "id" });
@@ -276,11 +280,13 @@ export async function saveBoardMembers(members: BoardMember[]): Promise<void> {
       initials: m.initials || toInitials(m.name),
       role: m.role,
       profession: m.profession ?? null,
+      korean_title: m.koreanTitle ?? null, // ← new
       type: m.type,
       image_url: m.imageUrl ?? null,
       display_order: m.displayOrder ?? persisted.length + i,
       is_active: m.isActive ?? true,
     }));
+
     const { error } = await db.from("about_board").insert(rows);
     if (error) throw error;
   }

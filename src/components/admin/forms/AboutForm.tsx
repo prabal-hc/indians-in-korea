@@ -336,13 +336,13 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 const emptyMember = (): BoardMember & { _key: string } => ({
-  // ✅ Use a non-UUID temp id so the service can detect it as brand-new
   id: `new_${Date.now()}_${Math.random()}`,
   _key: `new_${Date.now()}_${Math.random()}`,
   name: "",
   initials: "",
   role: "",
   profession: "",
+  koreanTitle: "", // ← new
   type: "board",
   imageUrl: "",
   displayOrder: 0,
@@ -530,6 +530,17 @@ function BoardForm({
                       onChange={(e) => update(i, "profession", e.target.value)}
                       className={field}
                       placeholder="Professor, Kwangwoon University"
+                    />
+                  </label>
+                  <label className="space-y-1.5 block">
+                    <span className="text-xs font-semibold text-slate-700">
+                      Korean title (optional)
+                    </span>
+                    <input
+                      value={member.koreanTitle ?? ""}
+                      onChange={(e) => update(i, "koreanTitle", e.target.value)}
+                      className={field}
+                      placeholder="이사"
                     />
                   </label>
                   <label className="space-y-1.5 block">

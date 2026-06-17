@@ -1,3 +1,6 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// GallerySection.tsx  — uses global GSAP utility classes
+// ─────────────────────────────────────────────────────────────────────────────
 "use client";
 
 import { useEffect, useState, useRef } from "react";
@@ -15,6 +18,7 @@ export const GallerySection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const autoScrollRaf = useRef<number>(0);
   const mouseXInScroll = useRef(0);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     getAll().then((data) => {
@@ -23,39 +27,30 @@ export const GallerySection = () => {
     });
   }, []);
 
-  // ── Edge auto-scroll ───────────────────────────────────────────────────────
   const startAutoScroll = () => {
     const scroll = () => {
       const el = scrollRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const x = mouseXInScroll.current;
-      const edgeZone = 120; // px from edge that triggers scroll
+      const edgeZone = 120;
       const maxSpeed = 12;
-
       if (x < rect.left + edgeZone) {
-        // Near left edge
         const strength = 1 - (x - rect.left) / edgeZone;
         el.scrollLeft -= maxSpeed * strength;
       } else if (x > rect.right - edgeZone) {
-        // Near right edge
         const strength = 1 - (rect.right - x) / edgeZone;
         el.scrollLeft += maxSpeed * strength;
       }
-
       autoScrollRaf.current = requestAnimationFrame(scroll);
     };
     autoScrollRaf.current = requestAnimationFrame(scroll);
   };
 
-  const stopAutoScroll = () => {
-    cancelAnimationFrame(autoScrollRaf.current);
-  };
-
+  const stopAutoScroll = () => cancelAnimationFrame(autoScrollRaf.current);
   const onSectionMouseMove = (e: React.MouseEvent) => {
     mouseXInScroll.current = e.clientX;
   };
-
   const onSectionMouseLeave = () => {
     stopAutoScroll();
     setHoveredIdx(null);
@@ -63,6 +58,7 @@ export const GallerySection = () => {
 
   return (
     <section
+      ref={sectionRef}
       style={{
         background: "#fff",
         position: "relative",
@@ -71,9 +67,12 @@ export const GallerySection = () => {
         overflow: "hidden",
       }}
     >
-      {/* ── Section header ── */}
+      {/* gsap-reveal-heading + gsap-reveal-para → animated by SmoothScrollProvider */}
       <div className="mx-2 sm:mx-4 md:mx-6 lg:mx-8 xl:mx-10 pt-16 pb-10 px-4 sm:px-8 lg:px-16">
-        <h2 className="font-playfair text-[36px] font-bold leading-[1.15] text-slate-900 sm:text-[40px]">
+        <h2
+          className="gsap-reveal-heading font-playfair text-[36px] font-bold leading-[1.15] text-slate-900 sm:text-[40px]"
+          style={{ opacity: 0 }}
+        >
           Glimpses into our{" "}
           <em
             className="italic"
@@ -87,12 +86,14 @@ export const GallerySection = () => {
           </em>{" "}
           across the peninsula
         </h2>
-        <p className="mt-2 text-sm text-slate-500">
+        <p
+          className="gsap-reveal-para mt-2 text-sm text-slate-500"
+          style={{ opacity: 0 }}
+        >
           Hover a card to expand · Move to edges to scroll
         </p>
       </div>
 
-      {/* ── Scroll container ── */}
       <div
         ref={scrollRef}
         onMouseMove={onSectionMouseMove}
@@ -113,7 +114,6 @@ export const GallerySection = () => {
             WebkitOverflowScrolling: "touch",
             minHeight: 580,
             gap: 0,
-            // Full width — no compression
             width: "100%",
             boxSizing: "border-box",
           } as React.CSSProperties
@@ -121,21 +121,14 @@ export const GallerySection = () => {
       >
         <style>{`
           .gallery-scroll-row::-webkit-scrollbar { display: none; }
-          @keyframes shimmer {
-            0%, 100% { opacity: 0.15; }
-            50% { opacity: 0.28; }
-          }
+          @keyframes shimmer { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.28; } }
         `}</style>
 
         {loading
           ? Array.from({ length: 10 }).map((_, i) => (
               <div
                 key={i}
-                style={{
-                  flexShrink: 0,
-                  width: 72,
-                  marginTop: getTopOffset(i),
-                }}
+                style={{ flexShrink: 0, width: 72, marginTop: getTopOffset(i) }}
               >
                 <div
                   style={{
@@ -162,7 +155,6 @@ export const GallerySection = () => {
                   onMouseLeave={() => setHoveredIdx(null)}
                   style={{
                     flexShrink: 0,
-                    // Collapsed: share viewport evenly; expanded: fixed wide
                     width: isHovered
                       ? 320
                       : `calc((100vw - 4rem) / ${Math.min(items.length, 12)})`,
@@ -184,7 +176,6 @@ export const GallerySection = () => {
                       background: "#0c0c0a",
                     }}
                   >
-                    {/* Image */}
                     {imageUrl && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -206,8 +197,6 @@ export const GallerySection = () => {
                         }}
                       />
                     )}
-
-                    {/* Gradient overlay */}
                     <div
                       style={{
                         position: "absolute",
@@ -219,8 +208,6 @@ export const GallerySection = () => {
                         pointerEvents: "none",
                       }}
                     />
-
-                    {/* Tricolor left stripe */}
                     <div
                       style={{
                         position: "absolute",
@@ -241,8 +228,6 @@ export const GallerySection = () => {
                       <div style={{ flex: 1, background: "#fff" }} />
                       <div style={{ flex: 1, background: "#138808" }} />
                     </div>
-
-                    {/* Info overlay */}
                     <div
                       style={{
                         position: "absolute",

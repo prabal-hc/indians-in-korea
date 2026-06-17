@@ -6,6 +6,11 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Search, X, Menu } from "lucide-react";
 import { motion, AnimatePresence, useScroll, LayoutGroup } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollSmoother } from "gsap/ScrollSmoother";
+
+gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
 // ─── Nav Items ────────────────────────────────────────────────────────────────
 const navItems = [
@@ -84,12 +89,35 @@ const mobileLinkVariants = {
 };
 
 // ─── Scroll Progress Bar ──────────────────────────────────────────────────────
+// framer-motion's useScroll reads from the window, which ScrollSmoother keeps
+// at 0. We drive the bar manually from ScrollSmoother's scroll position instead.
 const ScrollProgressBar = () => {
-  const { scrollYProgress } = useScroll();
+  const barRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Wait one tick for ScrollSmoother to be created by SmoothScrollProvider
+    const raf = requestAnimationFrame(() => {
+      const smoother = ScrollSmoother.get();
+      if (!smoother || !barRef.current) return;
+
+      // ScrollTrigger fires on every smoother tick
+      ScrollTrigger.create({
+        onUpdate: (self) => {
+          if (barRef.current) {
+            barRef.current.style.transform = `scaleX(${self.progress})`;
+          }
+        },
+      });
+    });
+
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
   return (
-    <motion.div
-      className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-orange-500 via-orange-400 to-amber-400 origin-left z-10"
-      style={{ scaleX: scrollYProgress, width: "100%" }}
+    <div
+      ref={barRef}
+      className="absolute bottom-0 left-0 h-[2px] w-full bg-gradient-to-r from-orange-500 via-orange-400 to-amber-400 origin-left z-10"
+      style={{ transform: "scaleX(0)" }}
     />
   );
 };
@@ -155,14 +183,13 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const [heroMode, setHeroMode] = useState(isHome); // transparent only on home
+  const [heroMode, setHeroMode] = useState(isHome);
   const lastScrollY = useRef(0);
 
   const isActive = (href: string) => href !== "#" && pathname === href;
 
-  // ── Scroll listener ────────────────────────────────────────────────────
+  // ── Scroll listener — reads ScrollSmoother, falls back to window ──────
   useEffect(() => {
-    // Non-home pages: always white, skip scroll logic
     if (!isHome) {
       setHeroMode(false);
       setScrolled(false);
@@ -170,8 +197,7 @@ const Navbar = () => {
       return;
     }
 
-    const handleScroll = () => {
-      const currentY = window.scrollY;
+    const handleScroll = (currentY: number) => {
       const vh = window.innerHeight;
 
       setHeroMode(currentY < vh * 0.72);
@@ -186,11 +212,37 @@ const Navbar = () => {
       lastScrollY.current = currentY;
     };
 
-    // Set initial state on mount
-    handleScroll();
+    // Try ScrollSmoother first (available after SmoothScrollProvider mounts)
+    let st: ScrollTrigger | undefined;
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const init = () => {
+      const smoother = ScrollSmoother.get();
+
+      if (smoother) {
+        // Use ScrollTrigger's onUpdate which fires on the smoother's virtual scroll
+        st = ScrollTrigger.create({
+          onUpdate: () => {
+            handleScroll(smoother.scrollTop());
+          },
+        });
+        // Set initial state
+        handleScroll(smoother.scrollTop());
+      } else {
+        // Fallback: native scroll (non-home pages, or if smoother not ready)
+        const onNativeScroll = () => handleScroll(window.scrollY);
+        window.addEventListener("scroll", onNativeScroll, { passive: true });
+        handleScroll(window.scrollY);
+        return () => window.removeEventListener("scroll", onNativeScroll);
+      }
+    };
+
+    // Small delay to ensure SmoothScrollProvider has mounted first
+    const timer = setTimeout(init, 100);
+
+    return () => {
+      clearTimeout(timer);
+      st?.kill();
+    };
   }, [isHome]);
 
   // Close mobile menu on desktop resize
@@ -202,11 +254,20 @@ const Navbar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Lock body scroll while menu is open
+  // Lock body scroll while mobile menu is open
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    // Use ScrollSmoother.get()?.paused() instead of body overflow
+    // so it integrates cleanly with the smooth scroll system
+    const smoother = ScrollSmoother.get();
+    if (smoother) {
+      smoother.paused(open);
+    } else {
+      document.body.style.overflow = open ? "hidden" : "";
+    }
     return () => {
-      document.body.style.overflow = "";
+      const s = ScrollSmoother.get();
+      if (s) s.paused(false);
+      else document.body.style.overflow = "";
     };
   }, [open]);
 
@@ -236,7 +297,6 @@ const Navbar = () => {
           ${barCls}
         `}
       >
-        {/* Sheen — only in white mode */}
         {!heroMode && (
           <>
             <div className="absolute inset-0 bg-gradient-to-b from-white/50 to-transparent pointer-events-none" />
@@ -280,15 +340,11 @@ const Navbar = () => {
                   heroMode ? "text-white/90" : "text-gray-700"
                 }`}
               >
-                <span
-                  className={heroMode ? "text-orange-400" : "text-orange-600"}
-                >
+                <span className={heroMode ? "text-orange-400" : "text-orange-600"}>
                   INDIANS
                 </span>{" "}
                 IN{" "}
-                <span
-                  className={heroMode ? "text-green-400" : "text-[#138808]"}
-                >
+                <span className={heroMode ? "text-green-400" : "text-[#138808]"}>
                   KOREA
                 </span>
               </span>
@@ -365,10 +421,7 @@ const Navbar = () => {
                   exit={{ rotate: 45, opacity: 0 }}
                   transition={{ duration: 0.18 }}
                 >
-                  <X
-                    size={17}
-                    className={heroMode ? "text-white" : "text-gray-700"}
-                  />
+                  <X size={17} className={heroMode ? "text-white" : "text-gray-700"} />
                 </motion.span>
               ) : (
                 <motion.span
@@ -378,10 +431,7 @@ const Navbar = () => {
                   exit={{ rotate: -45, opacity: 0 }}
                   transition={{ duration: 0.18 }}
                 >
-                  <Menu
-                    size={17}
-                    className={heroMode ? "text-white" : "text-gray-700"}
-                  />
+                  <Menu size={17} className={heroMode ? "text-white" : "text-gray-700"} />
                 </motion.span>
               )}
             </AnimatePresence>
@@ -406,7 +456,6 @@ const Navbar = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-orange-50/15 to-transparent pointer-events-none" />
 
             <div className="relative px-6 py-5 max-w-screen-xl mx-auto">
-              {/* NAV LINKS */}
               <ul className="flex flex-col gap-0.5 mb-5">
                 {navItems.map((item, i) => (
                   <motion.li
@@ -438,15 +487,10 @@ const Navbar = () => {
                 ))}
               </ul>
 
-              {/* DIVIDER */}
               <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mb-4" />
 
-              {/* MOBILE SEARCH */}
               <div className="relative mb-3">
-                <Search
-                  size={14}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                />
+                <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search community..."
@@ -454,7 +498,6 @@ const Navbar = () => {
                 />
               </div>
 
-              {/* MOBILE CTA */}
               <motion.div whileTap={{ scale: 0.97 }}>
                 <Link
                   href="/join"

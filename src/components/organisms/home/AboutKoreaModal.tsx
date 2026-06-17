@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { ModalPortal } from "./ModalPortal";
 
 interface AboutKoreaModalProps {
   open: boolean;
@@ -153,205 +154,220 @@ export function AboutKoreaModal({ open, onClose }: AboutKoreaModalProps) {
     if (open) setActiveTab("flag");
   }, [open]);
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   if (!open) return null;
 
   const section = SECTIONS.find((s) => s.id === activeTab)!;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/60 px-0 pb-0 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label="About Korea"
-    >
+    <ModalPortal>
       <div
-        className="flex w-full max-w-4xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-slate-50 shadow-2xl shadow-slate-900/20 sm:max-h-[90vh] sm:rounded-3xl"
-        style={{ maxHeight: "92vh" }}
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/60 px-0 pb-0 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6"
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-label="About Korea"
       >
-        {/* Header */}
-        <div className="relative shrink-0 overflow-hidden bg-white px-6 pb-0 pt-6 sm:px-8 sm:pt-8">
-          {/* Decorative stripe — Korean flag colours */}
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#C60C30] via-white to-[#003478]" />
+        <div
+          className="flex w-full max-w-4xl flex-col overflow-y-auto overscroll-contain rounded-t-3xl border border-slate-200 bg-slate-50 shadow-2xl shadow-slate-900/20 sm:max-h-[90vh] sm:rounded-3xl"
+          style={{ maxHeight: "92vh" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="relative shrink-0 overflow-hidden bg-white px-6 pb-0 pt-6 sm:px-8 sm:pt-8">
+            {/* Decorative stripe — Korean flag colours */}
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#C60C30] via-white to-[#003478]" />
 
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-100 text-2xl shadow-sm">
-                🌏
-              </div>
-              <div>
-                <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-blue-600">
-                  IIK Guide
-                </p>
-                <h2 className="mt-0.5 text-xl font-bold text-slate-900 sm:text-2xl">
-                  About Korea
-                </h2>
-                <p className="mt-1 text-xs text-slate-500">
-                  National flag · national flower · national anthem · curated
-                  for Indian families
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-500 transition hover:bg-slate-200"
-            >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          {/* Tabs */}
-          <div className="mt-5 flex gap-1 border-b border-slate-100">
-            {SECTIONS.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setActiveTab(s.id as SectionId)}
-                className={`relative pb-3 pr-5 text-sm font-semibold transition-colors ${
-                  activeTab === s.id
-                    ? "text-slate-900"
-                    : "text-slate-400 hover:text-slate-600"
-                }`}
-              >
-                <span className="mr-1.5">{s.emoji}</span>
-                {s.id === "flag"
-                  ? "Flag"
-                  : s.id === "flower"
-                    ? "Flower"
-                    : "Anthem"}
-                {activeTab === s.id && (
-                  <span className="absolute bottom-0 left-0 right-5 h-0.5 rounded-full bg-blue-500" />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-5 sm:px-8">
-          {/* Section hero */}
-          <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-100 text-2xl shadow-sm">
-              {section.emoji}
-            </div>
-            <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-blue-500">
-                {section.label}
-              </p>
-              <h3 className="text-lg font-bold text-slate-900">
-                {section.title}
-              </h3>
-              <p className="text-xs text-slate-400">{section.subtitle}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
-            {/* Text content */}
-            <div className="space-y-3 lg:col-span-3">
-              {section.content
-                .filter((c) => c.type === "paragraph")
-                .map((c, i) => (
-                  <p key={i} className="text-sm leading-7 text-slate-600">
-                    {"text" in c ? c.text : ""}
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-100 text-2xl shadow-sm">
+                  🌏
+                </div>
+                <div>
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-blue-600">
+                    IIK Guide
                   </p>
-                ))}
-            </div>
-
-            {/* Facts card */}
-            <div className="lg:col-span-2">
-              {section.content
-                .filter((c) => c.type === "facts")
-                .map((c, i) =>
-                  "items" in c ? (
-                    <div
-                      key={i}
-                      className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm"
-                    >
-                      <p className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.25em] text-blue-500">
-                        Quick Facts
-                      </p>
-                      <div className="space-y-2.5">
-                        {(
-                          c as {
-                            items: Array<{ label: string; value: string }>;
-                          }
-                        ).items.map((item, j) => (
-                          <div key={j} className="flex flex-col gap-0.5">
-                            <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-                              {item.label}
-                            </span>
-                            <span className="text-xs font-medium text-slate-700">
-                              {item.value}
-                            </span>
-                            {j <
-                              (
-                                c as {
-                                  items: Array<{
-                                    label: string;
-                                    value: string;
-                                  }>;
-                                }
-                              ).items.length -
-                                1 && <div className="mt-2 h-px bg-slate-50" />}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null,
-                )}
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="shrink-0 border-t border-slate-100 bg-white px-6 py-4 sm:px-8">
-          <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-            <p className="text-xs text-slate-400">
-              Data sourced from{" "}
-              <a
-                href="https://indiansinkorea.com/inspire/about-korea/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-slate-600 underline underline-offset-2 hover:text-blue-600"
-              >
-                Indians in Korea (IIK)
-              </a>{" "}
-              · Est. 2002 · 12,000+ members
-            </p>
-            <div className="flex items-center gap-2">
+                  <h2 className="mt-0.5 text-xl font-bold text-slate-900 sm:text-2xl">
+                    About Korea
+                  </h2>
+                  <p className="mt-1 text-xs text-slate-500">
+                    National flag · national flower · national anthem · curated
+                    for Indian families
+                  </p>
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex h-9 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                aria-label="Close"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-500 transition hover:bg-slate-200"
               >
-                Close
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
               </button>
-              <Link
-                href="/contact"
-                className="inline-flex h-9 items-center justify-center rounded-full bg-orange-500 px-5 text-sm font-semibold text-white shadow-md shadow-orange-200/40 transition hover:bg-orange-600 active:scale-95"
-              >
-                Contact IIK
-              </Link>
+            </div>
+
+            {/* Tabs */}
+            <div className="mt-5 flex gap-1 border-b border-slate-100">
+              {SECTIONS.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setActiveTab(s.id as SectionId)}
+                  className={`relative pb-3 pr-5 text-sm font-semibold transition-colors ${
+                    activeTab === s.id
+                      ? "text-slate-900"
+                      : "text-slate-400 hover:text-slate-600"
+                  }`}
+                >
+                  <span className="mr-1.5">{s.emoji}</span>
+                  {s.id === "flag"
+                    ? "Flag"
+                    : s.id === "flower"
+                      ? "Flower"
+                      : "Anthem"}
+                  {activeTab === s.id && (
+                    <span className="absolute bottom-0 left-0 right-5 h-0.5 rounded-full bg-blue-500" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-5 sm:px-8">
+            {/* Section hero */}
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-100 text-2xl shadow-sm">
+                {section.emoji}
+              </div>
+              <div>
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-blue-500">
+                  {section.label}
+                </p>
+                <h3 className="text-lg font-bold text-slate-900">
+                  {section.title}
+                </h3>
+                <p className="text-xs text-slate-400">{section.subtitle}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-5">
+              {/* Text content */}
+              <div className="space-y-3 lg:col-span-3">
+                {section.content
+                  .filter((c) => c.type === "paragraph")
+                  .map((c, i) => (
+                    <p key={i} className="text-sm leading-7 text-slate-600">
+                      {"text" in c ? c.text : ""}
+                    </p>
+                  ))}
+              </div>
+
+              {/* Facts card */}
+              <div className="lg:col-span-2">
+                {section.content
+                  .filter((c) => c.type === "facts")
+                  .map((c, i) =>
+                    "items" in c ? (
+                      <div
+                        key={i}
+                        className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm"
+                      >
+                        <p className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.25em] text-blue-500">
+                          Quick Facts
+                        </p>
+                        <div className="space-y-2.5">
+                          {(
+                            c as {
+                              items: Array<{ label: string; value: string }>;
+                            }
+                          ).items.map((item, j) => (
+                            <div key={j} className="flex flex-col gap-0.5">
+                              <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                                {item.label}
+                              </span>
+                              <span className="text-xs font-medium text-slate-700">
+                                {item.value}
+                              </span>
+                              {j <
+                                (
+                                  c as {
+                                    items: Array<{
+                                      label: string;
+                                      value: string;
+                                    }>;
+                                  }
+                                ).items.length -
+                                  1 && (
+                                <div className="mt-2 h-px bg-slate-50" />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null,
+                  )}
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="shrink-0 border-t border-slate-100 bg-white px-6 py-4 sm:px-8">
+            <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+              <p className="text-xs text-slate-400">
+                Data sourced from{" "}
+                <a
+                  href="https://indiansinkorea.com/inspire/about-korea/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-slate-600 underline underline-offset-2 hover:text-blue-600"
+                >
+                  Indians in Korea (IIK)
+                </a>{" "}
+                · Est. 2002 · 12,000+ members
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="inline-flex h-9 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                >
+                  Close
+                </button>
+                <Link
+                  href="/contact"
+                  className="inline-flex h-9 items-center justify-center rounded-full bg-orange-500 px-5 text-sm font-semibold text-white shadow-md shadow-orange-200/40 transition hover:bg-orange-600 active:scale-95"
+                >
+                  Contact IIK
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </ModalPortal>
   );
 }
 

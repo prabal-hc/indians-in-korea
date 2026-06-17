@@ -32,24 +32,31 @@ const Newsletter = () => (
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <rect x="2" y="4" width="20" height="16" rx="2" />
-        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
       </svg>
-      Stay connected
+      Get in Touch
     </p>
     <p className="mb-3 text-[13px] leading-[1.5] text-[#8a9580]">
-      Get IIK updates, events &amp; stories in your inbox.
+      Have questions or want to connect with the Indian community in Korea?
     </p>
-    <div className="flex flex-col xs:flex-row gap-2">
-      <input
-        type="email"
-        placeholder="your@email.com"
-        className="flex-1 rounded-[8px] border border-white/10 bg-white/7 px-3 py-2 text-[12.5px] text-[#e8e4dc] placeholder:text-[#555] outline-none focus:border-[#FF9933]/40"
-      />
-      <button className="rounded-[8px] bg-[#FF9933] px-4 py-2 text-[12px] font-bold text-[#1a0a00] transition-colors hover:bg-[#e8871f] whitespace-nowrap">
-        Subscribe
-      </button>
-    </div>
+
+    <a
+      href="/contact"
+      className="inline-flex items-center gap-2 rounded-[8px] bg-[#FF9933] px-4 py-2 text-[12px] font-bold text-[#1a0a00] transition-colors hover:bg-[#e8871f]"
+    >
+      <svg
+        className="h-3.5 w-3.5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M5 12h14M12 5l7 7-7 7" />
+      </svg>
+      Contact Us
+    </a>
   </div>
 );
 

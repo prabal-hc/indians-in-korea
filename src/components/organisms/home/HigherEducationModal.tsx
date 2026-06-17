@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { ModalPortal } from "./ModalPortal";
 
 interface HigherEducationModalProps {
   open: boolean;
@@ -386,277 +387,290 @@ export function HigherEducationModal({
     return () => window.removeEventListener("keydown", handler);
   }, [open, onClose]);
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-200 flex items-end justify-center bg-slate-950/60 px-0 pb-0 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Higher Education in Korea"
-    >
+    <ModalPortal>
       <div
-        className="flex w-full max-w-4xl flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-slate-50 shadow-2xl shadow-slate-900/20 sm:max-h-[90vh] sm:rounded-3xl"
-        style={{ maxHeight: "92vh" }}
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/60 px-0 pb-0 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6"
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Higher Education in Korea"
       >
-        {/* ── HEADER ── */}
-        <div className="relative shrink-0 overflow-hidden bg-white px-6 pb-0 pt-6 sm:px-8 sm:pt-8">
-          {/* Tricolor stripe */}
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
+        <div
+          className="flex w-full max-w-4xl flex-col overflow-y-auto overscroll-contain rounded-t-3xl border border-slate-200 bg-slate-50 shadow-2xl shadow-slate-900/20 sm:max-h-[90vh] sm:rounded-3xl"
+          style={{ maxHeight: "92vh" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* ── HEADER ── */}
+          <div className="relative shrink-0 overflow-hidden bg-white px-6 pb-0 pt-6 sm:px-8 sm:pt-8">
+            {/* Tricolor stripe */}
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
 
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-amber-100 text-2xl shadow-sm">
-                🎓
-              </div>
-              <div>
-                <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-orange-500">
-                  IIK Education
-                </p>
-                <h2 className="mt-0.5 text-xl font-bold text-slate-900 sm:text-2xl">
-                  Higher Education in Korea
-                </h2>
-                <p className="mt-1 text-xs text-slate-500">
-                  {UNIVERSITIES.length} top universities · scholarships · IIK
-                  student support
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-500 transition hover:bg-slate-200"
-            >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          {/* Tabs */}
-          <div className="mt-5 flex gap-1 border-b border-slate-100">
-            {(["universities", "support"] as const).map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={`relative pb-3 pr-5 text-sm font-semibold transition-colors ${
-                  activeTab === tab
-                    ? "text-slate-900"
-                    : "text-slate-400 hover:text-slate-600"
-                }`}
-              >
-                <span className="mr-1.5">
-                  {tab === "universities" ? "🏫" : "🤝"}
-                </span>
-                {tab === "universities" ? "Universities" : "IIK Support"}
-                {activeTab === tab && (
-                  <span className="absolute bottom-0 left-0 right-5 h-0.5 rounded-full bg-orange-500" />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ── BODY ── */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-5 sm:px-8">
-          {/* UNIVERSITIES TAB */}
-          {activeTab === "universities" && (
-            <div className="space-y-3">
-              <p className="text-[10px] font-medium text-slate-400">
-                ✦ Tap any card to see full details, highlights & links
-              </p>
-
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {UNIVERSITIES.map((uni) => (
-                  <UniversityCard key={uni.id} uni={uni} />
-                ))}
-              </div>
-
-              {/* Government portal banner */}
-              <a
-                href="https://www.studyinkorea.go.kr/en/main.do"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center justify-between w-full rounded-2xl border border-orange-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md hover:shadow-orange-50"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">🇰🇷</span>
-                  <div>
-                    <p className="text-xs font-bold text-orange-700">
-                      Official Government Portal
-                    </p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      studyinkorea.go.kr — Scholarships, programs & admissions
-                    </p>
-                  </div>
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-amber-100 text-2xl shadow-sm">
+                  🎓
                 </div>
+                <div>
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-orange-500">
+                    IIK Education
+                  </p>
+                  <h2 className="mt-0.5 text-xl font-bold text-slate-900 sm:text-2xl">
+                    Higher Education in Korea
+                  </h2>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {UNIVERSITIES.length} top universities · scholarships · IIK
+                    student support
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-500 transition hover:bg-slate-200"
+              >
                 <svg
-                  className="h-4 w-4 shrink-0 text-orange-400 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  className="h-4 w-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                 >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
-              </a>
+              </button>
             </div>
-          )}
 
-          {/* SUPPORT TAB */}
-          {activeTab === "support" && (
-            <div className="space-y-5">
-              {/* Intro */}
-              <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-                <p className="text-[10px] font-extrabold uppercase tracking-[0.25em] text-orange-500 mb-2">
-                  About IIK Support
-                </p>
-                <p className="text-sm leading-7 text-slate-600">
-                  Indians in Korea (IIK) has been supporting the Indian
-                  community since 2002. For students, we provide guidance, peer
-                  mentorship, and connections that make the transition to Korean
-                  academic life smoother and more confident.
-                </p>
-              </div>
+            {/* Tabs */}
+            <div className="mt-5 flex gap-1 border-b border-slate-100">
+              {(["universities", "support"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setActiveTab(tab)}
+                  className={`relative pb-3 pr-5 text-sm font-semibold transition-colors ${
+                    activeTab === tab
+                      ? "text-slate-900"
+                      : "text-slate-400 hover:text-slate-600"
+                  }`}
+                >
+                  <span className="mr-1.5">
+                    {tab === "universities" ? "🏫" : "🤝"}
+                  </span>
+                  {tab === "universities" ? "Universities" : "IIK Support"}
+                  {activeTab === tab && (
+                    <span className="absolute bottom-0 left-0 right-5 h-0.5 rounded-full bg-orange-500" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
 
-              {/* Service cards */}
-              <div>
-                <p className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.25em] text-slate-400">
-                  How We Help
+          {/* ── BODY ── */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-5 sm:px-8">
+            {/* UNIVERSITIES TAB */}
+            {activeTab === "universities" && (
+              <div className="space-y-3">
+                <p className="text-[10px] font-medium text-slate-400">
+                  ✦ Tap any card to see full details, highlights & links
                 </p>
+
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {SUPPORT_SERVICES.map((svc) => (
-                    <div
-                      key={svc.title}
-                      className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-200 hover:border-orange-100 hover:shadow-md"
-                    >
-                      <div
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg"
-                        style={{ background: svc.colorLight }}
-                      >
-                        {svc.emoji}
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-slate-900">
-                          {svc.title}
-                        </p>
-                        <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
-                          {svc.desc}
-                        </p>
-                      </div>
-                    </div>
+                  {UNIVERSITIES.map((uni) => (
+                    <UniversityCard key={uni.id} uni={uni} />
                   ))}
                 </div>
-              </div>
 
-              {/* Contact block */}
-              <div className="rounded-2xl border border-orange-200 bg-white p-4 shadow-sm sm:p-5">
-                <div className="mb-4 flex items-start gap-3">
-                  <span className="text-2xl">💬</span>
-                  <div>
-                    <p className="text-sm font-bold text-slate-900">
-                      Talk to the IIK Team
-                    </p>
-                    <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
-                      Reach out for personalised guidance on admissions,
-                      scholarships, and campus life from Indians who've been
-                      through it.
-                    </p>
+                {/* Government portal banner */}
+                <a
+                  href="https://www.studyinkorea.go.kr/en/main.do"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center justify-between w-full rounded-2xl border border-orange-200 bg-white p-4 shadow-sm transition-all hover:border-orange-300 hover:shadow-md hover:shadow-orange-50"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">🇰🇷</span>
+                    <div>
+                      <p className="text-xs font-bold text-orange-700">
+                        Official Government Portal
+                      </p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        studyinkorea.go.kr — Scholarships, programs & admissions
+                      </p>
+                    </div>
+                  </div>
+                  <svg
+                    className="h-4 w-4 shrink-0 text-orange-400 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </a>
+              </div>
+            )}
+
+            {/* SUPPORT TAB */}
+            {activeTab === "support" && (
+              <div className="space-y-5">
+                {/* Intro */}
+                <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.25em] text-orange-500 mb-2">
+                    About IIK Support
+                  </p>
+                  <p className="text-sm leading-7 text-slate-600">
+                    Indians in Korea (IIK) has been supporting the Indian
+                    community since 2002. For students, we provide guidance,
+                    peer mentorship, and connections that make the transition to
+                    Korean academic life smoother and more confident.
+                  </p>
+                </div>
+
+                {/* Service cards */}
+                <div>
+                  <p className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.25em] text-slate-400">
+                    How We Help
+                  </p>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {SUPPORT_SERVICES.map((svc) => (
+                      <div
+                        key={svc.title}
+                        className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition-all duration-200 hover:border-orange-100 hover:shadow-md"
+                      >
+                        <div
+                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg"
+                          style={{ background: svc.colorLight }}
+                        >
+                          {svc.emoji}
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-900">
+                            {svc.title}
+                          </p>
+                          <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
+                            {svc.desc}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  {CONTACT_LINKS.map((c) => (
-                    <a
-                      key={c.label}
-                      href={c.href}
-                      target={
-                        c.href.startsWith("mailto") ? undefined : "_blank"
-                      }
-                      rel="noopener noreferrer"
-                      className="group flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-2.5 transition-all hover:border-orange-200 hover:bg-orange-50"
-                    >
-                      <div>
-                        <span className="text-[9px] font-extrabold uppercase tracking-wider text-orange-400">
-                          {c.label}
-                        </span>
-                        <p className="mt-0.5 text-[11px] font-semibold text-slate-700">
-                          {c.value}
-                        </p>
-                      </div>
-                      <svg
-                        className="h-3.5 w-3.5 shrink-0 text-orange-400 transition-transform group-hover:translate-x-0.5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2.5}
+                {/* Contact block */}
+                <div className="rounded-2xl border border-orange-200 bg-white p-4 shadow-sm sm:p-5">
+                  <div className="mb-4 flex items-start gap-3">
+                    <span className="text-2xl">💬</span>
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">
+                        Talk to the IIK Team
+                      </p>
+                      <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
+                        Reach out for personalised guidance on admissions,
+                        scholarships, and campus life from Indians who've been
+                        through it.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {CONTACT_LINKS.map((c) => (
+                      <a
+                        key={c.label}
+                        href={c.href}
+                        target={
+                          c.href.startsWith("mailto") ? undefined : "_blank"
+                        }
+                        rel="noopener noreferrer"
+                        className="group flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-2.5 transition-all hover:border-orange-200 hover:bg-orange-50"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </a>
-                  ))}
+                        <div>
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-orange-400">
+                            {c.label}
+                          </span>
+                          <p className="mt-0.5 text-[11px] font-semibold text-slate-700">
+                            {c.value}
+                          </p>
+                        </div>
+                        <svg
+                          className="h-3.5 w-3.5 shrink-0 text-orange-400 transition-transform group-hover:translate-x-0.5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2.5}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* ── FOOTER ── */}
-        <div className="shrink-0 border-t border-slate-100 bg-white px-6 py-4 sm:px-8">
-          <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-            <p className="text-xs text-slate-400">
-              Data sourced from{" "}
-              <a
-                href="https://indiansinkorea.com/inspire/higher-education/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-slate-600 underline underline-offset-2 hover:text-orange-600"
-              >
-                Indians in Korea (IIK)
-              </a>{" "}
-              · Est. 2002 · 12,000+ members
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="inline-flex h-9 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
-              >
-                Close
-              </button>
-              <Link
-                href="/contact"
-                className="inline-flex h-9 items-center justify-center rounded-full bg-orange-500 px-5 text-sm font-semibold text-white shadow-md shadow-orange-200/40 transition hover:bg-orange-600 active:scale-95"
-              >
-                Contact IIK
-              </Link>
+          {/* ── FOOTER ── */}
+          <div className="shrink-0 border-t border-slate-100 bg-white px-6 py-4 sm:px-8">
+            <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+              <p className="text-xs text-slate-400">
+                Data sourced from{" "}
+                <a
+                  href="https://indiansinkorea.com/inspire/higher-education/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-slate-600 underline underline-offset-2 hover:text-orange-600"
+                >
+                  Indians in Korea (IIK)
+                </a>{" "}
+                · Est. 2002 · 12,000+ members
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="inline-flex h-9 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                >
+                  Close
+                </button>
+                <Link
+                  href="/contact"
+                  className="inline-flex h-9 items-center justify-center rounded-full bg-orange-500 px-5 text-sm font-semibold text-white shadow-md shadow-orange-200/40 transition hover:bg-orange-600 active:scale-95"
+                >
+                  Contact IIK
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </ModalPortal>
   );
 }
 
