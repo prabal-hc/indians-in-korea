@@ -110,81 +110,47 @@ export async function getFeatured(limit = 4): Promise<CommunityItem[]> {
 export async function create(
   data: Omit<CommunityItem, "id">,
 ): Promise<CommunityItem> {
-  const { data: created, error } = await getSupabase()
-    .from("communities")
-    .insert([
-      {
-        name: data.name,
-        abbr: data.abbr,
-        category: data.category,
-        tag: data.tag || data.category,
-        icon: data.icon || "🎉",
-        members: data.members || "0",
-        since: data.since || null,
-        description: data.description,
-        highlights: data.highlights || [],
-        website_url: data.websiteUrl || null,
-        facebook_url: data.facebookUrl || null,
-        email: data.email || null,
-        contact: data.contact || null,
-        image_url: data.imageUrl || null,
-        accent_color: data.accentColor || "#ea580c",
-        is_active: data.status === "Published",
-        is_featured: data.isFeatured || false,
-        display_order: data.displayOrder || 0,
-      },
-    ])
-    .select()
-    .single();
+  const response = await fetch("/api/admin/communities/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
-  if (error) throw error;
-  return mapCommunity(created);
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to create community");
+  }
+
+  return mapCommunity(await response.json());
 }
 
 export async function update(
   id: string,
   data: Partial<CommunityItem>,
 ): Promise<CommunityItem> {
-  const payload: Record<string, any> = {};
-  if (data.name !== undefined) payload.name = data.name;
-  if (data.abbr !== undefined) payload.abbr = data.abbr;
-  if (data.category !== undefined) payload.category = data.category;
-  if (data.tag !== undefined) payload.tag = data.tag;
-  if (data.icon !== undefined) payload.icon = data.icon;
-  if (data.members !== undefined) payload.members = data.members;
-  if (data.since !== undefined) payload.since = data.since;
-  if (data.description !== undefined) payload.description = data.description;
-  if (data.highlights !== undefined) payload.highlights = data.highlights;
-  if (data.websiteUrl !== undefined)
-    payload.website_url = data.websiteUrl || null;
-  if (data.facebookUrl !== undefined)
-    payload.facebook_url = data.facebookUrl || null;
-  if (data.email !== undefined) payload.email = data.email || null;
-  if (data.contact !== undefined) payload.contact = data.contact || null;
-  if (data.imageUrl !== undefined) payload.image_url = data.imageUrl || null;
-  if (data.accentColor !== undefined) payload.accent_color = data.accentColor;
-  if (data.isFeatured !== undefined) payload.is_featured = data.isFeatured;
-  if (data.displayOrder !== undefined)
-    payload.display_order = data.displayOrder;
-  if (data.status !== undefined)
-    payload.is_active = data.status === "Published";
+  const response = await fetch(`/api/admin/communities/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
-  const { data: updated, error } = await getSupabase()
-    .from("communities")
-    .update(payload)
-    .eq("id", id)
-    .select()
-    .single();
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to update community");
+  }
 
-  if (error) throw error;
-  return mapCommunity(updated);
+  return mapCommunity(await response.json());
 }
 
 export async function remove(id: string): Promise<boolean> {
-  const { error } = await getSupabase()
-    .from("communities")
-    .delete()
-    .eq("id", id);
-  if (error) throw error;
+  const response = await fetch(`/api/admin/communities/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to delete community");
+  }
+
   return true;
 }

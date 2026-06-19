@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import RootLayoutShell from "@/components/RootLayoutShell";
 import { SmoothScrollProvider } from "@/components/organisms/home/Smoothscrollprovider";
-import Navbar from "@/components/organisms/Navbar";
+import NavbarGate from "@/components/organisms/NavbarGate";
+import SupabaseAuthProvider from "@/components/SupabaseAuthProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -64,20 +65,25 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body style={{ overscrollBehavior: "none", margin: 0 }}>
+      <body
+        style={{ overscrollBehavior: "none", margin: 0 }}
+        suppressHydrationWarning
+      >
         {/*
           Navbar is position:fixed so it lives OUTSIDE the smoother.
           It floats above everything via z-50 regardless of the scroll wrapper.
         */}
-        <Navbar />
+        <NavbarGate />
 
-        <SmoothScrollProvider>
-          {/*
-            RootLayoutShell should no longer render the Navbar internally.
-            It should only wrap page content (footer, etc.).
-          */}
-          <RootLayoutShell>{children}</RootLayoutShell>
-        </SmoothScrollProvider>
+        <SupabaseAuthProvider>
+          <SmoothScrollProvider>
+            {/*
+              RootLayoutShell should no longer render the Navbar internally.
+              It should only wrap page content (footer, etc.).
+            */}
+            <RootLayoutShell>{children}</RootLayoutShell>
+          </SmoothScrollProvider>
+        </SupabaseAuthProvider>
       </body>
     </html>
   );

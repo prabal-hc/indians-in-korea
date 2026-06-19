@@ -13,6 +13,7 @@ import { HigherEducationModal } from "./HigherEducationModal";
 import { InternationalSchoolsModal } from "./InternationalSchoolsModal";
 import { AboutKoreaModal } from "./AboutKoreaModal";
 import { FAQModal } from "./FAQModal";
+import { useScrollReveal } from "@/hooks/useScrollReveal"; // adjust path
 
 // ── No local GSAP setup needed — SmoothScrollProvider handles all scroll
 // animations globally. We keep framer-motion only for the initial entrance
@@ -201,6 +202,7 @@ const FeatCard = ({
 export const AboutSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: "-100px" });
+  useScrollReveal(sectionRef);
 
   const [openHigherEducation, setOpenHigherEducation] = useState(false);
   const [openInternationalSchools, setOpenInternationalSchools] =

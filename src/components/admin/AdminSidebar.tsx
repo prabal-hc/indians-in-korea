@@ -26,7 +26,7 @@ const navItems = [
   { label: "Events", href: "/admin/events", icon: CalendarDays },
   // { label: "Sports", href: "/admin/sports", icon: Goal },
   { label: "Gallery", href: "/admin/gallery", icon: Image },
-  { label: "Homepage", href: "/admin/homepage", icon: Sparkles },
+  // { label: "Homepage", href: "/admin/homepage", icon: Sparkles },
   {
     label: "Voice of Community",
     href: "/admin/testimonial",

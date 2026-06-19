@@ -1,47 +1,54 @@
 "use client";
 
-import { useState } from "react";
-import { createSupabaseClient } from "@/lib/supabase/client";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default function AdminLoginPage() {
+  const searchParams = useSearchParams();
+  const redirect = useMemo(
+    () => searchParams.get("redirect") ?? "/admin/dashboard",
+    [searchParams],
+  );
+  const initialMessage = useMemo(
+    () => searchParams.get("message") ?? "",
+    [searchParams],
+  );
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialMessage);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     setLoading(true);
 
-    const supabase = createSupabaseClient();
-    if (!supabase) {
-      setError(
-        "Supabase is not configured. Please set the environment variables.",
-      );
+    try {
+      const response = await fetch("/api/admin/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password, redirect }),
+      });
+
+      const body = await response.json();
       setLoading(false);
-      return;
+
+      if (!response.ok) {
+        setError(body.message ?? "Login failed. Please try again.");
+        return;
+      }
+
+      window.location.href = body.redirect ?? "/admin/dashboard";
+    } catch (error) {
+      setLoading(false);
+      setError("Unable to sign in. Please try again.");
     }
-    event.preventDefault();
-    setError("");
-    setLoading(true);
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    setLoading(false);
-
-    if (error) {
-      setError(error.message);
-      return;
-    }
-
-    window.location.href = "/admin/dashboard";
   };
 
   return (

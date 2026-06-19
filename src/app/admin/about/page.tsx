@@ -10,7 +10,6 @@ import {
 import {
   getAboutPageData,
   saveAbout,
-  saveBoardMembers,
   saveContacts,
   type BoardMember,
   type ContactItem,
@@ -77,9 +76,13 @@ export default function AdminAboutPage() {
   const handleSaveBoard = async (members: BoardMember[]) => {
     setSaving(true);
     try {
-      await saveBoardMembers(members);
-      setBoardValues(members);
-      flash("Board saved successfully.");
+      // addBoardMembers expects only newly added members; after saving, re-fetch data
+      const { addBoardMembers } =
+        await import("@/services/admin/about.service");
+      await addBoardMembers(members as any);
+      const fresh = await getAboutPageData();
+      setBoardValues([...fresh.board, ...fresh.advisors, ...fresh.core]);
+      flash("Board updated successfully.");
     } catch {
       alert("Save failed. Please try again.");
     } finally {

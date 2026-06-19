@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import type { BoardMember, ContactItem } from "@/services/admin/about.service";
 
@@ -362,6 +363,11 @@ function BoardForm({
     () => initial?.map((m) => ({ ...m, _key: m.id })) ?? [],
   );
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [draftMember, setDraftMember] = useState<
+    (BoardMember & { _key?: string }) | null
+  >(null);
+  const nameInputRef = useRef<HTMLInputElement | null>(null);
 
   // ✅ Re-sync local state whenever parent passes fresh data (after save + re-fetch)
   useEffect(() => {
@@ -383,12 +389,46 @@ function BoardForm({
 
   // ✅ Fixed stale closure: derive next length inside setter
   const add = () => {
+    // kept for internal callers; prefer `openAddModal` for UI
     setMembers((prev) => {
       const next = [...prev, emptyMember()];
       setOpenIdx(next.length - 1);
       return next;
     });
   };
+
+  const openAddModal = () => {
+    const e = emptyMember();
+    setDraftMember(e);
+    setShowAddModal(true);
+    // focus name input after portal mounts
+    setTimeout(() => nameInputRef.current?.focus(), 50);
+  };
+
+  const closeAddModal = () => {
+    setShowAddModal(false);
+    setDraftMember(null);
+  };
+
+  const submitAddModal = () => {
+    if (!draftMember || !draftMember.name.trim()) {
+      // require a name
+      return;
+    }
+    setMembers((prev) => {
+      const next = [...prev, draftMember];
+      setOpenIdx(next.length - 1);
+      return next;
+    });
+    closeAddModal();
+  };
+
+  // NOTE: previously this was a `ModalPortal` component defined here, inside
+  // BoardForm's render body. That meant a brand-new component function was
+  // created on every render, so React unmounted/remounted the entire portal
+  // subtree (including the input) on every keystroke — which is what was
+  // breaking the popup's input field. We now call `createPortal` directly
+  // in the JSX below instead, so no wrapper component gets recreated.
 
   const autoInitials = (name: string) =>
     name
@@ -404,26 +444,55 @@ function BoardForm({
     core: members.filter((m) => m.type === "core"),
   };
 
+  // detect UUIDs: treat non-UUID ids as new
+  const UUID_RE =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        onSubmit(members.filter((m) => m.name.trim()) as BoardMember[]);
+        const newMembers = members
+          .filter((m) => !UUID_RE.test(m.id) && m.name.trim())
+          .map((m) => ({
+            name: m.name,
+            initials: m.initials,
+            role: m.role,
+            profession: m.profession ?? null,
+            koreanTitle: m.koreanTitle ?? null,
+            type: m.type,
+            imageUrl: m.imageUrl ?? null,
+            displayOrder: m.displayOrder ?? 0,
+            isActive: m.isActive ?? true,
+          }));
+        onSubmit(newMembers as BoardMember[]);
       }}
       className="space-y-8"
     >
-      <div className="grid grid-cols-3 gap-3">
-        {TYPE_OPTIONS.map(({ value, label }) => (
-          <div
-            key={value}
-            className={`rounded-2xl border px-4 py-3 text-center ${TYPE_COLORS[value]}`}
+      <div className="flex items-start justify-between">
+        <div className="grid grid-cols-3 gap-3">
+          {TYPE_OPTIONS.map(({ value, label }) => (
+            <div
+              key={value}
+              className={`rounded-2xl border px-4 py-3 text-center ${TYPE_COLORS[value]}`}
+            >
+              <p className="text-lg font-bold">{grouped[value].length}</p>
+              <p className="text-[11px] font-semibold uppercase tracking-wide mt-0.5">
+                {label}s
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div>
+          <button
+            type="button"
+            onClick={openAddModal}
+            className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-orange-300 px-4 py-2 text-xs font-semibold text-orange-500 hover:bg-orange-50 transition"
           >
-            <p className="text-lg font-bold">{grouped[value].length}</p>
-            <p className="text-[11px] font-semibold uppercase tracking-wide mt-0.5">
-              {label}s
-            </p>
-          </div>
-        ))}
+            + Add member
+          </button>
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -605,11 +674,119 @@ function BoardForm({
 
       <button
         type="button"
-        onClick={add}
+        onClick={openAddModal}
         className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-orange-300 px-5 py-2 text-xs font-semibold text-orange-500 hover:bg-orange-50 transition"
       >
         + Add member
       </button>
+
+      {showAddModal &&
+        draftMember &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div
+              className="absolute inset-0 bg-black/40"
+              onClick={closeAddModal}
+            />
+            <div className="relative w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl">
+              <h3 className="text-sm font-bold mb-4">Add board member</h3>
+              <div className="space-y-3">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="space-y-1.5 block">
+                    <span className="text-xs font-semibold text-slate-700">
+                      Full name *
+                    </span>
+                    <input
+                      ref={nameInputRef}
+                      autoFocus
+                      value={draftMember.name}
+                      onChange={(e) =>
+                        setDraftMember((prev) =>
+                          prev ? { ...prev, name: e.target.value } : prev,
+                        )
+                      }
+                      className={field}
+                      placeholder="Full name"
+                    />
+                  </label>
+                  <label className="space-y-1.5 block">
+                    <span className="text-xs font-semibold text-slate-700">
+                      Role / Title
+                    </span>
+                    <input
+                      value={draftMember.role}
+                      onChange={(e) =>
+                        setDraftMember((prev) =>
+                          prev ? { ...prev, role: e.target.value } : prev,
+                        )
+                      }
+                      className={field}
+                      placeholder="President"
+                    />
+                  </label>
+                  <label className="space-y-1.5 block">
+                    <span className="text-xs font-semibold text-slate-700">
+                      Profession
+                    </span>
+                    <input
+                      value={draftMember.profession ?? ""}
+                      onChange={(e) =>
+                        setDraftMember((prev) =>
+                          prev ? { ...prev, profession: e.target.value } : prev,
+                        )
+                      }
+                      className={field}
+                      placeholder="Organization"
+                    />
+                  </label>
+                  <label className="space-y-1.5 block">
+                    <span className="text-xs font-semibold text-slate-700">
+                      Type
+                    </span>
+                    <select
+                      value={draftMember.type}
+                      onChange={(e) =>
+                        setDraftMember((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                type: e.target.value as BoardMember["type"],
+                              }
+                            : prev,
+                        )
+                      }
+                      className={field}
+                    >
+                      {TYPE_OPTIONS.map((t) => (
+                        <option key={t.value} value={t.value}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={closeAddModal}
+                    className="rounded-3xl px-4 py-2 text-sm font-semibold border"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={submitAddModal}
+                    className="rounded-3xl bg-orange-500 px-4 py-2 text-sm font-bold text-white"
+                  >
+                    Add member
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
 
       <SaveBtn label="Save Board" saving={saving} />
     </form>

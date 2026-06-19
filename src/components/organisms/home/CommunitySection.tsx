@@ -198,7 +198,7 @@ const KoreaMap = () => (
             fontSize="11"
             fontWeight="600"
             fill="#FF9933"
-            fontFamily="DM Sans, sans-serif"
+            fontFamily="Plus Jakarta Sans, sans-serif"
           >
             Seoul Metro
           </text>
@@ -207,7 +207,7 @@ const KoreaMap = () => (
             y="162"
             fontSize="10"
             fill="#64748b"
-            fontFamily="DM Sans, sans-serif"
+            fontFamily="Plus Jakarta Sans, sans-serif"
           >
             Bengali · Marathi · KTN
           </text>
@@ -258,7 +258,7 @@ const KoreaMap = () => (
             fontSize="11"
             fontWeight="600"
             fill="#138808"
-            fontFamily="DM Sans, sans-serif"
+            fontFamily="Plus Jakarta Sans, sans-serif"
           >
             Busan
           </text>
@@ -267,7 +267,7 @@ const KoreaMap = () => (
             y="305"
             fontSize="10"
             fill="#64748b"
-            fontFamily="DM Sans, sans-serif"
+            fontFamily="Plus Jakarta Sans, sans-serif"
           >
             Arts &amp; Culture
           </text>
@@ -294,7 +294,7 @@ const KoreaMap = () => (
           fontSize="11"
           fontWeight="600"
           fill="#FF9933"
-          fontFamily="DM Sans, sans-serif"
+          fontFamily="Plus Jakarta Sans, sans-serif"
         >
           Uijeongbu
         </text>
@@ -303,7 +303,7 @@ const KoreaMap = () => (
           y="135"
           fontSize="10"
           fill="#64748b"
-          fontFamily="DM Sans, sans-serif"
+          fontFamily="Plus Jakarta Sans, sans-serif"
         >
           ISKCON Korea Temple
         </text>
@@ -317,7 +317,7 @@ const KoreaMap = () => (
         fontWeight="700"
         fill="#475569"
         letterSpacing="6"
-        fontFamily="DM Sans, sans-serif"
+        fontFamily="Plus Jakarta Sans, sans-serif"
       >
         SOUTH KOREA
       </text>

@@ -51,40 +51,48 @@ export async function getById(id: string) {
 }
 
 export async function create(data: Omit<AnnouncementItem, "id">) {
-  const { data: created, error } = await getSupabase()
-    .from("announcements")
-    .insert([data])
-    .select()
-    .single();
+  const response = await fetch("/api/admin/announcements/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
-  if (error) throw error;
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to create announcement");
+  }
 
-  return created;
+  return await response.json();
 }
 
 export async function update(id: string, data: Partial<AnnouncementItem>) {
-  const { data: updated, error } = await getSupabase()
-    .from("announcements")
-    .update({
-      ...data,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", id)
-    .select()
-    .single();
+  const response = await fetch(`/api/admin/announcements/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
-  if (error) throw error;
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to update announcement");
+  }
 
-  return updated;
+  return await response.json();
 }
 
 export async function remove(id: string) {
-  const { error } = await getSupabase()
-    .from("announcements")
-    .delete()
-    .eq("id", id);
+  const response = await fetch(`/api/admin/announcements/${id}`, {
+    method: "DELETE",
+  });
 
-  if (error) throw error;
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to delete announcement");
+  }
 
   return true;
 }

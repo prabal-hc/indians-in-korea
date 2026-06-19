@@ -88,58 +88,47 @@ export async function getById(id: string): Promise<GalleryItem | null> {
 export async function create(
   data: Omit<GalleryItem, "id">,
 ): Promise<GalleryItem> {
-  const { data: created, error } = await getSupabase()
-    .from("gallery")
-    .insert([
-      {
-        title: data.title,
-        caption: data.caption || null,
-        tag: data.tag,
-        tag_color: data.tagColor,
-        year: data.year || new Date().getFullYear().toString(),
-        likes: data.likes || 0,
-        image_url: data.imageUrl || null,
-        is_active: data.status === "Published",
-        display_order: data.displayOrder || 0,
-      },
-    ])
-    .select()
-    .single();
+  const response = await fetch("/api/admin/gallery/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
-  if (error) throw error;
-  return mapItem(created);
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to create gallery item");
+  }
+
+  return mapItem(await response.json());
 }
 
 export async function update(
   id: string,
   data: Partial<GalleryItem>,
 ): Promise<GalleryItem> {
-  const payload: Record<string, any> = {};
-  if (data.title !== undefined) payload.title = data.title;
-  if (data.caption !== undefined) payload.caption = data.caption || null;
-  if (data.tag !== undefined) payload.tag = data.tag;
-  if (data.tagColor !== undefined) payload.tag_color = data.tagColor;
-  if (data.year !== undefined) payload.year = data.year;
-  if (data.likes !== undefined) payload.likes = data.likes;
-  if (data.imageUrl !== undefined) payload.image_url = data.imageUrl || null;
-  if (data.displayOrder !== undefined)
-    payload.display_order = data.displayOrder;
-  if (data.status !== undefined)
-    payload.is_active = data.status === "Published";
+  const response = await fetch(`/api/admin/gallery/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
-  const { data: updated, error } = await getSupabase()
-    .from("gallery")
-    .update(payload)
-    .eq("id", id)
-    .select()
-    .single();
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to update gallery item");
+  }
 
-  if (error) throw error;
-  return mapItem(updated);
+  return mapItem(await response.json());
 }
 
 export async function remove(id: string): Promise<boolean> {
-  const { error } = await getSupabase().from("gallery").delete().eq("id", id);
-  if (error) throw error;
+  const response = await fetch(`/api/admin/gallery/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to delete gallery item");
+  }
+
   return true;
 }

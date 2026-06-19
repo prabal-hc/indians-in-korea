@@ -183,24 +183,24 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
+  // Transparent "hero" treatment is only ever true on the homepage hero.
   const [heroMode, setHeroMode] = useState(isHome);
   const lastScrollY = useRef(0);
 
   const isActive = (href: string) => href !== "#" && pathname === href;
 
   // ── Scroll listener — reads ScrollSmoother, falls back to window ──────
+  // Runs on every page so the bar's "scrolled" / "hidden" behavior is always
+  // live. Only `heroMode` (the transparent navbar) is gated to the homepage
+  // hero section — every other page (and the rest of the homepage) just gets
+  // the normal white bar with its usual scroll-based opacity/shadow/hide.
   useEffect(() => {
-    if (!isHome) {
-      setHeroMode(false);
-      setScrolled(false);
-      setHidden(false);
-      return;
-    }
+    lastScrollY.current = 0;
 
     const handleScroll = (currentY: number) => {
       const vh = window.innerHeight;
 
-      setHeroMode(currentY < vh * 0.72);
+      setHeroMode(isHome ? currentY < vh * 0.72 : false);
       setScrolled(currentY > 80);
 
       if (currentY > lastScrollY.current && currentY > 140) {
@@ -228,7 +228,7 @@ const Navbar = () => {
         // Set initial state
         handleScroll(smoother.scrollTop());
       } else {
-        // Fallback: native scroll (non-home pages, or if smoother not ready)
+        // Fallback: native scroll
         const onNativeScroll = () => handleScroll(window.scrollY);
         window.addEventListener("scroll", onNativeScroll, { passive: true });
         handleScroll(window.scrollY);
@@ -340,11 +340,15 @@ const Navbar = () => {
                   heroMode ? "text-white/90" : "text-gray-700"
                 }`}
               >
-                <span className={heroMode ? "text-orange-400" : "text-orange-600"}>
+                <span
+                  className={heroMode ? "text-orange-400" : "text-orange-600"}
+                >
                   INDIANS
                 </span>{" "}
                 IN{" "}
-                <span className={heroMode ? "text-green-400" : "text-[#138808]"}>
+                <span
+                  className={heroMode ? "text-green-400" : "text-[#138808]"}
+                >
                   KOREA
                 </span>
               </span>
@@ -421,7 +425,10 @@ const Navbar = () => {
                   exit={{ rotate: 45, opacity: 0 }}
                   transition={{ duration: 0.18 }}
                 >
-                  <X size={17} className={heroMode ? "text-white" : "text-gray-700"} />
+                  <X
+                    size={17}
+                    className={heroMode ? "text-white" : "text-gray-700"}
+                  />
                 </motion.span>
               ) : (
                 <motion.span
@@ -431,7 +438,10 @@ const Navbar = () => {
                   exit={{ rotate: -45, opacity: 0 }}
                   transition={{ duration: 0.18 }}
                 >
-                  <Menu size={17} className={heroMode ? "text-white" : "text-gray-700"} />
+                  <Menu
+                    size={17}
+                    className={heroMode ? "text-white" : "text-gray-700"}
+                  />
                 </motion.span>
               )}
             </AnimatePresence>
@@ -490,7 +500,10 @@ const Navbar = () => {
               <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mb-4" />
 
               <div className="relative mb-3">
-                <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Search
+                  size={14}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+                />
                 <input
                   type="text"
                   placeholder="Search community..."

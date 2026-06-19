@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, useInView, animate } from "framer-motion";
-import { MapPin, Users, ExternalLink } from "lucide-react";
+import { MapPin, Users, ExternalLink, Flag, Trophy } from "lucide-react";
 import { getAll, type CommunityItem } from "@/services/community.service";
 
 // ─── Static accent map (maps DB accent_color to full card theme) ──────────────
@@ -395,10 +395,9 @@ export default function CommunitiesPage() {
       className={`communities-root min-h-screen bg-orange-50/60 text-stone-900 overflow-x-hidden relative transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0"}`}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         .communities-root { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-        .font-playfair { font-family: 'Playfair Display', Georgia, serif; }
-        .communities-root h1,.communities-root h2,.communities-root h3 { font-family: 'Playfair Display', Georgia, serif; }
+        .font-playfair { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        .communities-root h1,.communities-root h2,.communities-root h3 { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
         .label-caps { font-family:'Plus Jakarta Sans',system-ui,sans-serif; font-weight:700; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; }
         @keyframes shimmerSweep { 0%{left:-100%} 100%{left:160%} }
         @keyframes gradShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
@@ -573,7 +572,10 @@ export default function CommunitiesPage() {
 
           {filtered.length === 0 ? (
             <div className="text-center py-20 px-6">
-              <p className="text-4xl mb-3">🏳️</p>
+              <Flag
+                className="w-10 h-10 mx-auto mb-3 text-stone-300"
+                strokeWidth={1.5}
+              />
               <p className="text-stone-500 font-medium">
                 No communities in this category yet.
               </p>
@@ -701,8 +703,8 @@ export default function CommunitiesPage() {
                         Cricket Club
                       </h3>
                     </div>
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-100 text-2xl">
-                      🏏
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-100 text-orange-600">
+                      <Trophy className="h-7 w-7" strokeWidth={1.75} />
                     </div>
                   </div>
                   <p className="mt-4 text-sm leading-relaxed text-stone-600">

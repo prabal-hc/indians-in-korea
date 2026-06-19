@@ -2,6 +2,13 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import {
+  PiXBold,
+  PiFlag,
+  PiFlower,
+  PiMusicNotes,
+  PiGlobeHemisphereEast,
+} from "react-icons/pi";
 import { ModalPortal } from "./ModalPortal";
 
 interface AboutKoreaModalProps {
@@ -12,7 +19,7 @@ interface AboutKoreaModalProps {
 const SECTIONS = [
   {
     id: "flag",
-    emoji: "🇰🇷",
+    icon: PiFlag,
     label: "National Symbol",
     title: "The National Flag of Korea",
     subtitle: "태극기 · Taegeukgi",
@@ -56,7 +63,7 @@ const SECTIONS = [
   },
   {
     id: "flower",
-    emoji: "🌸",
+    icon: PiFlower,
     label: "National Symbol",
     title: "The National Flower of Korea",
     subtitle: "무궁화 · Mugunghwa",
@@ -87,7 +94,7 @@ const SECTIONS = [
   },
   {
     id: "anthem",
-    emoji: "🎵",
+    icon: PiMusicNotes,
     label: "National Symbol",
     title: "The National Anthem of Korea",
     subtitle: "애국가 · Aegukga",
@@ -190,8 +197,8 @@ export function AboutKoreaModal({ open, onClose }: AboutKoreaModalProps) {
 
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-100 text-2xl shadow-sm">
-                  🌏
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-600 shadow-sm">
+                  <PiGlobeHemisphereEast className="h-7 w-7" />
                 </div>
                 <div>
                   <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-blue-600">
@@ -212,19 +219,7 @@ export function AboutKoreaModal({ open, onClose }: AboutKoreaModalProps) {
                 aria-label="Close"
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-500 transition hover:bg-slate-200"
               >
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <PiXBold className="h-4 w-4" />
               </button>
             </div>
 
@@ -241,7 +236,7 @@ export function AboutKoreaModal({ open, onClose }: AboutKoreaModalProps) {
                       : "text-slate-400 hover:text-slate-600"
                   }`}
                 >
-                  <span className="mr-1.5">{s.emoji}</span>
+                  <s.icon className="mr-1.5 inline h-4 w-4 -translate-y-0.5" />
                   {s.id === "flag"
                     ? "Flag"
                     : s.id === "flower"
@@ -259,8 +254,8 @@ export function AboutKoreaModal({ open, onClose }: AboutKoreaModalProps) {
           <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-5 sm:px-8">
             {/* Section hero */}
             <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-100 text-2xl shadow-sm">
-                {section.emoji}
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-100 text-blue-600 shadow-sm">
+                <section.icon className="h-6 w-6" />
               </div>
               <div>
                 <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-blue-500">
@@ -289,8 +284,12 @@ export function AboutKoreaModal({ open, onClose }: AboutKoreaModalProps) {
               <div className="lg:col-span-2">
                 {section.content
                   .filter((c) => c.type === "facts")
-                  .map((c, i) =>
-                    "items" in c ? (
+                  .map((c, i) => {
+                    const items = (
+                      c as { items: Array<{ label: string; value: string }> }
+                    ).items;
+
+                    return (
                       <div
                         key={i}
                         className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm"
@@ -299,11 +298,7 @@ export function AboutKoreaModal({ open, onClose }: AboutKoreaModalProps) {
                           Quick Facts
                         </p>
                         <div className="space-y-2.5">
-                          {(
-                            c as {
-                              items: Array<{ label: string; value: string }>;
-                            }
-                          ).items.map((item, j) => (
+                          {items.map((item, j) => (
                             <div key={j} className="flex flex-col gap-0.5">
                               <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                                 {item.label}
@@ -311,24 +306,15 @@ export function AboutKoreaModal({ open, onClose }: AboutKoreaModalProps) {
                               <span className="text-xs font-medium text-slate-700">
                                 {item.value}
                               </span>
-                              {j <
-                                (
-                                  c as {
-                                    items: Array<{
-                                      label: string;
-                                      value: string;
-                                    }>;
-                                  }
-                                ).items.length -
-                                  1 && (
+                              {j < items.length - 1 && (
                                 <div className="mt-2 h-px bg-slate-50" />
                               )}
                             </div>
                           ))}
                         </div>
                       </div>
-                    ) : null,
-                  )}
+                    );
+                  })}
               </div>
             </div>
           </div>

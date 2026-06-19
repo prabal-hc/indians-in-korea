@@ -45,6 +45,7 @@ import {
   Calendar,
   Wifi,
   CreditCard,
+  Siren,
 } from "lucide-react";
 import { Heading } from "@/components/atoms/Heading";
 
@@ -54,11 +55,15 @@ gsap.registerPlugin(ScrollTrigger);
 // TYPES
 // ─────────────────────────────────────────────────────────────────────────────
 
+// A detail line can be plain text, or text paired with its own icon
+// (used for items like the emergency numbers list).
+type DetailLine = string | { icon: React.ReactNode; text: string };
+
 interface ResourceItem {
   title: string;
   icon: React.ReactNode;
   description: string;
-  details: string[];
+  details: DetailLine[];
   link?: { label: string; url: string };
   tags: string[];
 }
@@ -462,14 +467,35 @@ const resourceCategories: ResourceCategory[] = [
         description:
           "Save these numbers before you need them. Emergencies don't wait.",
         details: [
-          "🚨 112 — Police (criminal emergencies, theft, assault). English operators available.",
-          "🚑 119 — Ambulance & Fire. Call for any medical emergency. Some English support.",
-          "☎️ 1345 — Korea Immigration & Foreigner Support. 24/7. Available in English, Chinese, and other languages.",
-          "☎️ 1399 — Foreign Language Support Center. Help for foreigners in everyday situations.",
-          "🏛️ Indian Embassy Seoul: +82-2-798-4257 | emergencies: +82-10-5371-7700.",
+          {
+            icon: <Shield className="w-3.5 h-3.5" />,
+            text: "112 — Police (criminal emergencies, theft, assault). English operators available.",
+          },
+          {
+            icon: <Siren className="w-3.5 h-3.5" />,
+            text: "119 — Ambulance & Fire. Call for any medical emergency. Some English support.",
+          },
+          {
+            icon: <Phone className="w-3.5 h-3.5" />,
+            text: "1345 — Korea Immigration & Foreigner Support. 24/7. Available in English, Chinese, and other languages.",
+          },
+          {
+            icon: <Phone className="w-3.5 h-3.5" />,
+            text: "1399 — Foreign Language Support Center. Help for foreigners in everyday situations.",
+          },
+          {
+            icon: <Landmark className="w-3.5 h-3.5" />,
+            text: "Indian Embassy Seoul: +82-2-798-4257 | emergencies: +82-10-5371-7700.",
+          },
           "Indian Embassy Emergency Email: emb.seoul@mea.gov.in",
-          "🏥 After-hours medical: 'Night Pharmacy' (야간약국) — search Naver for nearest one. Most open until midnight.",
-          "Seoul Global Emergency Center: +82-2-1588-1830.",
+          {
+            icon: <Hospital className="w-3.5 h-3.5" />,
+            text: "After-hours medical: 'Night Pharmacy' (야간약국) — search Naver for nearest one. Most open until midnight.",
+          },
+          {
+            icon: <Phone className="w-3.5 h-3.5" />,
+            text: "Seoul Global Emergency Center: +82-2-1588-1830.",
+          },
         ],
         tags: ["112", "119", "1345", "Embassy"],
       },
@@ -806,7 +832,9 @@ const HeroFloatCard = ({
       animationDelay: `${delay * 0.5}s`,
     }}
   >
-    <span className="text-lg">{icon}</span>
+    <span className="flex items-center justify-center w-5 h-5 text-orange-500">
+      {icon}
+    </span>
     <span className="text-[11px] font-semibold text-stone-700 whitespace-nowrap">
       {label}
     </span>
@@ -945,27 +973,40 @@ const AccordionItem = ({
                   border: `1px solid ${accent}15`,
                 }}
               >
-                {item.details.map((detail, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      duration: 0.28,
-                      delay: i * 0.045,
-                      ease: "easeOut",
-                    }}
-                    className="flex items-start gap-2.5"
-                  >
-                    <span
-                      className="flex-shrink-0 mt-[6px] w-1.5 h-1.5 rounded-full"
-                      style={{ background: accent }}
-                    />
-                    <p className="text-xs text-stone-700 leading-relaxed">
-                      {detail}
-                    </p>
-                  </motion.div>
-                ))}
+                {item.details.map((detail, i) => {
+                  const hasIcon = typeof detail !== "string";
+                  const text = hasIcon ? detail.text : detail;
+                  return (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{
+                        duration: 0.28,
+                        delay: i * 0.045,
+                        ease: "easeOut",
+                      }}
+                      className="flex items-start gap-2.5"
+                    >
+                      {hasIcon ? (
+                        <span
+                          className="flex-shrink-0 mt-[2px] flex items-center justify-center"
+                          style={{ color: accent }}
+                        >
+                          {detail.icon}
+                        </span>
+                      ) : (
+                        <span
+                          className="flex-shrink-0 mt-[6px] w-1.5 h-1.5 rounded-full"
+                          style={{ background: accent }}
+                        />
+                      )}
+                      <p className="text-xs text-stone-700 leading-relaxed">
+                        {text}
+                      </p>
+                    </motion.div>
+                  );
+                })}
                 {item.link && (
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -1194,25 +1235,25 @@ export default function ResourcesPageContent() {
         <div className="relative mx-auto max-w-5xl text-center">
           {/* Floating mini cards */}
           <HeroFloatCard
-            icon="🛂"
+            icon={<FileText className="w-4 h-4" />}
             label="Visa Help"
             delay={0.9}
             className="-left-4 top-12"
           />
           <HeroFloatCard
-            icon="🏠"
+            icon={<Home className="w-4 h-4" />}
             label="Housing Tips"
             delay={1.1}
             className="-right-8 top-8"
           />
           <HeroFloatCard
-            icon="🚨"
+            icon={<AlertCircle className="w-4 h-4" />}
             label="Emergency Contacts"
             delay={1.3}
             className="-left-2 bottom-4"
           />
           <HeroFloatCard
-            icon="🎓"
+            icon={<GraduationCap className="w-4 h-4" />}
             label="Student Guide"
             delay={1.5}
             className="-right-4 bottom-8"
@@ -1259,13 +1300,13 @@ export default function ResourcesPageContent() {
                 }}
               />
               <span
-                className="text-base"
+                className="flex items-center justify-center w-4 h-4"
                 style={{
                   animation: "iconPulse 2.8s ease-in-out infinite",
-                  display: "inline-block",
+                  display: "inline-flex",
                 }}
               >
-                📖
+                <BookOpen className="w-4 h-4" />
               </span>
               <span className="text-[11px] font-bold tracking-[0.2em] uppercase relative z-10">
                 Comprehensive Resources

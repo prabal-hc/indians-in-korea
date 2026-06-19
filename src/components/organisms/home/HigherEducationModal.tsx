@@ -2,6 +2,18 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import {
+  PiXBold,
+  PiCaretRightBold,
+  PiArrowSquareOut,
+  PiBookOpen,
+  PiGraduationCap,
+  PiHandshake,
+  PiBank,
+  PiScroll,
+  PiMicroscope,
+  PiLightning,
+} from "react-icons/pi";
 import { ModalPortal } from "./ModalPortal";
 
 interface HigherEducationModalProps {
@@ -24,7 +36,7 @@ const UNIVERSITIES = [
     accent: "#4f46e5",
     accentLight: "rgba(79,70,229,0.08)",
     accentBorder: "rgba(79,70,229,0.2)",
-    emoji: "🏛️",
+    icon: PiBank,
     stats: [
       { label: "QS Asia Rank", value: "#7" },
       { label: "Students", value: "30K+" },
@@ -52,7 +64,7 @@ const UNIVERSITIES = [
     accent: "#dc2626",
     accentLight: "rgba(220,38,38,0.08)",
     accentBorder: "rgba(220,38,38,0.2)",
-    emoji: "📜",
+    icon: PiScroll,
     stats: [
       { label: "Founded", value: "1905" },
       { label: "Undergrads", value: "20K+" },
@@ -81,7 +93,7 @@ const UNIVERSITIES = [
     accent: "#0891b2",
     accentLight: "rgba(8,145,178,0.08)",
     accentBorder: "rgba(8,145,178,0.2)",
-    emoji: "🔬",
+    icon: PiMicroscope,
     stats: [
       { label: "Founded", value: "1885" },
       { label: "Colleges", value: "21" },
@@ -109,7 +121,7 @@ const UNIVERSITIES = [
     accent: "#059669",
     accentLight: "rgba(5,150,105,0.08)",
     accentBorder: "rgba(5,150,105,0.2)",
-    emoji: "⚡",
+    icon: PiLightning,
     stats: [
       { label: "Founded", value: "1398" },
       { label: "Campuses", value: "2" },
@@ -209,14 +221,16 @@ function UniversityCard({ uni }: { uni: (typeof UNIVERSITIES)[0] }) {
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-3">
             <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
               style={{
                 background: uni.accentLight,
                 border: `1.5px solid ${uni.accentBorder}`,
+                color: uni.accent,
               }}
             >
-              {uni.emoji}
+              <uni.icon className="h-5 w-5" />
             </div>
+
             <div>
               <div className="flex flex-wrap items-center gap-1.5">
                 <h4 className="text-xs font-bold leading-snug text-slate-900">
@@ -235,23 +249,13 @@ function UniversityCard({ uni }: { uni: (typeof UNIVERSITIES)[0] }) {
             </div>
           </div>
           {/* Chevron */}
-          <svg
+          <PiCaretRightBold
             className="mt-0.5 h-3.5 w-3.5 shrink-0 transition-transform duration-200"
             style={{
               color: expanded ? uni.accent : "#94a3b8",
               transform: expanded ? "rotate(90deg)" : "rotate(0deg)",
             }}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2.5}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
+          />
         </div>
 
         {/* Tagline */}
@@ -311,19 +315,7 @@ function UniversityCard({ uni }: { uni: (typeof UNIVERSITIES)[0] }) {
                 className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold text-white transition-all hover:opacity-90"
                 style={{ background: uni.accent }}
               >
-                <svg
-                  className="h-2.5 w-2.5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
+                <PiArrowSquareOut className="h-2.5 w-2.5" />
                 Official Website
               </a>
               {uni.studyLink && (
@@ -339,19 +331,7 @@ function UniversityCard({ uni }: { uni: (typeof UNIVERSITIES)[0] }) {
                     background: uni.accentLight,
                   }}
                 >
-                  <svg
-                    className="h-2.5 w-2.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                    />
-                  </svg>
+                  <PiBookOpen className="h-2.5 w-2.5" />
                   Study in Korea Portal
                 </a>
               )}
@@ -421,8 +401,8 @@ export function HigherEducationModal({
 
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-amber-100 text-2xl shadow-sm">
-                  🎓
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-amber-100 text-orange-500 shadow-sm">
+                  <PiGraduationCap className="h-7 w-7" />
                 </div>
                 <div>
                   <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-orange-500">
@@ -443,19 +423,7 @@ export function HigherEducationModal({
                 aria-label="Close"
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-500 transition hover:bg-slate-200"
               >
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <PiXBold className="h-4 w-4" />
               </button>
             </div>
 
@@ -473,8 +441,13 @@ export function HigherEducationModal({
                   }`}
                 >
                   <span className="mr-1.5">
-                    {tab === "universities" ? "🏫" : "🤝"}
+                    {tab === "universities" ? (
+                      <PiGraduationCap className="inline h-4 w-4" />
+                    ) : (
+                      <PiHandshake className="inline h-4 w-4" />
+                    )}
                   </span>
+
                   {tab === "universities" ? "Universities" : "IIK Support"}
                   {activeTab === tab && (
                     <span className="absolute bottom-0 left-0 right-5 h-0.5 rounded-full bg-orange-500" />
@@ -517,19 +490,7 @@ export function HigherEducationModal({
                       </p>
                     </div>
                   </div>
-                  <svg
-                    className="h-4 w-4 shrink-0 text-orange-400 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
+                  <PiArrowSquareOut className="h-4 w-4 shrink-0 text-orange-400 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </a>
               </div>
             )}
@@ -615,19 +576,7 @@ export function HigherEducationModal({
                             {c.value}
                           </p>
                         </div>
-                        <svg
-                          className="h-3.5 w-3.5 shrink-0 text-orange-400 transition-transform group-hover:translate-x-0.5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2.5}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
+                        <PiCaretRightBold className="h-3.5 w-3.5 shrink-0 text-orange-400 transition-transform group-hover:translate-x-0.5" />
                       </a>
                     ))}
                   </div>

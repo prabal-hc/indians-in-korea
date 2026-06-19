@@ -95,64 +95,47 @@ export async function getAllAdmin(): Promise<TestimonialItem[]> {
 export async function create(
   data: Omit<TestimonialItem, "id">,
 ): Promise<TestimonialItem> {
-  const { data: created, error } = await getSupabase()
-    .from("testimonials")
-    .insert([
-      {
-        name: data.name,
-        initials: data.initials || toInitials(data.name),
-        role: data.role,
-        location: data.location,
-        color: data.color,
-        quote: data.quote,
-        rating: data.rating ?? 5,
-        is_active: data.status === "Published",
-        is_verified: data.isVerified ?? true,
-        display_order: data.displayOrder ?? 0,
-      },
-    ])
-    .select()
-    .single();
+  const response = await fetch("/api/admin/testimonials/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
-  if (error) throw error;
-  return mapItem(created);
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to create testimonial");
+  }
+
+  return mapItem(await response.json());
 }
 
 export async function update(
   id: string,
   data: Partial<TestimonialItem>,
 ): Promise<TestimonialItem> {
-  const payload: Record<string, any> = {};
-  if (data.name !== undefined) payload.name = data.name;
-  if (data.initials !== undefined)
-    payload.initials = data.initials || toInitials(data.name ?? "");
-  if (data.role !== undefined) payload.role = data.role;
-  if (data.location !== undefined) payload.location = data.location;
-  if (data.color !== undefined) payload.color = data.color;
-  if (data.quote !== undefined) payload.quote = data.quote;
-  if (data.rating !== undefined) payload.rating = data.rating;
-  if (data.isVerified !== undefined) payload.is_verified = data.isVerified;
-  if (data.displayOrder !== undefined)
-    payload.display_order = data.displayOrder;
-  if (data.status !== undefined)
-    payload.is_active = data.status === "Published";
+  const response = await fetch(`/api/admin/testimonials/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
-  const { data: updated, error } = await getSupabase()
-    .from("testimonials")
-    .update(payload)
-    .eq("id", id)
-    .select()
-    .single();
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to update testimonial");
+  }
 
-  if (error) throw error;
-  return mapItem(updated);
+  return mapItem(await response.json());
 }
 
 export async function remove(id: string): Promise<boolean> {
-  const { error } = await getSupabase()
-    .from("testimonials")
-    .delete()
-    .eq("id", id);
-  if (error) throw error;
+  const response = await fetch(`/api/admin/testimonials/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to delete testimonial");
+  }
+
   return true;
 }

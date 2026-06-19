@@ -109,63 +109,47 @@ export async function getById(id: string): Promise<EventItem | null> {
 export async function create(
   data: Omit<EventItem, "id"> & { isActive?: boolean },
 ): Promise<EventItem> {
-  const { data: created, error } = await getSupabase()
-    .from("events")
-    .insert([
-      {
-        title: data.title,
-        category: data.category,
-        is_active: data.isActive ?? data.status === "Published",
-        event_date: data.date,
-        time: data.time ?? null,
-        location: data.location,
-        description: data.description,
-        image_url: data.imageUrl ?? null,
-        attendees: data.attendees ?? "0",
-      },
-    ])
-    .select()
-    .single();
+  const response = await fetch("/api/admin/events/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
-  if (error) throw error;
-  return mapEvent(created);
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to create event");
+  }
+
+  return mapEvent(await response.json());
 }
 
 export async function update(
   id: string,
   data: Partial<EventItem> & { isActive?: boolean },
 ): Promise<EventItem> {
-  const payload: Record<string, any> = {};
+  const response = await fetch(`/api/admin/events/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
-  if (data.title !== undefined) payload.title = data.title;
-  if (data.category !== undefined) payload.category = data.category;
-  if (data.date !== undefined) payload.event_date = data.date;
-  if (data.time !== undefined) payload.time = data.time ?? null;
-  if (data.location !== undefined) payload.location = data.location;
-  if (data.description !== undefined) payload.description = data.description;
-  if (data.imageUrl !== undefined) payload.image_url = data.imageUrl ?? null;
-  if (data.attendees !== undefined) payload.attendees = data.attendees;
-
-  // is_active: accept explicit boolean or derive from status string
-  if (typeof data.isActive === "boolean") {
-    payload.is_active = data.isActive;
-  } else if (data.status !== undefined) {
-    payload.is_active = data.status === "Published";
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to update event");
   }
 
-  const { data: updated, error } = await getSupabase()
-    .from("events")
-    .update(payload)
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return mapEvent(updated);
+  return mapEvent(await response.json());
 }
 
 export async function remove(id: string): Promise<boolean> {
-  const { error } = await getSupabase().from("events").delete().eq("id", id);
-  if (error) throw error;
+  const response = await fetch(`/api/admin/events/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to delete event");
+  }
+
   return true;
 }

@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       replyTo: email,
       subject: `[IIK Contact] ${subject}`,
       html: `
-        <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #fed7aa;border-radius:12px;">
+        <div style="font-family:'Plus Jakarta Sans', system-ui, sans-serif;max-width:600px;margin:0 auto;padding:24px;border:1px solid #fed7aa;border-radius:12px;">
           <h2 style="color:#ea580c;margin-bottom:4px;">New Message — Indians in Korea</h2>
           <p style="color:#9ca3af;font-size:13px;margin-top:0;">Submitted via the IIK Contact Form</p>
           <hr style="border:none;border-top:1px solid #ffedd5;margin:20px 0;" />

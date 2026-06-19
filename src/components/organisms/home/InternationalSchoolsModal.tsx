@@ -2,6 +2,13 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import {
+  PiXBold,
+  PiBuildings,
+  PiMagnifyingGlass,
+  PiMapPin,
+  PiPhone,
+} from "react-icons/pi";
 import { ModalPortal } from "./ModalPortal";
 
 interface InternationalSchoolsModalProps {
@@ -584,40 +591,11 @@ function SchoolCard({ school }: { school: (typeof SCHOOLS)[0] }) {
       </div>
       <div className="mt-1 space-y-1 pl-12">
         <p className="flex items-start gap-1.5 text-xs text-slate-500">
-          <svg
-            className="mt-0.5 h-3 w-3 shrink-0 text-slate-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
+          <PiMapPin className="mt-0.5 h-3 w-3 shrink-0 text-slate-400" />
           {school.address}
         </p>
         <p className="flex items-center gap-1.5 text-xs text-slate-500">
-          <svg
-            className="h-3 w-3 shrink-0 text-slate-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z"
-            />
-          </svg>
+          <PiPhone className="h-3 w-3 shrink-0 text-slate-400" />
           {school.phone}
         </p>
       </div>
@@ -690,8 +668,8 @@ export function InternationalSchoolsModal({
 
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-green-200 bg-gradient-to-br from-green-50 to-emerald-100 text-2xl shadow-sm">
-                  🏫
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-green-200 bg-gradient-to-br from-green-50 to-emerald-100 text-[#138808] shadow-sm">
+                  <PiBuildings className="h-7 w-7" />
                 </div>
                 <div>
                   <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-[#138808]">
@@ -712,19 +690,7 @@ export function InternationalSchoolsModal({
                 aria-label="Close"
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-slate-500 transition hover:bg-slate-200"
               >
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <PiXBold className="h-4 w-4" />
               </button>
             </div>
 
@@ -760,19 +726,7 @@ export function InternationalSchoolsModal({
           <div className="shrink-0 border-b border-slate-100 bg-white px-6 py-3 sm:px-8">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <div className="relative flex-1">
-                <svg
-                  className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
+                <PiMagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
                   placeholder="Search by name, city, or address…"
@@ -807,7 +761,7 @@ export function InternationalSchoolsModal({
           >
             {filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <span className="text-4xl">🔍</span>
+                <PiMagnifyingGlass className="h-10 w-10 text-slate-300" />
                 <p className="mt-3 text-sm font-semibold text-slate-600">
                   No schools found
                 </p>

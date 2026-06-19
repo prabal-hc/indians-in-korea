@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        playfair: ["Playfair Display", "serif"],
+        playfair: ["Plus Jakarta Sans", "sans-serif"],
         sans: ["Plus Jakarta Sans", "sans-serif"],
       },
       spacing: {
