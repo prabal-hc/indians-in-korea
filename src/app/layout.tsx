@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import RootLayoutShell from "@/components/RootLayoutShell";
+import RouteTransition from "@/components/RouteTransition";
 import { SmoothScrollProvider } from "@/components/organisms/home/Smoothscrollprovider";
 import NavbarGate from "@/components/organisms/NavbarGate";
 import SupabaseAuthProvider from "@/components/SupabaseAuthProvider";
@@ -77,11 +78,13 @@ export default function RootLayout({
 
         <SupabaseAuthProvider>
           <SmoothScrollProvider>
-            {/*
-              RootLayoutShell should no longer render the Navbar internally.
-              It should only wrap page content (footer, etc.).
-            */}
-            <RootLayoutShell>{children}</RootLayoutShell>
+            <RouteTransition>
+              {/*
+                RootLayoutShell should no longer render the Navbar internally.
+                It should only wrap page content (footer, etc.).
+              */}
+              <RootLayoutShell>{children}</RootLayoutShell>
+            </RouteTransition>
           </SmoothScrollProvider>
         </SupabaseAuthProvider>
       </body>

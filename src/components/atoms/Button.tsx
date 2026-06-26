@@ -13,9 +13,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-3 rounded-full transition-colors duration-300 ease-in-out",
+    "bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-3 rounded-full transition duration-300 ease-out transform hover:scale-[1.02] hover:shadow-[0_18px_60px_rgba(251,146,60,0.18)]",
   secondary:
-    "bg-white hover:bg-gray-100 text-gray-900 border-2 border-gray-200 font-semibold px-8 py-3 rounded-full transition-colors duration-300 ease-in-out",
+    "bg-white hover:bg-gray-100 text-gray-900 border-2 border-gray-200 font-semibold px-8 py-3 rounded-full transition duration-300 ease-out transform hover:scale-[1.02] hover:shadow-[0_16px_48px_rgba(148,163,184,0.14)]",
 };
 
 export const Button: React.FC<ButtonProps> = ({

@@ -6,6 +6,7 @@ import {
   getAll,
   AnnouncementItem,
 } from "@/services/admin/announcements.service";
+import { getLenis } from "@/lib/scroll";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -452,6 +453,15 @@ export const Hero = () => {
 
   // ── Scroll ───────────────────────────────────────────────────────────────
   useEffect(() => {
+    const lenis = getLenis();
+
+    if (lenis) {
+      const onLenisScroll = (event: { scroll: number }) =>
+        setScrollY(event.scroll);
+      lenis.on("scroll", onLenisScroll);
+      return () => lenis.off("scroll", onLenisScroll);
+    }
+
     const onScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);

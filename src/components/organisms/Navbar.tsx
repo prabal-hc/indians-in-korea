@@ -5,12 +5,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Search, X, Menu } from "lucide-react";
-import { motion, AnimatePresence, useScroll, LayoutGroup } from "framer-motion";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ScrollSmoother } from "gsap/ScrollSmoother";
+import { getLenis } from "@/lib/scroll";
 
-gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+gsap.registerPlugin(ScrollTrigger);
 
 // ─── Nav Items ────────────────────────────────────────────────────────────────
 const navItems = [
@@ -89,28 +89,29 @@ const mobileLinkVariants = {
 };
 
 // ─── Scroll Progress Bar ──────────────────────────────────────────────────────
-// framer-motion's useScroll reads from the window, which ScrollSmoother keeps
-// at 0. We drive the bar manually from ScrollSmoother's scroll position instead.
 const ScrollProgressBar = () => {
   const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Wait one tick for ScrollSmoother to be created by SmoothScrollProvider
-    const raf = requestAnimationFrame(() => {
-      const smoother = ScrollSmoother.get();
-      if (!smoother || !barRef.current) return;
+    const lenis = getLenis();
+    if (!lenis || !barRef.current) return;
 
-      // ScrollTrigger fires on every smoother tick
-      ScrollTrigger.create({
-        onUpdate: (self) => {
-          if (barRef.current) {
-            barRef.current.style.transform = `scaleX(${self.progress})`;
-          }
-        },
-      });
+    const update = (event: any) => {
+      if (!barRef.current) return;
+      const progress = event.limit ? event.scroll / event.limit : 0;
+      barRef.current.style.transform = `scaleX(${Math.min(1, Math.max(0, progress))})`;
+    };
+
+    lenis.on("scroll", update);
+    update({
+      scroll: lenis.scroll,
+      limit:
+        (lenis as any).limit ?? document.body.scrollHeight - window.innerHeight,
     });
 
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      lenis.off("scroll", update);
+    };
   }, []);
 
   return (
@@ -212,28 +213,23 @@ const Navbar = () => {
       lastScrollY.current = currentY;
     };
 
-    // Try ScrollSmoother first (available after SmoothScrollProvider mounts)
-    let st: ScrollTrigger | undefined;
+    type LenisScrollEvent = { scroll: number; limit?: number };
+    let cleanup: (() => void) | undefined;
 
     const init = () => {
-      const smoother = ScrollSmoother.get();
+      const lenis = getLenis();
 
-      if (smoother) {
-        // Use ScrollTrigger's onUpdate which fires on the smoother's virtual scroll
-        st = ScrollTrigger.create({
-          onUpdate: () => {
-            handleScroll(smoother.scrollTop());
-          },
-        });
-        // Set initial state
-        handleScroll(smoother.scrollTop());
-      } else {
-        // Fallback: native scroll
-        const onNativeScroll = () => handleScroll(window.scrollY);
-        window.addEventListener("scroll", onNativeScroll, { passive: true });
-        handleScroll(window.scrollY);
-        return () => window.removeEventListener("scroll", onNativeScroll);
+      if (lenis) {
+        const onLenisScroll = (event: LenisScrollEvent) =>
+          handleScroll(event.scroll);
+        lenis.on("scroll", onLenisScroll);
+        cleanup = () => lenis.off("scroll", onLenisScroll);
+        return;
       }
+
+      const onNativeScroll = () => handleScroll(window.scrollY);
+      window.addEventListener("scroll", onNativeScroll, { passive: true });
+      cleanup = () => window.removeEventListener("scroll", onNativeScroll);
     };
 
     // Small delay to ensure SmoothScrollProvider has mounted first
@@ -241,7 +237,7 @@ const Navbar = () => {
 
     return () => {
       clearTimeout(timer);
-      st?.kill();
+      cleanup?.();
     };
   }, [isHome]);
 
@@ -256,18 +252,9 @@ const Navbar = () => {
 
   // Lock body scroll while mobile menu is open
   useEffect(() => {
-    // Use ScrollSmoother.get()?.paused() instead of body overflow
-    // so it integrates cleanly with the smooth scroll system
-    const smoother = ScrollSmoother.get();
-    if (smoother) {
-      smoother.paused(open);
-    } else {
-      document.body.style.overflow = open ? "hidden" : "";
-    }
+    document.body.style.overflow = open ? "hidden" : "";
     return () => {
-      const s = ScrollSmoother.get();
-      if (s) s.paused(false);
-      else document.body.style.overflow = "";
+      document.body.style.overflow = "";
     };
   }, [open]);
 
