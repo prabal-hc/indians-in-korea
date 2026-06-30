@@ -4,7 +4,7 @@ interface RootLayoutShellProps {
 
 export default function RootLayoutShell({ children }: RootLayoutShellProps) {
   return (
-    <div className="min-h-full flex flex-col">
+    <div className="flex flex-col w-full">
       <main className="flex-1">{children}</main>
     </div>
   );

@@ -2,10 +2,13 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect } from "react";
+import { getLenis } from "@/lib/scroll";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 interface RouteTransitionProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 const pageVariants = {
@@ -16,6 +19,19 @@ const pageVariants = {
 
 export default function RouteTransition({ children }: RouteTransitionProps) {
   const pathname = usePathname();
+
+  useEffect(() => {
+    // Refresh scroll calculations on route change
+    const timer = setTimeout(() => {
+      const lenis = getLenis();
+      if (lenis) {
+        lenis.resize();
+        ScrollTrigger.refresh();
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [pathname]);
 
   return (
     <AnimatePresence mode="wait" initial={false}>

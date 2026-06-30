@@ -66,7 +66,10 @@ export function SmoothScrollProvider({
     };
     rafId = requestAnimationFrame(animate);
 
-    const onResize = () => ScrollTrigger.refresh();
+    const onResize = () => {
+      ScrollTrigger.refresh();
+      setTimeout(() => lenis.resize(), 100);
+    };
     window.addEventListener("resize", onResize, { passive: true });
 
     ScrollTrigger.refresh();

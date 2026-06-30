@@ -64,10 +64,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       <body
-        style={{ overscrollBehavior: "none", margin: 0 }}
+        style={{ overscrollBehavior: "none", margin: 0, padding: 0 }}
         suppressHydrationWarning
       >
         {/*
