@@ -190,6 +190,21 @@ const Navbar = () => {
 
   const isActive = (href: string) => href !== "#" && pathname === href;
 
+  // ── Immediate sync on route change ─────────────────────────────────────
+  // Navbar persists across client-side navigation (it isn't remounted per
+  // page), so heroMode only updates reactively through scroll events. If the
+  // user navigates away from Home without scrolling, heroMode would keep its
+  // previous value. This effect forces heroMode to the correct value the
+  // instant the route changes, independent of scroll.
+  useEffect(() => {
+    if (!isHome) {
+      setHeroMode(false);
+      return;
+    }
+    const vh = window.innerHeight;
+    setHeroMode(window.scrollY < vh * 0.72);
+  }, [isHome]);
+
   // ── Scroll listener — reads ScrollSmoother, falls back to window ──────
   // Runs on every page so the bar's "scrolled" / "hidden" behavior is always
   // live. Only `heroMode` (the transparent navbar) is gated to the homepage

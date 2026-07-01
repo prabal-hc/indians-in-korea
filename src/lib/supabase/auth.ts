@@ -14,11 +14,12 @@ interface AdminSession {
 export async function resolveAdminSession() {
   const supabase = await createSupabaseServerClient();
   const {
-    data: { session },
+    data: { user },
     error,
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getUser();
 
-  if (error || !session || !session.user) {
+  if (error || !user) {
+    await supabase.auth.signOut();
     return null;
   }
 
@@ -26,15 +27,16 @@ export async function resolveAdminSession() {
   const { data: profile, error: profileError } = await service
     .from("users")
     .select("role,email")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .single();
 
   if (profileError || !profile || profile.role !== "admin") {
+    await supabase.auth.signOut();
     return null;
   }
 
   return {
-    userId: session.user.id,
+    userId: user.id,
     email: profile.email,
     role: profile.role,
   } as AdminSession;
@@ -44,7 +46,7 @@ export async function requireAdminSessionOrRedirect() {
   const admin = await resolveAdminSession();
   if (!admin) {
     redirect(
-      "/admin/login?message=Your session has expired.Please login again.",
+      "/admin/login?message=Your session has expired. Please login again.",
     );
   }
   return admin;
@@ -61,11 +63,12 @@ export function forbiddenJson(message = "Access denied") {
 export async function requireAdminApi() {
   const supabase = await createSupabaseServerClient();
   const {
-    data: { session },
+    data: { user },
     error,
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getUser();
 
-  if (error || !session || !session.user) {
+  if (error || !user) {
+    await supabase.auth.signOut();
     return null;
   }
 
@@ -73,12 +76,13 @@ export async function requireAdminApi() {
   const { data: profile, error: profileError } = await service
     .from("users")
     .select("role")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .single();
 
   if (profileError || !profile || profile.role !== "admin") {
+    await supabase.auth.signOut();
     return null;
   }
 
-  return { session, user: session.user };
+  return { user };
 }

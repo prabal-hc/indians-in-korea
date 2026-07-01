@@ -16,6 +16,11 @@ export const createSupabaseClient = (): SupabaseClient | null => {
     return null;
   }
 
-  cachedClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  cachedClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  });
   return cachedClient;
 };

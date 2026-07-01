@@ -2,24 +2,18 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/auth-helpers-nextjs";
 
-const AUTH_ROUTES = [
-  "/admin",
-  "/admin/dashboard",
-  "/admin/announcements",
-  "/admin/about",
-  "/admin/communities",
-  "/admin/events",
-  "/admin/gallery",
-  "/admin/testimonial",
-  "/admin/sports",
-  "/admin/homepage",
+const PUBLIC_ADMIN = [
+  "/admin/login",
+  "/api/admin/auth/login",
+  "/api/admin/auth/logout",
 ];
-const PUBLIC_ADMIN = ["/admin/login"];
 
-function isProtectedRoute(pathname: string) {
-  return AUTH_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`),
-  );
+function isAdminRoute(pathname: string) {
+  return pathname === "/admin" || pathname.startsWith("/admin/");
+}
+
+function isAdminApiRoute(pathname: string) {
+  return pathname === "/api/admin" || pathname.startsWith("/api/admin/");
 }
 
 export async function middleware(request: NextRequest) {
@@ -29,7 +23,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (!isProtectedRoute(pathname)) {
+  if (!isAdminRoute(pathname) && !isAdminApiRoute(pathname)) {
     return NextResponse.next();
   }
 
@@ -52,18 +46,29 @@ export async function middleware(request: NextRequest) {
       },
       auth: {
         persistSession: true,
-        autoRefreshToken: false,
+        autoRefreshToken: true,
         detectSessionInUrl: false,
       },
     },
   );
 
   const {
-    data: { session },
+    data: { user },
     error,
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getUser();
 
-  if (!session || error) {
+  const isApi = isAdminApiRoute(pathname);
+
+  if (!user || error) {
+    await supabase.auth.signOut();
+
+    if (isApi) {
+      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "content-type": "application/json" },
+      });
+    }
+
     const loginUrl = new URL("/admin/login", request.url);
     loginUrl.searchParams.set("redirect", request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
@@ -72,10 +77,16 @@ export async function middleware(request: NextRequest) {
   const { data: profile, error: profileError } = await supabase
     .from("users")
     .select("role")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .single();
 
   if (profileError || !profile || profile.role !== "admin") {
+    if (isApi) {
+      return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { "content-type": "application/json" },
+      });
+    }
     return NextResponse.redirect(new URL("/403", request.url));
   }
 
@@ -83,5 +94,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/api/admin/:path*"],
 };

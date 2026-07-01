@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { ImagePlus } from "lucide-react";
 import { useState } from "react";
-import { createSupabaseClient } from "@/lib/supabase/client";
+import { useSupabaseAuth } from "@/components/SupabaseAuthProvider";
 
 interface ImageUploaderProps {
   label: string;
@@ -19,19 +19,20 @@ export function ImageUploader({
   value,
   onChange,
   note,
-  bucket = "iik-images", // 👈 replace with your actual bucket name
+  bucket = "iik-images",
   folder = "uploads",
 }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { supabase } = useSupabaseAuth();
 
   const handleFile = async (file: File) => {
     setError(null);
     setUploading(true);
 
     try {
-      const supabase = createSupabaseClient();
-      if (!supabase) throw new Error("Supabase not configured");
+      if (!supabase) throw new Error("Supabase client not initialized");
 
       const ext = file.name.split(".").pop();
       const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;

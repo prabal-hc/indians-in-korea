@@ -273,6 +273,9 @@ export default function EventsPageContent() {
   }, [featured]);
   const countdown = useCountdown(countdownTarget);
 
+  // ✅ FIX: carry the event's unique `id` through so timeline items have a
+  // stable, unique React key. Previously only `label` (e.g. "Jul") was used,
+  // which duplicates whenever two upcoming events fall in the same month.
   const timeline = useMemo(() => {
     const today = new Date().toISOString().split("T")[0];
     return allEvents
@@ -280,6 +283,7 @@ export default function EventsPageContent() {
       .sort((a, b) => a.date.localeCompare(b.date))
       .slice(0, 6)
       .map((event) => ({
+        id: event.id, // ✅ unique key source
         label: new Date(event.date).toLocaleDateString("en-US", {
           month: "short",
         }),
@@ -667,11 +671,6 @@ export default function EventsPageContent() {
                   <span className="text-orange-500">2026</span>
                 </h2>
               </div>
-              {/* <p className="text-sm xl:text-base text-gray-500 max-w-sm leading-relaxed">
-                {upcomingEvents.length > 0
-                  ? `${upcomingEvents.length} upcoming experiences for the Indian community in Korea.`
-                  : "Vibrant experiences designed for the Indian community in Korea."}
-              </p> */}
             </motion.div>
 
             {/* ── Loading skeletons ── */}
@@ -901,7 +900,7 @@ export default function EventsPageContent() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          TIMELINE  (static — unchanged)
+          TIMELINE
       ═══════════════════════════════════════════════════════════════════════ */}
       <section
         id="timeline"
@@ -946,7 +945,7 @@ export default function EventsPageContent() {
               <div className="space-y-8 xl:space-y-10">
                 {timeline.map((item, i) => (
                   <motion.div
-                    key={item.label}
+                    key={item.id}
                     variants={i % 2 === 0 ? fadeLeft : fadeRight}
                     className="relative grid grid-cols-2 gap-8 xl:gap-12 items-center"
                   >
@@ -1009,7 +1008,7 @@ export default function EventsPageContent() {
               <div className="flex gap-3 pb-4 w-max">
                 {timeline.map((item) => (
                   <motion.div
-                    key={item.label}
+                    key={item.id}
                     variants={fadeUp}
                     className="w-52 flex-shrink-0 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm hover:border-orange-200 hover:shadow-md transition-all duration-300"
                   >
@@ -1032,7 +1031,7 @@ export default function EventsPageContent() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          PAST EVENTS  (static — unchanged)
+          PAST EVENTS
       ═══════════════════════════════════════════════════════════════════════ */}
       <section className={`${S} ${SY} bg-white relative overflow-hidden`}>
         <div className={`${W} relative`}>
@@ -1143,7 +1142,7 @@ export default function EventsPageContent() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          COMMUNITY MOMENTS  (static — unchanged)
+          COMMUNITY MOMENTS
       ═══════════════════════════════════════════════════════════════════════ */}
       <section className={`bg-gray-900 ${S} ${SY} relative overflow-hidden`}>
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_15%_20%,rgba(251,146,60,0.12),transparent),radial-gradient(ellipse_40%_30%_at_85%_80%,rgba(59,130,246,0.08),transparent)]" />
@@ -1229,7 +1228,7 @@ export default function EventsPageContent() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          CTA  (unchanged)
+          CTA
       ═══════════════════════════════════════════════════════════════════════ */}
       <section className={`bg-orange-50 ${S} ${SY}`}>
         <div className={W}>

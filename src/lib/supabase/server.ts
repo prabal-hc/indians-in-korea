@@ -19,7 +19,7 @@ export const createSupabaseServerClient = async () => {
     cookies: nextCookies,
     auth: {
       persistSession: true,
-      autoRefreshToken: false,
+      autoRefreshToken: true,
       detectSessionInUrl: false,
     },
   });

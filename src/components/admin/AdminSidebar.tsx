@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -41,7 +41,9 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isDesktop, setIsDesktop] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 1024px)");
@@ -128,13 +130,22 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
             </p>
           </div>
 
-          <Link
-            href="/admin/login"
-            className="mt-6 inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          <button
+            type="button"
+            onClick={async () => {
+              setIsLoggingOut(true);
+              try {
+                await fetch("/api/admin/auth/logout", { method: "POST" });
+              } finally {
+                router.replace("/admin/login");
+              }
+            }}
+            disabled={isLoggingOut}
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
           >
             <LogOut size={18} />
-            Logout
-          </Link>
+            {isLoggingOut ? "Signing out..." : "Logout"}
+          </button>
         </div>
       </motion.aside>
     </>
