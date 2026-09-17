@@ -186,6 +186,7 @@ export function AboutKoreaModal({ open, onClose }: AboutKoreaModalProps) {
         aria-label="About Korea"
       >
         <div
+          data-lenis-prevent
           className="flex w-full max-w-4xl flex-col overflow-y-auto overscroll-contain rounded-t-3xl border border-slate-200 bg-slate-50 shadow-2xl shadow-slate-900/20 sm:max-h-[90vh] sm:rounded-3xl"
           style={{ maxHeight: "92vh" }}
           onClick={(e) => e.stopPropagation()}
