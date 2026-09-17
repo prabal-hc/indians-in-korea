@@ -74,7 +74,19 @@ export function SmoothScrollProvider({
 
     ScrollTrigger.refresh();
 
+    // The body font loads asynchronously (see globals.css); once it swaps
+    // in, text metrics change and every previously-measured ScrollTrigger
+    // position is stale. Re-measuring here avoids a late, visible
+    // "snap" as those positions silently self-correct on next scroll.
+    let cancelled = false;
+    document.fonts?.ready?.then(() => {
+      if (cancelled) return;
+      ScrollTrigger.refresh();
+      lenis.resize();
+    });
+
     return () => {
+      cancelled = true;
       window.removeEventListener("resize", onResize);
       cancelAnimationFrame(rafId);
       setLenis(null);

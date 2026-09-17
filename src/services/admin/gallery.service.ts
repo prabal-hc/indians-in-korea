@@ -1,14 +1,6 @@
 import { createSupabaseClient } from "@/lib/supabase/client";
 
-const getSupabase = () => {
-  const supabase = createSupabaseClient();
-  if (!supabase) {
-    throw new Error(
-      "Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
-    );
-  }
-  return supabase;
-};
+const getSupabase = () => createSupabaseClient();
 
 export interface GalleryItem {
   id: string;

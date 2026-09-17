@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
-import { motion, useInView, useSpring, animate } from "framer-motion";
+import { motion, useInView, animate } from "framer-motion";
 import { Button } from "@/components/atoms";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -52,45 +52,6 @@ const AnimatedCounter = ({
       {display}
       {suffix}
     </span>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MAGNETIC BUTTON WRAPPER — cursor-reactive subtle pull
-// ─────────────────────────────────────────────────────────────────────────────
-
-const MagneticWrap = ({
-  children,
-  strength = 0.28,
-}: {
-  children: React.ReactNode;
-  strength?: number;
-}) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useSpring(0, { stiffness: 180, damping: 22 });
-  const y = useSpring(0, { stiffness: 180, damping: 22 });
-
-  const onMove = (e: React.MouseEvent) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    x.set((e.clientX - (rect.left + rect.width / 2)) * strength);
-    y.set((e.clientY - (rect.top + rect.height / 2)) * strength);
-  };
-  const onLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  return (
-    <motion.div
-      ref={ref}
-      style={{ x, y }}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-    >
-      {children}
-    </motion.div>
   );
 };
 

@@ -9,11 +9,13 @@ const SUPABASE_ANON_KEY =
 
 let cachedClient: SupabaseClient | null = null;
 
-export const createSupabaseClient = (): SupabaseClient | null => {
+export const createSupabaseClient = (): SupabaseClient => {
   if (cachedClient) return cachedClient;
 
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    return null;
+    throw new Error(
+      "Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+    );
   }
 
   cachedClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {

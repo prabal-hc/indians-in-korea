@@ -551,7 +551,7 @@ export function HigherEducationModal({
                       </p>
                       <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
                         Reach out for personalised guidance on admissions,
-                        scholarships, and campus life from Indians who've been
+                        scholarships, and campus life from Indians who&apos;ve been
                         through it.
                       </p>
                     </div>

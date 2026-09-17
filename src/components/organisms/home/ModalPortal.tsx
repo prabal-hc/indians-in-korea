@@ -9,9 +9,11 @@ interface ModalPortalProps {
 }
 
 export function ModalPortal({ children }: ModalPortalProps) {
-  if (typeof window === "undefined") return null;
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+
     const lenis = getLenis();
     if (lenis) {
       lenis.stop();
@@ -25,6 +27,8 @@ export function ModalPortal({ children }: ModalPortalProps) {
       document.body.style.overflow = "";
     };
   }, []);
+
+  if (!mounted) return null;
 
   return createPortal(children, document.body);
 }

@@ -1,14 +1,6 @@
 import { createSupabaseClient } from "@/lib/supabase/client";
 
-const getSupabase = () => {
-  const supabase = createSupabaseClient();
-  if (!supabase) {
-    throw new Error(
-      "Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
-    );
-  }
-  return supabase;
-};
+const getSupabase = () => createSupabaseClient();
 
 export interface CommunityItem {
   id: string;
@@ -95,11 +87,17 @@ export async function getFeatured(limit = 4): Promise<CommunityItem[]> {
     .from("communities")
     .select("*")
     .eq("is_active", true)
+    .eq("is_featured", true)
     .order("display_order", { ascending: true })
     .limit(limit);
 
   if (error) {
-    console.error(error);
+    console.error("Communities getFeatured Supabase error:", {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+    });
     return [];
   }
   return (data ?? []).map(mapCommunity);

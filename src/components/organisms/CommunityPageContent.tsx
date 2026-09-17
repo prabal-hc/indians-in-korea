@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, useInView, animate } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { MapPin, Users, ExternalLink, Flag, Trophy } from "lucide-react";
 import { getAll, type CommunityItem } from "@/services/community.service";
 
@@ -273,12 +273,12 @@ const CommunityCard = ({
               ease: [0.16, 1, 0.3, 1],
             }}
           />
-          <p className="text-xs font-medium text-stone-500 mt-1.5">
+          <p className="text-xs font-medium text-slate-500 mt-1.5">
             {community.name}
           </p>
         </div>
 
-        <p className="text-sm leading-relaxed text-stone-600 mb-5">
+        <p className="text-sm leading-relaxed text-slate-600 mb-5">
           {community.description}
         </p>
 
@@ -294,7 +294,7 @@ const CommunityCard = ({
                   duration: 0.4,
                   delay: index * 0.09 + 0.25 + i * 0.06,
                 }}
-                className="flex items-center gap-2.5 text-xs text-stone-700 font-medium"
+                className="flex items-center gap-2.5 text-xs text-slate-700 font-medium"
               >
                 <span
                   className="w-1.5 h-1.5 rounded-full shrink-0"
@@ -392,7 +392,7 @@ export default function CommunitiesPage() {
 
   return (
     <div
-      className={`communities-root min-h-screen bg-orange-50/60 text-stone-900 overflow-x-hidden relative transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0"}`}
+      className={`communities-root min-h-screen bg-orange-50/60 text-slate-900 overflow-x-hidden relative transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0"}`}
     >
       <style>{`
         .communities-root { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
@@ -411,7 +411,7 @@ export default function CommunitiesPage() {
       <div className="page-bg" />
       <div
         aria-hidden
-        className="pointer-events-none fixed -left-32 -top-32 w-[500px] h-[500px] rounded-full z-0"
+        className="pointer-events-none absolute -left-32 -top-32 w-[500px] h-[500px] rounded-full z-0"
         style={{
           background:
             "radial-gradient(circle,rgba(255,153,51,0.09) 0%,rgba(255,120,30,0.04) 45%,transparent 70%)",
@@ -419,10 +419,10 @@ export default function CommunitiesPage() {
           animation: "blobDrift 9s ease-in-out infinite alternate",
         }}
       />
-      <div className="fixed pointer-events-none z-0 top-12 right-0 transform rotate-45 opacity-[0.055]">
+      <div className="absolute pointer-events-none z-0 top-12 right-0 transform rotate-45 opacity-[0.055]">
         <RangoliDecor size={160} opacity={1} />
       </div>
-      <div className="fixed pointer-events-none z-0 bottom-16 left-0 transform -rotate-45 opacity-[0.045]">
+      <div className="absolute pointer-events-none z-0 bottom-16 left-0 transform -rotate-45 opacity-[0.045]">
         <RangoliDecor size={140} opacity={1} />
       </div>
 
@@ -454,11 +454,11 @@ export default function CommunitiesPage() {
           className="flex w-12 h-[3px] rounded-full mx-auto mb-6 overflow-hidden"
         >
           <div className="flex-1 bg-orange-600" />
-          <div className="flex-1 bg-stone-300" />
+          <div className="flex-1 bg-slate-300" />
           <div className="flex-1 bg-green-600" />
         </motion.div>
 
-        <h1 className="font-playfair text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.06] text-stone-900 mb-4">
+        <h1 className="font-playfair text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.06] text-slate-900 mb-4">
           {["Indian", "Communities", "in", "Korea"].map((word, i) => (
             <motion.span
               key={i}
@@ -496,7 +496,7 @@ export default function CommunitiesPage() {
           initial={{ opacity: 0, y: 18 }}
           animate={heroInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.62 }}
-          className="text-sm sm:text-base leading-relaxed text-stone-600 max-w-md mx-auto mb-9"
+          className="text-sm sm:text-base leading-relaxed text-slate-600 max-w-md mx-auto mb-9"
         >
           Showcasing the diverse Indian regional communities in Korea that bring
           people together through culture, language, shared experiences, and
@@ -557,7 +557,7 @@ export default function CommunitiesPage() {
                   "linear-gradient(90deg,transparent,rgba(234,88,12,0.2),rgba(203,213,225,0.4),transparent)",
               }}
             />
-            <span className="label-caps text-stone-500">
+            <span className="label-caps text-slate-500">
               {filtered.length}{" "}
               {filtered.length === 1 ? "community" : "communities"} found
             </span>
@@ -573,10 +573,10 @@ export default function CommunitiesPage() {
           {filtered.length === 0 ? (
             <div className="text-center py-20 px-6">
               <Flag
-                className="w-10 h-10 mx-auto mb-3 text-stone-300"
+                className="w-10 h-10 mx-auto mb-3 text-slate-300"
                 strokeWidth={1.5}
               />
-              <p className="text-stone-500 font-medium">
+              <p className="text-slate-500 font-medium">
                 No communities in this category yet.
               </p>
             </div>
@@ -612,11 +612,11 @@ export default function CommunitiesPage() {
                 Sports
               </p>
               <div>
-                <h2 className="text-3xl sm:text-4xl font-bold text-stone-900">
+                <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">
                   Indians In Korea{" "}
                   <span className="text-orange-600">Cricket Club</span>
                 </h2>
-                <p className="mt-4 text-sm sm:text-base leading-relaxed text-stone-600 max-w-2xl">
+                <p className="mt-4 text-sm sm:text-base leading-relaxed text-slate-600 max-w-2xl">
                   Established in 2013, IIKCC is one of the oldest and most
                   competitive cricket clubs which prides itself on providing a
                   healthy sporting habit among sportsmen, instilling discipline,
@@ -629,33 +629,33 @@ export default function CommunitiesPage() {
                     key={item}
                     className="rounded-3xl border border-orange-100 bg-orange-50/70 p-5 shadow-sm"
                   >
-                    <p className="text-sm text-stone-700">{item}</p>
+                    <p className="text-sm text-slate-700">{item}</p>
                   </div>
                 ))}
               </div>
-              <div className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-lg">
-                <div className="mb-4 text-sm font-semibold uppercase tracking-[0.32em] text-stone-500">
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
+                <div className="mb-4 text-sm font-semibold uppercase tracking-[0.32em] text-slate-500">
                   Practice & Contact
                 </div>
                 <div className="grid gap-4">
-                  <div className="flex items-center gap-3 rounded-3xl bg-stone-50 p-4">
+                  <div className="flex items-center gap-3 rounded-3xl bg-slate-50 p-4">
                     <MapPin className="h-4 w-4 text-orange-500" />
                     <div>
-                      <p className="text-xs uppercase tracking-[0.25em] text-stone-500">
+                      <p className="text-xs uppercase tracking-[0.25em] text-slate-500">
                         Training ground
                       </p>
-                      <p className="text-sm font-semibold text-stone-900">
+                      <p className="text-sm font-semibold text-slate-900">
                         Sungkyunkwan University, Suwon
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 rounded-3xl bg-stone-50 p-4">
+                  <div className="flex items-center gap-3 rounded-3xl bg-slate-50 p-4">
                     <Users className="h-4 w-4 text-orange-500" />
                     <div>
-                      <p className="text-xs uppercase tracking-[0.25em] text-stone-500">
+                      <p className="text-xs uppercase tracking-[0.25em] text-slate-500">
                         Weekend practice
                       </p>
-                      <p className="text-sm font-semibold text-stone-900">
+                      <p className="text-sm font-semibold text-slate-900">
                         Every weekend — tennis & leather ball
                       </p>
                     </div>
@@ -665,9 +665,9 @@ export default function CommunitiesPage() {
                   {cricketClub.contacts.map((c) => (
                     <div
                       key={c.name}
-                      className="rounded-3xl bg-stone-50 p-4 text-sm text-stone-700"
+                      className="rounded-3xl bg-slate-50 p-4 text-sm text-slate-700"
                     >
-                      <p className="font-semibold text-stone-900">{c.name}</p>
+                      <p className="font-semibold text-slate-900">{c.name}</p>
                       <p>{c.phone}</p>
                     </div>
                   ))}
@@ -689,7 +689,7 @@ export default function CommunitiesPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="group relative overflow-hidden rounded-[2rem] border border-gray-200 bg-gradient-to-br from-orange-50 via-white to-amber-50 p-6 shadow-xl"
+              className="group relative overflow-hidden rounded-3xl border border-gray-200 bg-gradient-to-br from-orange-50 via-white to-amber-50 p-6 shadow-xl"
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.14),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.1),transparent_30%)] pointer-events-none" />
               <div className="relative z-10 flex flex-col gap-6">
@@ -699,7 +699,7 @@ export default function CommunitiesPage() {
                       <p className="text-xs uppercase tracking-[0.35em] text-orange-600 font-semibold">
                         IIKCC
                       </p>
-                      <h3 className="mt-3 text-2xl font-bold text-stone-900">
+                      <h3 className="mt-3 text-2xl font-bold text-slate-900">
                         Cricket Club
                       </h3>
                     </div>
@@ -707,7 +707,7 @@ export default function CommunitiesPage() {
                       <Trophy className="h-7 w-7" strokeWidth={1.75} />
                     </div>
                   </div>
-                  <p className="mt-4 text-sm leading-relaxed text-stone-600">
+                  <p className="mt-4 text-sm leading-relaxed text-slate-600">
                     A community-first club with leather-ball ambition and
                     tennis-ball energy across Korea.
                   </p>
@@ -721,25 +721,25 @@ export default function CommunitiesPage() {
                       key={s.label}
                       className="rounded-3xl bg-white/85 p-5 shadow-sm border border-orange-100"
                     >
-                      <p className="text-xs uppercase tracking-[0.3em] text-stone-500">
+                      <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
                         {s.label}
                       </p>
-                      <p className="mt-3 text-lg font-semibold text-stone-900">
+                      <p className="mt-3 text-lg font-semibold text-slate-900">
                         {s.value}
                       </p>
                     </div>
                   ))}
                 </div>
-                <div className="rounded-[2rem] bg-white/90 p-5 border border-stone-200">
+                <div className="rounded-3xl bg-white/90 p-5 border border-slate-200">
                   <div className="flex items-center justify-between gap-4">
-                    <div className="text-sm font-semibold text-stone-900">
+                    <div className="text-sm font-semibold text-slate-900">
                       Sungkyunkwan University
                     </div>
                     <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold uppercase text-orange-600">
                       Suwon
                     </span>
                   </div>
-                  <p className="mt-3 text-sm leading-relaxed text-stone-600">
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600">
                     Most cricket activity is hosted here for easy access and
                     premium community reach.
                   </p>

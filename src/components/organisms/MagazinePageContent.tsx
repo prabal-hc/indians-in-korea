@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { ArrowRight, Download, BookOpen, Sparkles } from "lucide-react";
+import { ArrowRight, Download, BookOpen } from "lucide-react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28, filter: "blur(4px)" },

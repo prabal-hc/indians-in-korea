@@ -667,7 +667,7 @@ export default function EventsPageContent() {
               <div>
                 <Label>Upcoming Highlights</Label>
                 <h2 className="text-2xl sm:text-3xl md:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-gray-900">
-                  What's happening in{" "}
+                  What&apos;s happening in{" "}
                   <span className="text-orange-500">2026</span>
                 </h2>
               </div>
@@ -1144,8 +1144,8 @@ export default function EventsPageContent() {
       {/* ═══════════════════════════════════════════════════════════════════════
           COMMUNITY MOMENTS
       ═══════════════════════════════════════════════════════════════════════ */}
-      <section className={`bg-gray-900 ${S} ${SY} relative overflow-hidden`}>
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_15%_20%,rgba(251,146,60,0.12),transparent),radial-gradient(ellipse_40%_30%_at_85%_80%,rgba(59,130,246,0.08),transparent)]" />
+      <section className={`bg-orange-50/40 ${S} ${SY} relative overflow-hidden`}>
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_15%_20%,rgba(251,146,60,0.12),transparent),radial-gradient(ellipse_40%_30%_at_85%_80%,rgba(22,163,74,0.08),transparent)]" />
         <div className={`${W} relative`}>
           <motion.div
             initial="hidden"
@@ -1157,14 +1157,14 @@ export default function EventsPageContent() {
               variants={fadeUp}
               className="text-center mb-10 xl:mb-14"
             >
-              <p className="text-[10px] sm:text-xs xl:text-sm font-bold uppercase tracking-widest text-orange-400 mb-2 sm:mb-3">
+              <p className="text-[10px] sm:text-xs xl:text-sm font-bold uppercase tracking-widest text-orange-600 mb-2 sm:mb-3">
                 Community Moments
               </p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-white">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-gray-900">
                 Stories of{" "}
-                <span className="text-orange-400">joy & connection</span>
+                <span className="text-orange-500">joy & connection</span>
               </h2>
-              <p className="mt-4 text-sm sm:text-base xl:text-lg text-gray-400 max-w-xl xl:max-w-2xl mx-auto leading-relaxed">
+              <p className="mt-4 text-sm sm:text-base xl:text-lg text-gray-500 max-w-xl xl:max-w-2xl mx-auto leading-relaxed">
                 A cinematic flow of moments that define our shared life in
                 Korea.
               </p>
@@ -1194,7 +1194,7 @@ export default function EventsPageContent() {
                     y: -8,
                     transition: { duration: 0.45, ease: EASE_SOFT },
                   }}
-                  className="group relative overflow-hidden rounded-2xl xl:rounded-3xl border border-white/8 shadow-xl cursor-pointer"
+                  className="group relative overflow-hidden rounded-2xl xl:rounded-3xl border border-black/5 shadow-xl cursor-pointer"
                 >
                   <div className="h-64 xl:h-72 2xl:h-80 overflow-hidden">
                     <img
@@ -1279,11 +1279,11 @@ export default function EventsPageContent() {
                 <Zap className="h-3 w-3" /> Join the movement
               </motion.span>
               <h2 className="text-2xl sm:text-3xl md:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-white max-w-3xl mx-auto leading-tight">
-                Be part of India's most vibrant community in Korea
+                Be part of India&apos;s most vibrant community in Korea
               </h2>
               <p className="mt-5 text-sm sm:text-base xl:text-lg 2xl:text-xl text-white/80 max-w-xl xl:max-w-2xl mx-auto leading-relaxed">
                 Festivals, sports, cultural nights, food events, networking —
-                there's always something happening. Don't miss out.
+                there&apos;s always something happening. Don&apos;t miss out.
               </p>
               <div className="mt-8 xl:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a

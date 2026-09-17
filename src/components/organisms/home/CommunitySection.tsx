@@ -59,13 +59,7 @@ const Sk = ({ className }: { className?: string }) => (
   <div className={`animate-pulse bg-orange-100/50 rounded-2xl ${className}`} />
 );
 
-const CommunityRow = ({
-  community,
-  index,
-}: {
-  community: CommunityItem;
-  index: number;
-}) => {
+const CommunityRow = ({ community }: { community: CommunityItem }) => {
   const colors = tagColorClass(community.accentColor);
   const href = community.websiteUrl || community.facebookUrl || "/community";
 
@@ -74,12 +68,6 @@ const CommunityRow = ({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      style={{
-        animationDelay: `${0.3 + index * 0.1}s`,
-        animation: "fade-up 0.6s ease both",
-        opacity: 0,
-        animationFillMode: "forwards",
-      }}
       className="group flex items-center gap-2 sm:gap-3 rounded-2xl border border-slate-100 bg-white p-3 sm:p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF9933]/40 hover:shadow-md"
     >
       <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-slate-50 text-lg">
@@ -375,19 +363,15 @@ export const CommunitySection = () => {
               </em>
             </h2>
             <p className="gsap-reveal-para max-w-full sm:max-w-sm mt-2 text-[13px] leading-[1.85] text-slate-500">
-              Whether you're a student at SNU, an engineer in Pangyo, or a Tamil
-              in Seoul — there's an IIK community waiting for you.
+              Whether you&apos;re a student at SNU, an engineer in Pangyo, or a Tamil
+              in Seoul — there&apos;s an IIK community waiting for you.
             </p>
 
-            {/*
-              gsap-slide-left → SmoothScrollProvider slides list in from left.
-              (Also keeps the CSS animation on individual rows for a nice double-tap.)
-            */}
             <div className="gsap-slide-left flex flex-col gap-3 mt-1">
               {loading
                 ? [...Array(4)].map((_, i) => <Sk key={i} className="h-16" />)
-                : communities.map((c, i) => (
-                    <CommunityRow key={c.id} community={c} index={i} />
+                : communities.map((c) => (
+                    <CommunityRow key={c.id} community={c} />
                   ))}
             </div>
 
@@ -426,10 +410,6 @@ export const CommunitySection = () => {
           </motion.div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes fade-up { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-      `}</style>
     </motion.section>
   );
 };

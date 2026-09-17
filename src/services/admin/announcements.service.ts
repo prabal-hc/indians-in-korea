@@ -1,13 +1,15 @@
 import { createSupabaseClient } from "@/lib/supabase/client";
 
 const getSupabase = () => {
-  const supabase = createSupabaseClient();
-  if (!supabase) {
-    throw new Error(
-      "Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+  try {
+    return createSupabaseClient();
+  } catch (error) {
+    console.error(
+      "Supabase client initialization failed for announcements service:",
+      error,
     );
+    throw error;
   }
-  return supabase;
 };
 
 export interface AnnouncementItem {
@@ -21,78 +23,177 @@ export interface AnnouncementItem {
   status?: string;
 }
 
-export async function getAll() {
-  const { data, error } = await getSupabase()
-    .from("announcements")
-    .select("*")
-    .order("display_order", { ascending: true });
+/**
+ * Get all announcements
+ */
+export async function getAll(): Promise<AnnouncementItem[]> {
+  try {
+    const supabase = getSupabase();
 
-  if (error) {
-    console.error(error);
+    const { data, error } = await supabase
+      .from("announcements")
+      .select("*")
+      .order("display_order", { ascending: true });
+
+    if (error) {
+      console.error("Announcements Supabase Error:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+      });
+
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error("Announcements getAll Error:", error);
     return [];
   }
-
-  return data || [];
 }
 
-export async function getById(id: string) {
-  const { data, error } = await getSupabase()
-    .from("announcements")
-    .select("*")
-    .eq("id", id)
-    .single();
+/**
+ * Get announcement by ID
+ */
+export async function getById(
+  id: string
+): Promise<AnnouncementItem | null> {
+  try {
+    const supabase = getSupabase();
 
-  if (error) {
-    console.error(error);
+    const { data, error } = await supabase
+      .from("announcements")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error("Announcement getById Supabase Error:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+      });
+
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Announcement getById Error:", error);
     return null;
   }
-
-  return data;
 }
 
-export async function create(data: Omit<AnnouncementItem, "id">) {
-  const response = await fetch("/api/admin/announcements/create", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+/**
+ * Create announcement
+ */
+export async function create(
+  data: Omit<AnnouncementItem, "id">
+) {
+  try {
+    const response = await fetch(
+      "/api/admin/announcements/create",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to create announcement");
+    if (!response.ok) {
+      let errorMessage = "Failed to create announcement";
+
+      try {
+        const errorData = await response.json();
+        errorMessage =
+          errorData.error || errorData.message || errorMessage;
+      } catch {
+        // Ignore JSON parsing error
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Announcement create Error:", error);
+    throw error;
   }
-
-  return await response.json();
 }
 
-export async function update(id: string, data: Partial<AnnouncementItem>) {
-  const response = await fetch(`/api/admin/announcements/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+/**
+ * Update announcement
+ */
+export async function update(
+  id: string,
+  data: Partial<AnnouncementItem>
+) {
+  try {
+    const response = await fetch(
+      `/api/admin/announcements/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to update announcement");
+    if (!response.ok) {
+      let errorMessage = "Failed to update announcement";
+
+      try {
+        const errorData = await response.json();
+        errorMessage =
+          errorData.error || errorData.message || errorMessage;
+      } catch {
+        // Ignore JSON parsing error
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Announcement update Error:", error);
+    throw error;
   }
-
-  return await response.json();
 }
 
+/**
+ * Delete announcement
+ */
 export async function remove(id: string) {
-  const response = await fetch(`/api/admin/announcements/${id}`, {
-    method: "DELETE",
-  });
+  try {
+    const response = await fetch(
+      `/api/admin/announcements/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to delete announcement");
+    if (!response.ok) {
+      let errorMessage = "Failed to delete announcement";
+
+      try {
+        const errorData = await response.json();
+        errorMessage =
+          errorData.error || errorData.message || errorMessage;
+      } catch {
+        // Ignore JSON parsing error
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Announcement delete Error:", error);
+    throw error;
   }
-
-  return true;
 }

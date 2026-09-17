@@ -145,7 +145,7 @@ export async function POST(request: Request) {
         return Response.json({ success: true });
       }
 
-      const rows = brandNew.map((m: any, i: number) => ({
+      const rows = brandNew.map((m: any) => ({
         name: m.name,
         initials: m.initials,
         role: m.role,

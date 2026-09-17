@@ -1,14 +1,6 @@
 import { createSupabaseClient } from "@/lib/supabase/client";
 
-const getSupabase = () => {
-  const supabase = createSupabaseClient();
-  if (!supabase) {
-    throw new Error(
-      "Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
-    );
-  }
-  return supabase;
-};
+const getSupabase = () => createSupabaseClient();
 
 // Matches exactly the columns in the `events` table:
 // id, title, category, event_date, time, location, description,
@@ -67,7 +59,7 @@ export async function getFeatured(): Promise<EventItem | null> {
     .maybeSingle();
 
   if (error) {
-    console.error(error);
+    console.error("Supabase getFeatured query failed:", error);
     return null;
   }
   return data ? mapEvent(data) : null;

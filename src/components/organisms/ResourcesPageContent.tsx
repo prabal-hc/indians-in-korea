@@ -1,15 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import {
-  motion,
-  AnimatePresence,
-  useInView,
-  useSpring,
-  useMotionValue,
-} from "framer-motion";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useRef, useState, useCallback } from "react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import {
   Home,
   FileText,
@@ -22,7 +14,6 @@ import {
   ExternalLink,
   Train,
   Hospital,
-  Banknote,
   ShoppingBag,
   Smartphone,
   MapPin,
@@ -35,11 +26,9 @@ import {
   Key,
   ScrollText,
   Landmark,
-  Bus,
   Stethoscope,
   Pill,
   IndianRupee,
-  Clock,
   Star,
   MessageCircle,
   Calendar,
@@ -47,9 +36,6 @@ import {
   CreditCard,
   Siren,
 } from "lucide-react";
-import { Heading } from "@/components/atoms/Heading";
-
-gsap.registerPlugin(ScrollTrigger);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -421,9 +407,9 @@ const resourceCategories: ResourceCategory[] = [
     title: "Healthcare & Emergency",
     description: "Stay healthy, know your rights, and act fast in emergencies",
     icon: <Stethoscope className="w-6 h-6" />,
-    accent: "#dc2626",
-    bgGradient: "from-red-50 via-rose-50/60 to-white",
-    borderColor: "rgba(220,38,38,0.18)",
+    accent: "#22c55e",
+    bgGradient: "from-green-50 via-emerald-50/60 to-white",
+    borderColor: "rgba(34,197,94,0.18)",
     items: [
       {
         title: "National Health Insurance (NHI)",
@@ -523,9 +509,9 @@ const resourceCategories: ResourceCategory[] = [
     description:
       "Everything a student needs to thrive academically and socially in Korea",
     icon: <GraduationCap className="w-6 h-6" />,
-    accent: "#0891b2",
-    bgGradient: "from-cyan-50 via-sky-50/60 to-white",
-    borderColor: "rgba(8,145,178,0.18)",
+    accent: "#3b82f6",
+    bgGradient: "from-blue-50 via-sky-50/60 to-white",
+    borderColor: "rgba(59,130,246,0.18)",
     items: [
       {
         title: "University Onboarding & Admin",
@@ -606,9 +592,9 @@ const resourceCategories: ResourceCategory[] = [
     title: "Community & Support",
     description: "Connect with Indians in Korea — events, groups, and networks",
     icon: <Users className="w-6 h-6" />,
-    accent: "#f59e0b",
-    bgGradient: "from-amber-50 via-yellow-50/60 to-white",
-    borderColor: "rgba(245,158,11,0.18)",
+    accent: "#f97316",
+    bgGradient: "from-orange-50 via-amber-50/60 to-white",
+    borderColor: "rgba(249,115,22,0.18)",
     items: [
       {
         title: "IIK Community Support",
@@ -683,9 +669,9 @@ const resourceCategories: ResourceCategory[] = [
     description:
       "Honest answers to real questions Indians ask before and after moving to Korea",
     icon: <HelpCircle className="w-6 h-6" />,
-    accent: "#7c3aed",
-    bgGradient: "from-violet-50 via-purple-50/60 to-white",
-    borderColor: "rgba(124,58,237,0.18)",
+    accent: "#a855f7",
+    bgGradient: "from-purple-50 via-fuchsia-50/60 to-white",
+    borderColor: "rgba(168,85,247,0.18)",
     items: [
       {
         title: "Is Korea safe for Indians?",
@@ -1057,8 +1043,8 @@ const CategoryCard = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 36, filter: "blur(6px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={{ opacity: 0, y: 36 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{
         duration: 0.7,
@@ -1066,7 +1052,7 @@ const CategoryCard = ({
         ease: [0.16, 1, 0.3, 1],
       }}
       whileHover={{ y: -4, transition: { duration: 0.28, ease: "easeOut" } }}
-      className={`resources-scroll-reveal group relative overflow-hidden rounded-[2rem] border p-8 bg-gradient-to-br ${category.bgGradient}`}
+      className={`resources-scroll-reveal group relative overflow-hidden rounded-3xl border p-8 bg-gradient-to-br ${category.bgGradient}`}
       style={{
         borderColor: category.borderColor,
         boxShadow:
@@ -1084,7 +1070,7 @@ const CategoryCard = ({
     >
       {/* Gradient border glow on hover */}
       <div
-        className="absolute inset-0 rounded-[2rem] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        className="absolute inset-0 rounded-3xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         style={{
           background: `radial-gradient(ellipse at top left, ${category.accent}08, transparent 60%)`,
         }}
@@ -1140,7 +1126,6 @@ const CategoryCard = ({
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function ResourcesPageContent() {
-  const rootRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [primaryHovered, setPrimaryHovered] = useState(false);
@@ -1152,33 +1137,8 @@ export default function ResourcesPageContent() {
     setExpandedId((prev) => (prev === id ? null : id));
   }, []);
 
-  useEffect(() => {
-    if (!rootRef.current) return;
-    const ctx = gsap.context(() => {
-      gsap.utils
-        .toArray<HTMLElement>(".resources-scroll-reveal")
-        .forEach((section) => {
-          ScrollTrigger.create({
-            trigger: section,
-            start: "top 88%",
-            onEnter: () =>
-              gsap.to(section, {
-                opacity: 1,
-                y: 0,
-                duration: 0.8,
-                ease: "power3.out",
-              }),
-          });
-        });
-    }, rootRef);
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <div
-      ref={rootRef}
-      className="relative overflow-hidden bg-white text-stone-900"
-    >
+    <div className="relative overflow-hidden bg-white text-stone-900">
       <GlobalStyles />
 
       {/* Global ambient background */}
@@ -1504,8 +1464,8 @@ export default function ResourcesPageContent() {
 
         <div className="relative mx-auto max-w-5xl">
           <motion.div
-            initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
-            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col gap-8 rounded-[2.5rem] border border-white/25 bg-white/12 p-10 shadow-[0_40px_120px_rgba(0,0,0,0.15)] backdrop-blur-xl sm:p-14 lg:flex-row lg:items-center lg:justify-between"
@@ -1529,7 +1489,7 @@ export default function ResourcesPageContent() {
                 }}
                 className="text-3xl font-bold leading-tight text-white md:text-4xl"
               >
-                Can't find what you're looking for?
+                Can&apos;t find what you&apos;re looking for?
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0, y: 10 }}
@@ -1537,8 +1497,8 @@ export default function ResourcesPageContent() {
                 transition={{ duration: 0.55, delay: 0.42 }}
                 className="mt-3 text-sm leading-7 text-white/82"
               >
-                Reach out to the IIK community team. We've helped thousands of
-                Indians settle into Korean life — you're not alone in this.
+                Reach out to the IIK community team. We&apos;ve helped thousands of
+                Indians settle into Korean life — you&apos;re not alone in this.
               </motion.p>
             </div>
 

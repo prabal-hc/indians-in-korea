@@ -9,6 +9,15 @@ function getResendClient() {
   return new Resend(apiKey);
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export async function POST(req: Request) {
   try {
     const resend = getResendClient();
@@ -21,6 +30,11 @@ export async function POST(req: Request) {
       );
     }
 
+    const safeName = escapeHtml(String(name));
+    const safeEmail = escapeHtml(String(email));
+    const safeSubject = escapeHtml(String(subject));
+    const safeMessage = escapeHtml(String(message));
+
     const { error } = await resend.emails.send({
       from: "IIK Contact Form <onboarding@resend.dev>",
       to: "prabalhc@gmail.com",
@@ -32,15 +46,15 @@ export async function POST(req: Request) {
           <p style="color:#9ca3af;font-size:13px;margin-top:0;">Submitted via the IIK Contact Form</p>
           <hr style="border:none;border-top:1px solid #ffedd5;margin:20px 0;" />
           <table style="width:100%;font-size:14px;color:#374151;">
-            <tr><td style="padding:8px 0;font-weight:600;width:100px;">Name</td><td>${name}</td></tr>
-            <tr><td style="padding:8px 0;font-weight:600;">Email</td><td><a href="mailto:${email}" style="color:#f97316;">${email}</a></td></tr>
-            <tr><td style="padding:8px 0;font-weight:600;">Subject</td><td>${subject}</td></tr>
+            <tr><td style="padding:8px 0;font-weight:600;width:100px;">Name</td><td>${safeName}</td></tr>
+            <tr><td style="padding:8px 0;font-weight:600;">Email</td><td><a href="mailto:${safeEmail}" style="color:#f97316;">${safeEmail}</a></td></tr>
+            <tr><td style="padding:8px 0;font-weight:600;">Subject</td><td>${safeSubject}</td></tr>
           </table>
           <hr style="border:none;border-top:1px solid #ffedd5;margin:20px 0;" />
           <p style="font-weight:600;color:#374151;margin-bottom:8px;">Message</p>
-          <p style="color:#4b5563;line-height:1.7;white-space:pre-wrap;">${message}</p>
+          <p style="color:#4b5563;line-height:1.7;white-space:pre-wrap;">${safeMessage}</p>
           <hr style="border:none;border-top:1px solid #ffedd5;margin:20px 0;" />
-          <p style="font-size:11px;color:#d1d5db;">Hit reply to respond directly to ${name}.</p>
+          <p style="font-size:11px;color:#d1d5db;">Hit reply to respond directly to ${safeName}.</p>
         </div>
       `,
     });

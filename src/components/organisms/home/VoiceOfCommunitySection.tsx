@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getAll, type TestimonialItem } from "@/services/testimonials.service";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 // We still need GSAP here only for the Marquee tween (not a scroll trigger).
 gsap.registerPlugin(ScrollTrigger);
@@ -59,7 +60,7 @@ const VoiceCard = ({ item }: { item: TestimonialItem }) => {
         <div className="flex-1 scale-y-0 origin-top transition-transform duration-[380ms] [cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-y-100 bg-[#138808]" />
       </div>
       <span className="pointer-events-none absolute right-4 top-2 font-serif text-[72px] leading-none text-[#FF9933] opacity-[0.07] transition-opacity duration-300 group-hover:opacity-[0.14]">
-        "
+        &quot;
       </span>
       <div className="flex items-center gap-3">
         <div
@@ -76,7 +77,7 @@ const VoiceCard = ({ item }: { item: TestimonialItem }) => {
         <StarRating count={item.rating} />
       </div>
       <p className="relative z-10 mt-4 text-[12.5px] italic leading-[1.75] text-slate-500">
-        "{item.quote}"
+        &quot;{item.quote}&quot;
       </p>
       <div className="mt-4 flex items-center justify-between border-t border-slate-50 pt-4">
         <span
@@ -173,6 +174,7 @@ const Marquee = ({ items }: { items: TestimonialItem[] }) => {
 export const VoiceOfCommunitySection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: "-90px" });
+  useScrollReveal(sectionRef);
   const [items, setItems] = useState<TestimonialItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -226,7 +228,7 @@ export const VoiceOfCommunitySection = () => {
           style={{ opacity: 0 }}
         >
           {loading
-            ? "Loading voices…"
+            ? ""
             : `${items.length} community members sharing their IIK journey.`}
         </p>
       </motion.div>

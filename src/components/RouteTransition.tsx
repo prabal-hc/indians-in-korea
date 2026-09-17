@@ -1,31 +1,31 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { getLenis } from "@/lib/scroll";
-import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 interface RouteTransitionProps {
   children: React.ReactNode;
 }
 
-const pageVariants = {
-  initial: { opacity: 0, scale: 0.994, filter: "blur(2px)" },
-  animate: { opacity: 1, scale: 1, filter: "blur(0px)" },
-  exit: { opacity: 0, scale: 0.992, filter: "blur(1px)" },
-};
-
 export default function RouteTransition({ children }: RouteTransitionProps) {
   const pathname = usePathname();
 
   useEffect(() => {
+    // Jump to top on every route change — Lenis owns scroll position
+    // independently of the browser, and persists across navigations since
+    // it isn't remounted per page, so it needs to be reset explicitly.
+    window.scrollTo(0, 0);
+    getLenis()?.scrollTo(0, { immediate: true });
+
     // Refresh scroll calculations on route change
     const timer = setTimeout(() => {
       const lenis = getLenis();
       if (lenis) {
         lenis.resize();
+        lenis.scrollTo(0, { immediate: true });
         ScrollTrigger.refresh();
       }
     }, 100);
@@ -34,19 +34,14 @@ export default function RouteTransition({ children }: RouteTransitionProps) {
   }, [pathname]);
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={pathname}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        variants={pageVariants}
-        transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
-        style={{ willChange: "transform, opacity" }}
-        className="min-h-screen"
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      key={pathname}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className="min-h-screen"
+    >
+      {children}
+    </motion.div>
   );
 }

@@ -92,15 +92,7 @@ export type AboutPageData = {
   socials: ContactItem[];
 };
 
-const getSupabase = () => {
-  const supabase = createSupabaseClient();
-  if (!supabase) {
-    throw new Error(
-      "Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
-    );
-  }
-  return supabase;
-};
+const getSupabase = () => createSupabaseClient();
 
 const toInitials = (name: string) =>
   name
@@ -121,11 +113,6 @@ const mapContent = (row: any): AboutContent => ({
   ctaLabel: row.cta_label ?? "",
   ctaUrl: row.cta_url ?? "",
   heroImage: row.hero_image ?? "",
-});
-
-const mapVision = (row: any): VisionItem => ({
-  id: row.id,
-  content: row.content ?? "",
 });
 
 const mapBoard = (row: any): BoardMember => ({

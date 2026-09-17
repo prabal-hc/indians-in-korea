@@ -3,14 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useEffect, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   PiArrowRight,
   PiUsers,
   PiCalendar,
   PiGlobe,
   PiBuildings,
-  PiArrowSquareOut,
   PiHandshake,
 } from "react-icons/pi";
 import {
@@ -37,7 +36,6 @@ const Sk = ({ className }: { className?: string }) => (
 
 export const AboutPageContent = () => {
   const heroRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(heroRef, { once: true, margin: "-40px" });
   const [data, setData] = useState<AboutPageData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -65,7 +63,7 @@ export const AboutPageContent = () => {
       </div>
     );
 
-  const { content, vision, board, advisors, core, contacts, socials } = data!;
+  const { content, vision, board, advisors, core } = data!;
 
   const stats = [
     { value: content?.members ?? "12,000+", label: "Members", icon: PiUsers },
@@ -271,7 +269,7 @@ export const AboutPageContent = () => {
                 className="mb-12 text-center max-w-2xl mx-auto"
               >
                 <p className="text-xs font-bold uppercase tracking-widest text-orange-500 mb-3">
-                  IIK's Vision
+                  IIK&apos;s Vision
                 </p>
                 <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
                   Our guiding principles for a thriving community

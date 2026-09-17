@@ -274,7 +274,7 @@ export const AboutSection = () => {
             <p className="gsap-reveal-para mt-4 text-[13px] leading-[1.85] text-slate-500 max-w-[480px]">
               This group primarily includes engineering professionals, business
               persons, research fellows, students and housewives. IIK upholds
-              India's umbrella of{" "}
+              India&apos;s umbrella of{" "}
               <strong className="font-[700] text-slate-800">
                 Unity in Diversity
               </strong>{" "}

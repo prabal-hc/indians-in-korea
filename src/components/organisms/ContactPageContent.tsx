@@ -13,20 +13,6 @@ import {
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DESIGN TOKENS — mirrors HeroText's orange/warm palette exactly
-// ─────────────────────────────────────────────────────────────────────────────
-
-const ORANGE = {
-  50: "#fff7ed",
-  100: "#ffedd5",
-  200: "#fed7aa",
-  400: "#fb923c",
-  500: "#f97316",
-  600: "#ea580c",
-  700: "#c2410c",
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
 // WORD VARIANT — same staggered reveal as HeroText
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -741,7 +727,7 @@ export default function ContactPageContent() {
               className="text-base sm:text-lg md:text-xl text-gray-600 max-w-xl leading-relaxed"
             >
               Have questions or want to connect with the Indian community in
-              Korea? Reach out — let's build something stronger together.
+              Korea? Reach out — let&apos;s build something stronger together.
             </motion.p>
           </div>
         </div>
@@ -795,7 +781,7 @@ export default function ContactPageContent() {
                     Send us a Message
                   </h2>
                   <p className="text-sm text-gray-400 tracking-wide">
-                    We'll get back to you within 24 hours.
+                    We&apos;ll get back to you within 24 hours.
                   </p>
                 </div>
 
@@ -869,7 +855,7 @@ export default function ContactPageContent() {
                     }}
                   >
                     <CheckCircle size={16} />
-                    Message sent successfully! We'll be in touch soon.
+                    Message sent successfully! We&apos;ll be in touch soon.
                   </motion.div>
                 )}
                 {submitStatus === "error" && (

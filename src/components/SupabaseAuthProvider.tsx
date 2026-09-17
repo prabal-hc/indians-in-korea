@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { createBrowserClient } from "@supabase/ssr";
+import { createSupabaseClient } from "@/lib/supabase/client";
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 
 interface SupabaseAuthContextValue {
@@ -24,19 +24,7 @@ export default function SupabaseAuthProvider({
 }: SupabaseAuthProviderProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [supabase] = useState(() =>
-    createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
-      {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: false,
-        },
-      },
-    ),
-  );
+  const [supabase] = useState<SupabaseClient>(() => createSupabaseClient());
 
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);

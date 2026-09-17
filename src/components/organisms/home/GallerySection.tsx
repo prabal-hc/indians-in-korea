@@ -5,6 +5,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { getAll, type GalleryItem } from "@/services/gallery.service";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const getTopOffset = (i: number): string => {
   const pattern = ["0%", "2.5%", "5%", "2.5%"];
@@ -19,6 +20,7 @@ export const GallerySection = () => {
   const autoScrollRaf = useRef<number>(0);
   const mouseXInScroll = useRef(0);
   const sectionRef = useRef<HTMLElement>(null);
+  useScrollReveal(sectionRef);
 
   useEffect(() => {
     getAll().then((data) => {

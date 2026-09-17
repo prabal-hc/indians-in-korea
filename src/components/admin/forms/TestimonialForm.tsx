@@ -286,7 +286,7 @@ export function TestimonialForm({
         <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">
           Star rating
         </h3>
-        <StarPicker />
+        {StarPicker()}
       </div>
 
       {/* ── Display order ── */}
@@ -327,7 +327,7 @@ export function TestimonialForm({
             className="w-4 h-4 accent-green-600"
           />
           <span className="text-sm font-semibold text-slate-900">
-            Show "Verified member" badge
+            Show &quot;Verified member&quot; badge
           </span>
         </label>
       </div>

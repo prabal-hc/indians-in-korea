@@ -268,7 +268,7 @@ function ContentForm({
 
       <Section title="Vision Items">
         <p className="text-xs text-slate-400 -mt-2">
-          Numbered cards in the "Our Vision" section.
+          Numbered cards in the &quot;Our Vision&quot; section.
         </p>
         <div className="space-y-2.5">
           {values.visionItems.map((item, i) => (

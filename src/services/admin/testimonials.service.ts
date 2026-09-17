@@ -14,15 +14,7 @@ export interface TestimonialItem {
   displayOrder: number;
 }
 
-const getSupabase = () => {
-  const supabase = createSupabaseClient();
-  if (!supabase) {
-    throw new Error(
-      "Supabase client is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
-    );
-  }
-  return supabase;
-};
+const getSupabase = () => createSupabaseClient();
 
 // Auto-generate initials from name if not provided
 const toInitials = (name: string) =>

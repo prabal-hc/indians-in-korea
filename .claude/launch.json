@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "indians-in-korea-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "silver-oak-scaler",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["D:/agri/web/serve.js"],
+      "port": 5173
+    }
+  ]
+}
