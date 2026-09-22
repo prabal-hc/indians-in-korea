@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   motion,
@@ -26,6 +27,7 @@ import {
   getAll,
   type EventItem,
 } from "@/services/events.service";
+import { ModalPortal } from "./home/ModalPortal";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -265,6 +267,8 @@ export default function EventsPageContent() {
 
   // ── Other state ─────────────────────────────────────────────────────────────
   const [activeYear, setActiveYear] = useState("");
+  const [lightboxEvent, setLightboxEvent] = useState<EventItem | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   // Countdown to featured event date (falls back gracefully)
   const countdownTarget = useMemo(() => {
@@ -1100,6 +1104,10 @@ export default function EventsPageContent() {
                       y: -6,
                       transition: { duration: 0.35, ease: EASE_SOFT },
                     }}
+                    onClick={() => {
+                      setLightboxIndex(0);
+                      setLightboxEvent(ev);
+                    }}
                     className={`group relative overflow-hidden rounded-2xl xl:rounded-3xl bg-gray-900 text-white shadow-lg cursor-pointer ${i === 0 ? "sm:row-span-2 sm:col-span-1" : ""}`}
                   >
                     <motion.img
@@ -1306,6 +1314,117 @@ export default function EventsPageContent() {
           </motion.div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          PAST EVENT LIGHTBOX
+      ═══════════════════════════════════════════════════════════════════════ */}
+      {lightboxEvent &&
+        (() => {
+          const photos = [
+            lightboxEvent.imageUrl,
+            ...(lightboxEvent.galleryUrls ?? []),
+          ].filter((url): url is string => Boolean(url));
+          const videoUrl = lightboxEvent.videoUrl;
+          const youtubeMatch = videoUrl?.match(
+            /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/,
+          );
+          const embedUrl = youtubeMatch
+            ? `https://www.youtube.com/embed/${youtubeMatch[1]}`
+            : null;
+
+          return (
+            <ModalPortal>
+              <div
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 px-4 py-8"
+                onClick={() => setLightboxEvent(null)}
+              >
+                <div
+                  data-lenis-prevent
+                  className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-gray-900"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setLightboxEvent(null)}
+                    className="absolute right-4 top-4 z-10 rounded-full bg-black/50 p-2 text-white hover:bg-black/70"
+                    aria-label="Close"
+                  >
+                    ✕
+                  </button>
+
+                  {videoUrl ? (
+                    <div className="aspect-video w-full bg-black">
+                      {embedUrl ? (
+                        <iframe
+                          src={embedUrl}
+                          title={lightboxEvent.title}
+                          className="h-full w-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <video
+                          src={videoUrl}
+                          controls
+                          className="h-full w-full"
+                        />
+                      )}
+                    </div>
+                  ) : photos.length > 0 ? (
+                    <div className="relative aspect-video w-full bg-black">
+                      <Image
+                        src={photos[lightboxIndex]}
+                        alt={lightboxEvent.title}
+                        fill
+                        className="object-contain"
+                      />
+                      {photos.length > 1 && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setLightboxIndex(
+                                (i) => (i - 1 + photos.length) % photos.length,
+                              )
+                            }
+                            className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70"
+                            aria-label="Previous photo"
+                          >
+                            ‹
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setLightboxIndex((i) => (i + 1) % photos.length)
+                            }
+                            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70"
+                            aria-label="Next photo"
+                          >
+                            ›
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  ) : null}
+
+                  <div className="p-6">
+                    <p className="text-xs font-bold uppercase tracking-widest text-orange-400">
+                      {lightboxEvent.date
+                        ? new Date(lightboxEvent.date).getFullYear()
+                        : ""}
+                    </p>
+                    <h3 className="mt-1 text-xl font-bold text-white">
+                      {lightboxEvent.title}
+                    </h3>
+                    <p className="mt-2 text-sm text-white/70 leading-6">
+                      {lightboxEvent.description || lightboxEvent.location}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </ModalPortal>
+          );
+        })()}
     </div>
   );
 }

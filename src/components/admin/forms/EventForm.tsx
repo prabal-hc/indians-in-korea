@@ -9,7 +9,9 @@ import dayjs, { Dayjs } from "dayjs";
 
 // Matches the DB columns exactly:
 // title, category, event_date (→ date), time, location,
-// description, image_url (→ imageUrl), attendees, is_active (→ status)
+// description, image_url (→ imageUrl), attendees, is_active (→ status),
+// gallery_urls (→ galleryUrls), video_url (→ videoUrl),
+// registration_url (→ registrationUrl)
 export interface EventFormValues {
   title: string;
   category: string;
@@ -20,6 +22,9 @@ export interface EventFormValues {
   imageUrl: string;
   attendees: string;
   status: "Published" | "Draft";
+  galleryUrls: string[];
+  videoUrl: string;
+  registrationUrl: string;
 }
 
 interface EventFormProps {
@@ -72,6 +77,9 @@ export function EventForm({
       imageUrl: "",
       attendees: "",
       status: "Published",
+      galleryUrls: [],
+      videoUrl: "",
+      registrationUrl: "",
     },
   );
 
@@ -283,6 +291,81 @@ export function EventForm({
           onChange={(url) => set("imageUrl", url)}
           note="Landscape image works best (1200×630)."
         />
+
+        {/* Gallery (past-event photos shown in the events catalog) */}
+        <div className="space-y-3">
+          <span className="text-sm font-semibold text-slate-900">
+            Gallery photos (optional)
+          </span>
+          {values.galleryUrls.map((url, i) => (
+            <div key={i} className="flex items-start gap-3">
+              <div className="flex-1">
+                <ImageUploader
+                  label={`Gallery photo ${i + 1}`}
+                  value={url}
+                  onChange={(newUrl) =>
+                    setValues((v) => ({
+                      ...v,
+                      galleryUrls: v.galleryUrls.map((u, j) =>
+                        j === i ? newUrl : u,
+                      ),
+                    }))
+                  }
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  setValues((v) => ({
+                    ...v,
+                    galleryUrls: v.galleryUrls.filter((_, j) => j !== i),
+                  }))
+                }
+                className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-500 transition hover:bg-rose-100"
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              setValues((v) => ({
+                ...v,
+                galleryUrls: [...v.galleryUrls, ""],
+              }))
+            }
+            className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-orange-300 px-4 py-2 text-xs font-semibold text-orange-500 transition hover:bg-orange-50"
+          >
+            + Add gallery photo
+          </button>
+        </div>
+
+        {/* Video */}
+        <label className="block space-y-2">
+          <span className="text-sm font-semibold text-slate-900">
+            Video link (optional)
+          </span>
+          <input
+            value={values.videoUrl}
+            onChange={(e) => set("videoUrl", e.target.value)}
+            className={field}
+            placeholder="https://www.youtube.com/watch?v=..."
+          />
+        </label>
+
+        {/* Registration link */}
+        <label className="block space-y-2">
+          <span className="text-sm font-semibold text-slate-900">
+            Registration link (optional)
+          </span>
+          <input
+            value={values.registrationUrl}
+            onChange={(e) => set("registrationUrl", e.target.value)}
+            className={field}
+            placeholder="https://forms.gle/... or an external registration page"
+          />
+        </label>
 
         {/* Submit */}
         <div className="flex justify-end">

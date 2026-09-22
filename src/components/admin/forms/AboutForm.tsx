@@ -346,6 +346,8 @@ const emptyMember = (): BoardMember & { _key: string } => ({
   koreanTitle: "", // ← new
   type: "board",
   imageUrl: "",
+  bio: "",
+  message: "",
   displayOrder: 0,
   isActive: true,
 });
@@ -462,6 +464,8 @@ function BoardForm({
             koreanTitle: m.koreanTitle ?? null,
             type: m.type,
             imageUrl: m.imageUrl ?? null,
+            bio: m.bio ?? null,
+            message: m.message ?? null,
             displayOrder: m.displayOrder ?? 0,
             isActive: m.isActive ?? true,
           }));
@@ -646,6 +650,32 @@ function BoardForm({
                   </label>
                 </div>
 
+                <label className="space-y-1.5 block">
+                  <span className="text-xs font-semibold text-slate-700">
+                    Short bio (optional)
+                  </span>
+                  <textarea
+                    value={member.bio ?? ""}
+                    onChange={(e) => update(i, "bio", e.target.value)}
+                    className={field}
+                    rows={2}
+                    placeholder="One or two sentences introducing this member."
+                  />
+                </label>
+
+                <label className="space-y-1.5 block">
+                  <span className="text-xs font-semibold text-slate-700">
+                    Leadership message (optional)
+                  </span>
+                  <textarea
+                    value={member.message ?? ""}
+                    onChange={(e) => update(i, "message", e.target.value)}
+                    className={field}
+                    rows={3}
+                    placeholder="A short welcome message from this member, shown in the About page's leadership section."
+                  />
+                </label>
+
                 <div className="flex items-center justify-between pt-1">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -766,6 +796,41 @@ function BoardForm({
                     </select>
                   </label>
                 </div>
+
+                <label className="space-y-1.5 block">
+                  <span className="text-xs font-semibold text-slate-700">
+                    Short bio (optional)
+                  </span>
+                  <textarea
+                    value={draftMember.bio ?? ""}
+                    onChange={(e) =>
+                      setDraftMember((prev) =>
+                        prev ? { ...prev, bio: e.target.value } : prev,
+                      )
+                    }
+                    className={field}
+                    rows={2}
+                    placeholder="One or two sentences introducing this member."
+                  />
+                </label>
+
+                <label className="space-y-1.5 block">
+                  <span className="text-xs font-semibold text-slate-700">
+                    Leadership message (optional)
+                  </span>
+                  <textarea
+                    value={draftMember.message ?? ""}
+                    onChange={(e) =>
+                      setDraftMember((prev) =>
+                        prev ? { ...prev, message: e.target.value } : prev,
+                      )
+                    }
+                    className={field}
+                    rows={3}
+                    placeholder="A short welcome message from this member, shown in the About page's leadership section."
+                  />
+                </label>
+
                 <div className="flex items-center justify-end gap-3 pt-2">
                   <button
                     type="button"

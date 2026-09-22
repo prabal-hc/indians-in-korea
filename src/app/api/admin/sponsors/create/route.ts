@@ -4,40 +4,20 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
-    const {
-      title,
-      category,
-      date,
-      time,
-      location,
-      description,
-      imageUrl,
-      attendees,
-      isActive,
-      status,
-      galleryUrls,
-      videoUrl,
-      registrationUrl,
-    } = await request.json();
+    const { name, logoUrl, websiteUrl, displayOrder, isActive } =
+      await request.json();
 
     const supabaseAdmin = createSupabaseServiceRoleClient();
 
     const { data, error } = await supabaseAdmin
-      .from("events")
+      .from("sponsors")
       .insert([
         {
-          title,
-          category: category || "General",
-          is_active: isActive ?? status === "Published",
-          event_date: date,
-          time: time ?? null,
-          location,
-          description,
-          image_url: imageUrl ?? null,
-          attendees: attendees ?? "0",
-          gallery_urls: galleryUrls ?? [],
-          video_url: videoUrl ?? null,
-          registration_url: registrationUrl ?? null,
+          name,
+          logo_url: logoUrl || null,
+          website_url: websiteUrl || null,
+          display_order: displayOrder || 0,
+          is_active: isActive ?? true,
         },
       ])
       .select()

@@ -107,6 +107,8 @@ export async function POST(request: Request) {
           korean_title: m.koreanTitle ?? null,
           type: m.type,
           image_url: m.imageUrl ?? null,
+          bio: m.bio ?? null,
+          message: m.message ?? null,
           display_order: m.displayOrder ?? i,
           is_active: m.isActive ?? true,
         }));
@@ -127,6 +129,8 @@ export async function POST(request: Request) {
           korean_title: m.koreanTitle ?? null,
           type: m.type,
           image_url: m.imageUrl ?? null,
+          bio: m.bio ?? null,
+          message: m.message ?? null,
           display_order: m.displayOrder ?? persisted.length + i,
           is_active: m.isActive ?? true,
         }));
@@ -153,6 +157,8 @@ export async function POST(request: Request) {
         korean_title: m.koreanTitle ?? null,
         type: m.type,
         image_url: m.imageUrl ?? null,
+        bio: m.bio ?? null,
+        message: m.message ?? null,
         display_order: m.displayOrder ?? 0,
         is_active: m.isActive ?? true,
       }));

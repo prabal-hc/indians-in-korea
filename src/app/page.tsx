@@ -4,6 +4,7 @@ import {
   CommunitySection,
   GallerySection,
   Hero,
+  SponsorsSection,
   UpcomingEvent,
   VoiceOfCommunitySection,
 } from "@/components/organisms/home";
@@ -16,6 +17,7 @@ export default function Home() {
       <UpcomingEvent />
       <CommunitySection />
       <GallerySection />
+      <SponsorsSection />
       <VoiceOfCommunitySection />
     </MainLayout>
   );

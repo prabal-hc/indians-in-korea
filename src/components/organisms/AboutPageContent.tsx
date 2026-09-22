@@ -64,6 +64,9 @@ export const AboutPageContent = () => {
     );
 
   const { content, vision, board, advisors, core } = data!;
+  const leadershipMessages = [...board, ...advisors, ...core].filter(
+    (member) => member.message && member.message.trim(),
+  );
 
   const stats = [
     { value: content?.members ?? "12,000+", label: "Members", icon: PiUsers },
@@ -299,6 +302,72 @@ export const AboutPageContent = () => {
         </section>
       )}
 
+      {/* ── LEADERSHIP MESSAGES ─────────────────────────────────────────────── */}
+      {leadershipMessages.length > 0 && (
+        <section className="bg-gray-50 px-5 py-24 sm:px-8 lg:px-14">
+          <div className="mx-auto max-w-9xl">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={stagger}
+            >
+              <motion.div
+                variants={fadeUp}
+                className="mb-12 text-center max-w-2xl mx-auto"
+              >
+                <p className="text-xs font-bold uppercase tracking-widest text-orange-500 mb-3">
+                  From Our Leadership
+                </p>
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                  Messages from the people leading IIK
+                </h2>
+              </motion.div>
+              <motion.div
+                variants={stagger}
+                className="grid gap-6 sm:grid-cols-2"
+              >
+                {leadershipMessages.map((member) => (
+                  <motion.div
+                    key={member.id}
+                    variants={fadeUp}
+                    className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+                  >
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="relative flex-shrink-0 h-14 w-14 overflow-hidden rounded-2xl bg-orange-500 text-white shadow-md shadow-orange-200">
+                        {member.imageUrl ? (
+                          <Image
+                            src={member.imageUrl}
+                            alt={member.name}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center font-bold text-base">
+                            {member.initials}
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900 text-sm leading-snug">
+                          {member.name}
+                        </h3>
+                        <p className="text-xs font-semibold text-orange-600 mt-0.5 uppercase tracking-wide">
+                          {member.role}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-sm leading-7 text-gray-600 italic">
+                      &quot;{member.message}&quot;
+                    </p>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+      )}
+
       {/* ── BOARD ────────────────────────────────────────────────────────────── */}
       {(board.length > 0 || advisors.length > 0 || core.length > 0) && (
         <section className="px-5 py-24 sm:px-8 lg:px-14">
@@ -356,6 +425,11 @@ export const AboutPageContent = () => {
                       <p className="text-xs text-gray-500 mt-1.5 leading-5">
                         {member.profession}
                       </p>
+                      {member.bio && (
+                        <p className="text-xs text-gray-500 mt-1.5 leading-5">
+                          {member.bio}
+                        </p>
+                      )}
                     </div>
                   </motion.div>
                 ))}
@@ -397,6 +471,11 @@ export const AboutPageContent = () => {
                         <p className="text-xs text-gray-500 mt-1.5 leading-5">
                           {a.profession}
                         </p>
+                        {a.bio && (
+                          <p className="text-xs text-gray-500 mt-1.5 leading-5">
+                            {a.bio}
+                          </p>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -445,6 +524,11 @@ export const AboutPageContent = () => {
                       {m.koreanTitle && (
                         <p className="text-[10px] text-gray-400 mt-0.5">
                           {m.koreanTitle}
+                        </p>
+                      )}
+                      {m.bio && (
+                        <p className="text-[11px] text-gray-500 mt-1.5 leading-4">
+                          {m.bio}
                         </p>
                       )}
                       <span className="mt-2 inline-block rounded-full bg-orange-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-orange-600">

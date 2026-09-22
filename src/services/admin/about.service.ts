@@ -51,6 +51,8 @@ export type BoardMember = {
   koreanTitle?: string | null; // ← new
   type: "board" | "advisor" | "core";
   imageUrl?: string | null;
+  bio?: string | null;
+  message?: string | null;
   displayOrder?: number;
   isActive?: boolean;
 };
@@ -124,6 +126,8 @@ const mapBoard = (row: any): BoardMember => ({
   koreanTitle: row.korean_title ?? null, // ← new
   type: row.type,
   imageUrl: row.image_url ?? null,
+  bio: row.bio ?? null,
+  message: row.message ?? null,
   displayOrder: row.display_order ?? 0,
   isActive: row.is_active ?? true,
 });

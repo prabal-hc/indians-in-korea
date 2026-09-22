@@ -29,6 +29,9 @@ export default function AdminEditEventPage() {
           description: event.description,
           imageUrl: event.imageUrl || "",
           attendees: event.attendees || "0",
+          galleryUrls: event.galleryUrls ?? [],
+          videoUrl: event.videoUrl || "",
+          registrationUrl: event.registrationUrl || "",
         });
       }
       setLoading(false);
@@ -58,6 +61,9 @@ export default function AdminEditEventPage() {
               description: updated.description,
               imageUrl: updated.imageUrl || undefined,
               attendees: updated.attendees || "0",
+              galleryUrls: updated.galleryUrls.filter(Boolean),
+              videoUrl: updated.videoUrl || undefined,
+              registrationUrl: updated.registrationUrl || undefined,
             });
             router.push("/admin/events");
           }}

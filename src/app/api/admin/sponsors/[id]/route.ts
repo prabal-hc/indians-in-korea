@@ -13,26 +13,15 @@ export async function PUT(
     const supabaseAdmin = createSupabaseServiceRoleClient();
 
     const payload: Record<string, any> = {};
-    if (body.title !== undefined) payload.title = body.title;
-    if (body.category !== undefined) payload.category = body.category;
-    if (body.date !== undefined) payload.event_date = body.date;
-    if (body.time !== undefined) payload.time = body.time ?? null;
-    if (body.location !== undefined) payload.location = body.location;
-    if (body.description !== undefined) payload.description = body.description;
-    if (body.imageUrl !== undefined) payload.image_url = body.imageUrl ?? null;
-    if (body.attendees !== undefined) payload.attendees = body.attendees;
+    if (body.name !== undefined) payload.name = body.name;
+    if (body.logoUrl !== undefined) payload.logo_url = body.logoUrl;
+    if (body.websiteUrl !== undefined) payload.website_url = body.websiteUrl;
+    if (body.displayOrder !== undefined)
+      payload.display_order = body.displayOrder;
     if (body.isActive !== undefined) payload.is_active = body.isActive;
-    if (body.status !== undefined)
-      payload.is_active = body.status === "Published";
-    if (body.galleryUrls !== undefined)
-      payload.gallery_urls = body.galleryUrls ?? [];
-    if (body.videoUrl !== undefined)
-      payload.video_url = body.videoUrl ?? null;
-    if (body.registrationUrl !== undefined)
-      payload.registration_url = body.registrationUrl ?? null;
 
     const { data, error } = await supabaseAdmin
-      .from("events")
+      .from("sponsors")
       .update(payload)
       .eq("id", id)
       .select()
@@ -47,7 +36,7 @@ export async function PUT(
     }
 
     if (!data) {
-      return Response.json({ error: "Event not found" }, { status: 404 });
+      return Response.json({ error: "Sponsor not found" }, { status: 404 });
     }
 
     return Response.json(data);
@@ -69,7 +58,10 @@ export async function DELETE(
 
     const supabaseAdmin = createSupabaseServiceRoleClient();
 
-    const { error } = await supabaseAdmin.from("events").delete().eq("id", id);
+    const { error } = await supabaseAdmin
+      .from("sponsors")
+      .delete()
+      .eq("id", id);
 
     if (error) {
       console.error("Supabase error:", error);

@@ -9,4 +9,5 @@ export { FAQModal } from "./FAQModal";
 export { CommunitySection } from "./CommunitySection";
 export { GallerySection } from "./GallerySection";
 export { UpcomingEvent } from "./UpcomingEvent";
+export { SponsorsSection } from "./SponsorsSection";
 export { VoiceOfCommunitySection } from "./VoiceOfCommunitySection";

@@ -4,7 +4,8 @@ const getSupabase = () => createSupabaseClient();
 
 // Matches exactly the columns in the `events` table:
 // id, title, category, event_date, time, location, description,
-// image_url, attendees, is_active, created_at, updated_at
+// image_url, attendees, is_active, created_at, updated_at,
+// gallery_urls, video_url, registration_url
 export interface EventItem {
   id: string;
   title: string;
@@ -16,6 +17,9 @@ export interface EventItem {
   description: string;
   imageUrl?: string; // maps to image_url
   attendees?: string;
+  galleryUrls?: string[]; // maps to gallery_urls
+  videoUrl?: string | null; // maps to video_url
+  registrationUrl?: string | null; // maps to registration_url
 }
 
 const mapEvent = (item: any): EventItem => ({
@@ -29,6 +33,9 @@ const mapEvent = (item: any): EventItem => ({
   description: item.description ?? "",
   imageUrl: item.image_url || null,
   attendees: item.attendees ?? "0",
+  galleryUrls: item.gallery_urls ?? [],
+  videoUrl: item.video_url ?? null,
+  registrationUrl: item.registration_url ?? null,
 });
 
 // ── Public queries ─────────────────────────────────────────────────────────────

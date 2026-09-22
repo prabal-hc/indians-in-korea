@@ -121,12 +121,24 @@ const FeaturedCard = ({ event }: { event: EventItem }) => {
             </div>
             <div className="mt-1 text-white/60 text-xs">{event.location}</div>
           </div>
-          <Link
-            href="/events"
-            className="shrink-0 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-slate-900 transition-all duration-200"
-          >
-            <ArrowIcon />
-          </Link>
+          <div className="flex shrink-0 items-center gap-2">
+            {event.registrationUrl && (
+              <a
+                href={event.registrationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center rounded-full bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-orange-600"
+              >
+                Register Now
+              </a>
+            )}
+            <Link
+              href="/events"
+              className="shrink-0 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-slate-900 transition-all duration-200"
+            >
+              <ArrowIcon />
+            </Link>
+          </div>
         </div>
       </div>
     </div>

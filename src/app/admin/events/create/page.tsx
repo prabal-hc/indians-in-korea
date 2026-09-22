@@ -26,6 +26,9 @@ export default function AdminCreateEventPage() {
             description: values.description,
             imageUrl: values.imageUrl || undefined,
             attendees: values.attendees || "0",
+            galleryUrls: values.galleryUrls.filter(Boolean),
+            videoUrl: values.videoUrl || undefined,
+            registrationUrl: values.registrationUrl || undefined,
           });
           router.push("/admin/events");
         }}
