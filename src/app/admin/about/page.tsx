@@ -11,7 +11,6 @@ import {
   getAboutPageData,
   saveAbout,
   saveContacts,
-  type BoardMember,
   type ContactItem,
 } from "@/services/admin/about.service";
 
@@ -19,40 +18,35 @@ export default function AdminAboutPage() {
   const [contentValues, setContentValues] = useState<AboutFormValues | null>(
     null,
   );
-  const [boardValues, setBoardValues] = useState<BoardMember[]>([]);
   const [contactValues, setContactValues] = useState<ContactItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    getAboutPageData().then(
-      ({ content, vision, board, advisors, core, contacts, socials }) => {
-        if (content) {
-          setContentValues({
-            headline: content.headline,
-            subheadline: content.subheadline ?? "",
-            description: content.description ?? "",
-            mission: content.mission ?? "",
-            established: content.established ?? "",
-            members: content.members ?? "",
-            events: content.events ?? "",
-            ctaLabel: content.ctaLabel ?? "",
-            ctaUrl: content.ctaUrl ?? "",
-            heroImage: content.heroImage ?? "",
-            visionItems:
-              vision.length > 0
-                ? vision.map((v) => v.content)
-                : Array(8).fill(""),
-          });
-        }
-        // Merge all board types for the board tab
-        setBoardValues([...board, ...advisors, ...core]);
-        // Merge all contact types for the contacts tab
-        setContactValues([...contacts, ...socials]);
-        setLoading(false);
-      },
-    );
+    getAboutPageData().then(({ content, vision, contacts, socials }) => {
+      if (content) {
+        setContentValues({
+          headline: content.headline,
+          subheadline: content.subheadline ?? "",
+          description: content.description ?? "",
+          mission: content.mission ?? "",
+          established: content.established ?? "",
+          members: content.members ?? "",
+          events: content.events ?? "",
+          ctaLabel: content.ctaLabel ?? "",
+          ctaUrl: content.ctaUrl ?? "",
+          heroImage: content.heroImage ?? "",
+          visionItems:
+            vision.length > 0
+              ? vision.map((v) => v.content)
+              : Array(8).fill(""),
+        });
+      }
+      // Merge all contact types for the contacts tab
+      setContactValues([...contacts, ...socials]);
+      setLoading(false);
+    });
   }, []);
 
   const flash = (msg: string) => {
@@ -66,23 +60,6 @@ export default function AdminAboutPage() {
       await saveAbout(updated);
       setContentValues(updated);
       flash("Content saved successfully.");
-    } catch {
-      alert("Save failed. Please try again.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleSaveBoard = async (members: BoardMember[]) => {
-    setSaving(true);
-    try {
-      // addBoardMembers expects only newly added members; after saving, re-fetch data
-      const { addBoardMembers } =
-        await import("@/services/admin/about.service");
-      await addBoardMembers(members as any);
-      const fresh = await getAboutPageData();
-      setBoardValues([...fresh.board, ...fresh.advisors, ...fresh.core]);
-      flash("Board updated successfully.");
     } catch {
       alert("Save failed. Please try again.");
     } finally {
@@ -122,8 +99,6 @@ export default function AdminAboutPage() {
         <AboutForm
           initialContent={contentValues ?? undefined}
           onSubmitContent={handleSaveContent}
-          initialBoard={boardValues}
-          onSubmitBoard={handleSaveBoard}
           initialContacts={contactValues}
           onSubmitContacts={handleSaveContacts}
           saving={saving}

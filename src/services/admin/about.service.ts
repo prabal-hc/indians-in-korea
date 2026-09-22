@@ -175,6 +175,102 @@ export async function getAboutPageData(): Promise<AboutPageData> {
   };
 }
 
+// ─── Board members: admin list/create/edit/delete ─────────────────────────────
+// Unlike getAboutPageData() (public, active-only, split by type), these are
+// for the admin UI: unfiltered so drafts/inactive members are visible too.
+
+export async function getAllBoardMembers(): Promise<BoardMember[]> {
+  const { data, error } = await getSupabase()
+    .from("about_board")
+    .select("*")
+    .order("type")
+    .order("display_order");
+
+  if (error) {
+    console.error("Board members getAll Supabase error:", error);
+    return [];
+  }
+  return (data ?? []).map(mapBoard);
+}
+
+export async function getBoardMemberById(
+  id: string,
+): Promise<BoardMember | null> {
+  const { data, error } = await getSupabase()
+    .from("about_board")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error("Board member getById Supabase error:", error);
+    return null;
+  }
+  return mapBoard(data);
+}
+
+export async function createBoardMember(
+  data: Omit<BoardMember, "id">,
+): Promise<void> {
+  const response = await fetch("/api/admin/about/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      operation: "addBoardMembers",
+      data: [data],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to create board member");
+  }
+}
+
+export async function updateBoardMember(
+  id: string,
+  data: Partial<BoardMember>,
+): Promise<void> {
+  const response = await fetch(`/api/admin/about/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      table: "about_board",
+      data: {
+        name: data.name,
+        initials: data.initials,
+        role: data.role,
+        profession: data.profession ?? null,
+        korean_title: data.koreanTitle ?? null,
+        type: data.type,
+        image_url: data.imageUrl ?? null,
+        bio: data.bio ?? null,
+        message: data.message ?? null,
+        display_order: data.displayOrder ?? 0,
+        is_active: data.isActive ?? true,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to update board member");
+  }
+}
+
+export async function deleteBoardMember(id: string): Promise<void> {
+  const response = await fetch(`/api/admin/about/${id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ table: "about_board" }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to delete board member");
+  }
+}
+
 export async function saveAbout(values: AboutContent): Promise<void> {
   const response = await fetch("/api/admin/about/create", {
     method: "POST",
